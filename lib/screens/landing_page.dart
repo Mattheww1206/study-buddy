@@ -63,6 +63,7 @@ class _LandingPageState extends State<LandingPage> {
                 ),
                 ),
                 onPressed: () {
+                  Navigator.pushNamed(context, 'register');
                 },
               ),
                SizedBox(

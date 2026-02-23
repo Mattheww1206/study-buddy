@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/gestures.dart'; // Idinagdag ito para sa link
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _fullnameController = TextEditingController();
+  final _emailaddressController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmpasswordController = TextEditingController();
 
-  @override
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
@@ -26,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text('Login',
+                              child: Text('Register',
                               style: GoogleFonts.sourceSerif4(
                                 fontSize: 38,
                               ),
@@ -71,16 +74,52 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 40,
                             ),
-                            // Email TextField
+                            // Full Name TextField
                             Padding(
                               padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
                               child: TextFormField(
                                 style: TextStyle(
                                   fontSize: 18
                                 ),
-                                controller: _emailController,
+                                controller: _fullnameController,
                                 decoration: InputDecoration(
-                                  hintText: 'Email',
+                                  hintText: 'Enter Full Name',
+                                  hintStyle: TextStyle(
+                                    fontSize: 18,
+                                  ),
+                                  fillColor: Colors.grey[200],
+                                  filled: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none
+                                  )
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Name is required';
+                                  }
+                                  return null;
+                                }
+                              ),
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+
+                             // Email TextField
+                            Padding(
+                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
+                              child: TextFormField(
+                                style: TextStyle(
+                                  fontSize: 18
+                                ),
+                                controller: _emailaddressController,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter Email Address',
                                   hintStyle: TextStyle(
                                     fontSize: 18,
                                   ),
@@ -106,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 30,
                             ),
+
                            // Password TextField
                            Padding(
                               padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
@@ -135,6 +175,51 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value == null || value.isEmpty) {
                                     return 'Password is required';
                                   }
+
+                                  if(value.length != 8 || value.length != 16){
+                                    return 'Password must be 8 or 16 characters';
+                                  }
+                                  return null;
+                                }
+                              ),
+                            ),
+                             SizedBox(
+                              height: 30,
+                            ),
+
+                            // Confirm Password TextField
+                           Padding(
+                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
+                              child: TextFormField(
+                                style: TextStyle(
+                                  fontSize: 18
+                                ),
+                                controller: _confirmpasswordController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  hintText: 'Confirm Password',
+                                  hintStyle: TextStyle(
+                                    fontSize: 18,
+                                  ),
+                                  fillColor: Colors.grey[200],
+                                  filled: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none
+                                  )
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Confirm Password is required';
+                                  }
+
+                                  if(_passwordController != _confirmpasswordController ){
+                                    return 'Password does not match';
+                                  }
                                   return null;
                                 }
                               ),
@@ -142,14 +227,16 @@ class _LoginPageState extends State<LoginPage> {
                              SizedBox(
                               height: 50,
                             ),
+
+
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF16056B),
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.all(5),
+                                backgroundColor: Color(0xFFFD9519),
+                                foregroundColor: Colors.black,
+                                padding: EdgeInsets.all(10),
                                 minimumSize: Size(140, 12),
                               ),
-                              child: Text('Login',
+                              child: Text('Create Account',
                               style: GoogleFonts.itim(
                                fontSize: 28,
                                ),
@@ -160,28 +247,34 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 42,
                             ),
-                            Text('New to StudyBuddy?',
-                            style: GoogleFonts.itim(
-                              fontSize: 28,
-                            ),
+                            
+                            
+                            RichText(
+                              text: TextSpan(
+                                style: GoogleFonts.itim(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'Already Studying with us? '),
+                                  TextSpan(
+                                    text: 'Login',
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                         Navigator.pushNamed(context, 'login');
+                                        print('Login clicked');
+                                      },
+                                  ),
+                                ],
+                              ),
                             ),
                            
-                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFD9519),
-                                foregroundColor: Colors.black,
-                                padding: EdgeInsets.all(10),
-                                minimumSize: Size(279, 66)
-                              ),
-                              child: Text('Create Account',
-                              style: GoogleFonts.itim(
-                                fontSize: 32,
-                              ),
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(context, 'register');
-                              },
-                            ),
+                            
+                             
                           ],
                         ),
                       ),

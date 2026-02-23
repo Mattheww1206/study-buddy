@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:studybuddy/screens/login_page.dart';
+import 'package:studybuddy/screens/register_page.dart';
 import 'firebase_options.dart';
 import 'package:studybuddy/screens/opening_page.dart';
 import 'package:studybuddy/screens/landing_page.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
        'opening': (context) => const OpeningPage(),
        'landing': (context) => const LandingPage(),
        'login': (context) => const LoginPage(),
+       'register':(context) => const RegisterPage(),
       },
     );
   }
