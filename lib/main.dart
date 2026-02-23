@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
+import 'package:studybuddy/screens/login_page.dart';
 import 'firebase_options.dart';
 import 'package:studybuddy/screens/opening_page.dart';
+import 'package:studybuddy/screens/landing_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: OpeningPage(),
+      initialRoute: 'opening',
+      routes: {
+       'opening': (context) => const OpeningPage(),
+       'landing': (context) => const LandingPage(),
+       'login': (context) => const LoginPage(),
+      },
     );
   }
 }
