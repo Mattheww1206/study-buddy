@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:studybuddy/widgets/custom_textfield.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -58,7 +59,6 @@ class _LoginPageState extends State<LoginPage> {
                       key: _formKey,
                       child: SingleChildScrollView(
                         child: Column(
-                          
                           children: [
                             Align(
                               alignment: Alignment.centerLeft,
@@ -72,72 +72,38 @@ class _LoginPageState extends State<LoginPage> {
                               height: 40,
                             ),
                             // Email TextField
-                            Padding(
-                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
-                              child: TextFormField(
-                                style: TextStyle(
-                                  fontSize: 18
-                                ),
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  hintText: 'Email',
-                                  hintStyle: TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                  fillColor: Colors.grey[200],
-                                  filled: true,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 18,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none
-                                  )
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Email is required';
-                                  }
-                                  return null;
+                            CustomTextfield(
+                              controller: _emailController,
+                              hintText: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if(value == null || value.isEmpty) {
+                                  return 'Email is required';
                                 }
-                              ),
+
+                                if(!value.contains('@')) {
+                                  return 'Enter a Valid Email';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(
                               height: 30,
                             ),
                            // Password TextField
-                           Padding(
-                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 25),
-                              child: TextFormField(
-                                style: TextStyle(
-                                  fontSize: 18
-                                ),
-                                controller: _passwordController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: 'Password',
-                                  hintStyle: TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                  fillColor: Colors.grey[200],
-                                  filled: true,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 18,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none
-                                  )
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Password is required';
-                                  }
-                                  return null;
+                            CustomTextfield(
+                              controller: _passwordController,
+                              hintText: 'Password',
+                              isPassword: true,
+                              validator: (value) {
+                                if(value == null || value.isEmpty){
+                                  return 'Password is required';
                                 }
-                              ),
+                                if(value.length < 8) {
+                                  return 'Password must be at least 8 characters';
+                                }
+                                return null;
+                              },
                             ),
                              SizedBox(
                               height: 50,
@@ -165,8 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 28,
                             ),
                             ),
-                           
-                             ElevatedButton(
+                            ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFD9519),
                                 foregroundColor: Colors.black,
