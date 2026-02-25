@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset(
                   'assets/studybuddy-logo.png',
                   width: 330,
-                  height: 250,
+                  height: 220,
                   fit: BoxFit.cover,
                 ),
                 Expanded(
@@ -74,15 +74,11 @@ class _LoginPageState extends State<LoginPage> {
                             // Email TextField
                             CustomTextfield(
                               controller: _emailController,
-                              hintText: 'Email',
+                              hintText: 'Email or Username',
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if(value == null || value.isEmpty) {
-                                  return 'Email is required';
-                                }
-
-                                if(!value.contains('@')) {
-                                  return 'Enter a Valid Email';
+                                  return 'Email or Username is required';
                                 }
                                 return null;
                               },

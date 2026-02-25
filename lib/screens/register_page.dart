@@ -72,12 +72,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             SizedBox(
-                              height: 40,
+                              height: 25,
                             ),
                             // Full Name TextField
                              CustomTextfield(
                               controller: _fullnameController,
-                              hintText: 'Full Name',
+                              hintText: 'Username',
                               keyboardType: TextInputType.name,
                               validator: (value) {
                                 if(value == null || value.isEmpty){
@@ -87,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                             ),
                             SizedBox(
-                              height: 30,
+                              height: 25,
                             ),
                              // Email TextField
                              CustomTextfield(
@@ -105,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                             ),
                             SizedBox(
-                              height: 30,
+                              height: 25,
                             ),
                              // Password TextField
                              CustomTextfield(
@@ -123,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                             ),
                              SizedBox(
-                              height: 30,
+                              height: 25,
                             ),
                             // Confirm Password TextField
                             CustomTextfield(
@@ -141,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               },
                              ),
                              SizedBox(
-                              height: 50,
+                              height: 35,
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -178,7 +178,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                          Navigator.pushNamed(context, 'login');
-                                        print('Login clicked');
                                       },
                                   ),
                                 ],
