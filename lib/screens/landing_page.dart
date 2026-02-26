@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:studybuddy/widgets/custom_button.dart';
 
 
 class LandingPage extends StatefulWidget {
@@ -50,39 +51,29 @@ class _LandingPageState extends State<LandingPage> {
                 ),
                ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFD9519),
-                  foregroundColor: Colors.black,
-                  padding: EdgeInsets.all(10),
-                  minimumSize: Size(279, 66)
-                ),
-                child: Text('Create Account',
-                style: GoogleFonts.itim(
-                  fontSize: 32,
-                ),
-                ),
-                onPressed: () {
+              CustomButton(
+                text: 'Create Account',
+                backgroundColor: const Color(0xFFFD9519),
+                textColor: Colors.black,
+                fontSize: 32,
+                height: 66,
+                width: 279,
+                onTap: () {
                   Navigator.pushNamed(context, 'register');
                 },
               ),
                SizedBox(
-                height: 20,
+                height: 25,
               ),
-               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFB4D7FE),
-                  foregroundColor: Colors.black,
-                  padding: EdgeInsets.all(10),
-                  minimumSize: Size(279, 66),
-                ),
-                child: Text('Login',
-                style: GoogleFonts.itim(
-                  fontSize: 32,
-                ),
-                ),
-                onPressed: () {
-                    Navigator.pushNamed(context, 'login');
+              CustomButton(
+                text: 'Login',
+                backgroundColor: const Color(0xFFB4D7FE),
+                textColor: Colors.black,
+                fontSize: 32,
+                height: 66,
+                width: 279,
+                onTap: () {
+                  Navigator.pushNamed(context, 'login');
                 },
               ),
             ],

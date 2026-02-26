@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:studybuddy/widgets/custom_button.dart';
 import 'package:studybuddy/widgets/custom_textfield.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             SizedBox(
-                              height: 40,
+                              height: 25,
                             ),
                             // Email TextField
                             CustomTextfield(
@@ -104,21 +105,14 @@ class _LoginPageState extends State<LoginPage> {
                              SizedBox(
                               height: 50,
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF16056B),
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.all(5),
-                                minimumSize: Size(140, 12),
-                              ),
-                              child: Text('Login',
-                              style: GoogleFonts.itim(
-                               fontSize: 28,
-                               ),
-                              ),
-                              onPressed: () {
-                              },
-                            ),
+                             CustomButton(
+                              text: 'Login',
+                              backgroundColor: Color(0xFF16056B),
+                              textColor: Colors.white,
+                              fontSize: 23,
+                              width: 140,
+                              height: 50,
+                             ),
                             SizedBox(
                               height: 42,
                             ),
@@ -127,19 +121,14 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 28,
                             ),
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFD9519),
-                                foregroundColor: Colors.black,
-                                padding: EdgeInsets.all(10),
-                                minimumSize: Size(279, 66)
-                              ),
-                              child: Text('Create Account',
-                              style: GoogleFonts.itim(
-                                fontSize: 32,
-                              ),
-                              ),
-                              onPressed: () {
+                            CustomButton(
+                              text: 'Create Account',
+                              backgroundColor: const Color(0xFFFD9519),
+                              textColor: Colors.black,
+                              fontSize: 28,
+                              height: 55,
+                              width: 260,
+                              onTap: () {
                                 Navigator.pushNamed(context, 'register');
                               },
                             ),

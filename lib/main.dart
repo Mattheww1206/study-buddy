@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:studybuddy/screens/login_page.dart';
 import 'package:studybuddy/screens/register_page.dart';
-import 'firebase_options.dart';
+import 'package:studybuddy/services/firebase_service.dart';
 import 'package:studybuddy/screens/opening_page.dart';
 import 'package:studybuddy/screens/landing_page.dart';
 
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+   WidgetsFlutterBinding.ensureInitialized();
+   await FirebaseService.initializeFirebase();
   runApp(const MyApp());
 }
 

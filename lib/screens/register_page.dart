@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart'; // Idinagdag ito para sa link
+import 'package:studybuddy/widgets/custom_button.dart';
 import 'package:studybuddy/widgets/custom_textfield.dart'; 
 
 class RegisterPage extends StatefulWidget {
@@ -143,23 +144,16 @@ class _RegisterPageState extends State<RegisterPage> {
                              SizedBox(
                               height: 35,
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFFFD9519),
-                                foregroundColor: Colors.black,
-                                padding: EdgeInsets.all(10),
-                                minimumSize: Size(140, 12),
-                              ),
-                              child: Text('Create Account',
-                              style: GoogleFonts.itim(
-                               fontSize: 28,
-                               ),
-                              ),
-                              onPressed: () {
-                              },
+                            CustomButton(
+                              text: 'Create Account',
+                              backgroundColor: const Color(0xFFFD9519),
+                              textColor: Colors.black,
+                              fontSize: 30,
+                              height: 57,
+                              width: 255,
                             ),
                             SizedBox(
-                              height: 42,
+                              height: 30,
                             ),
                             RichText(
                               text: TextSpan(

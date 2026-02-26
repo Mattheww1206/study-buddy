@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:studybuddy/screens/landing_page.dart';
 
 class OpeningPage extends StatefulWidget {
   const OpeningPage({Key? key}) : super(key: key);
