@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +16,47 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future signIn() async {
+     if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+    
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = "Unexpected error has occured";
+      });
+    } finally {
+      if(mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -105,17 +147,26 @@ class _LoginPageState extends State<LoginPage> {
                              SizedBox(
                               height: 50,
                             ),
-                             CustomButton(
-                              text: 'Login',
-                              backgroundColor: Color(0xFF16056B),
-                              textColor: Colors.white,
-                              fontSize: 23,
-                              width: 140,
-                              height: 50,
-                              onTap: () {
-                                Navigator.pushNamed(context, 'home');
-                              },
+                            if (_errorMessage != null)
+                            Text(
+                              _errorMessage!,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                             SizedBox(
+                              height: 20,
                              ),
+                             _isLoading ? CircularProgressIndicator()
+                             : CustomButton(
+                                text: 'Login',
+                                backgroundColor: Color(0xFF16056B),
+                                textColor: Colors.white,
+                                fontSize: 23,
+                                width: 140,
+                                height: 50,
+                                onTap: () async {
+                                  await signIn();
+                                },
+                              ),
                             SizedBox(
                               height: 42,
                             ),

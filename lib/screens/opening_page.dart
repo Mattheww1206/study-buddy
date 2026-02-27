@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OpeningPage extends StatefulWidget {
-  const OpeningPage({Key? key}) : super(key: key);
+  const OpeningPage({super.key});
 
   @override
   State<OpeningPage> createState() => _OpeningPageState();

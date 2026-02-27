@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-class CreatePage extends StatefulWidget {
-  const CreatePage({super.key});
+class HomeContentPage extends StatefulWidget {
+  const HomeContentPage({super.key});
 
   @override
-  State<CreatePage> createState() => _CreatePageState();
+  State<HomeContentPage> createState() => _HomeContentPageState();
 }
 
-class _CreatePageState extends State<CreatePage> {
+class _HomeContentPageState extends State<HomeContentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Container(
-          color: const Color.fromARGB(255, 243, 233, 33),
-          child: Text('this is create page',
+          color: Colors.blue,
+          child: Text('this is home page',
           style: TextStyle(
             fontSize: 25
           ),
