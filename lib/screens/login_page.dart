@@ -112,6 +112,9 @@ class _LoginPageState extends State<LoginPage> {
                               fontSize: 23,
                               width: 140,
                               height: 50,
+                              onTap: () {
+                                Navigator.pushNamed(context, 'home');
+                              },
                              ),
                             SizedBox(
                               height: 42,
