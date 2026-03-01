@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:studybuddy/screens/login_page.dart';
-import 'package:studybuddy/widgets/custom_button.dart';
+import 'package:studybuddy/shared/widgets/custom_button.dart';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
         width: 140,
         height: 50,
         onTap: () {
-          Navigator.pushNamed(context, 'login');
+          FirebaseAuth.instance.signOut();
         },
         ),
      );

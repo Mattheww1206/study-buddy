@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:studybuddy/widgets/custom_button.dart';
+import 'package:studybuddy/shared/widgets/custom_button.dart';
 
 
 class LandingPage extends StatefulWidget {

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:studybuddy/screens/HomeContent_page.dart';
-import 'package:studybuddy/screens/create_page.dart';
-import 'package:studybuddy/screens/profile_page.dart';
-import 'package:studybuddy/screens/study_page.dart';
+import 'package:studybuddy/features/deck/presentation/create_page.dart';
+import 'package:studybuddy/features/home/presentation/HomeContent_page.dart';
+import 'package:studybuddy/features/profile/presentation/profile_page.dart';
+import 'package:studybuddy/features/quiz/presentation/study_page.dart';
+
+
+
+
 
 class NavButton extends StatefulWidget {
   const NavButton({super.key});

@@ -1,9 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
+  import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:studybuddy/widgets/custom_button.dart';
-import 'package:studybuddy/widgets/custom_textfield.dart';
+import 'package:studybuddy/features/auth/service/auth_service.dart';
+import 'package:studybuddy/shared/widgets/custom_button.dart';
+import 'package:studybuddy/shared/widgets/custom_textfield.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,42 +16,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
+  String? _authError;
   bool _isLoading = false;
-  String? _errorMessage;
 
-  Future signIn() async {
-     if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
-    
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = "Unexpected error has occured";
-      });
-    } finally {
-      if(mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
 
   @override
   void dispose() {
@@ -70,6 +42,44 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+
+  Future<void> signIn() async {
+  if (!_formKey.currentState!.validate()) return;
+
+  setState(() {
+    _isLoading = true;
+    _authError = null;
+  });
+
+  try {
+    final loggedInUser = await _authService.signInWithEmailOrUsername(
+      emailOrUsername: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+    await FirebaseAuth.instance.currentUser?.reload();  
+    if (loggedInUser != null) {
+     // automatic na ma detect ni auth wrapper yung login 
+     // and ma d-direct na sa Nav
+      if (mounted) {
+        Navigator.of(context).pop(); // <-- this pops the LoginPage
+      }
+
+      // authStateChanges() should trigger and AuthWrapper navigates
+      print('Login successful, user: ${FirebaseAuth.instance.currentUser?.email}');
+    }
+  } catch (e) {
+    setState(() {
+      _authError = e.toString();
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,22 +157,14 @@ class _LoginPageState extends State<LoginPage> {
                              SizedBox(
                               height: 50,
                             ),
-                            if (_errorMessage != null)
-                            Text(
-                              _errorMessage!,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                             SizedBox(
-                              height: 20,
-                             ),
-                             _isLoading ? CircularProgressIndicator()
-                             : CustomButton(
+                              CustomButton(
                                 text: 'Login',
                                 backgroundColor: Color(0xFF16056B),
                                 textColor: Colors.white,
                                 fontSize: 23,
                                 width: 140,
                                 height: 50,
+                                isLoading: _isLoading,
                                 onTap: () async {
                                   await signIn();
                                 },
