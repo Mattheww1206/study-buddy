@@ -2,10 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:studybuddy/features/profile/presentation/settings_page.dart';
-import 'package:studybuddy/shared/widgets/custom_button.dart';
 
 class AccountInformationPage extends StatefulWidget {
   const AccountInformationPage({super.key});

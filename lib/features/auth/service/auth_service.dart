@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:studybuddy/features/profile/model/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(); 
 
   // sign up
   Future<appUser?> signUp({
@@ -188,5 +190,62 @@ class AuthService {
     }
    }
 
+
+     Future<appUser?> signInWithGoogle() async {
+    try {
+      // oopen yung google account
+      final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
+
+      // pag nag cancel si user
+      if (gUser == null) return null;
+
+      final GoogleSignInAuthentication gAuth =
+          await gUser.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      final User? firebaseUser = userCredential.user;
+      if (firebaseUser == null) throw Exception('Google sign-in failed.');
+
+      // checks kung existing na si user
+      final doc = await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+
+      if (!doc.exists) {
+        // new user is masisave na sa firebase
+        final newUser = appUser(
+          userId: firebaseUser.uid,
+          username: firebaseUser.displayName ?? 'user_${firebaseUser.uid.substring(0, 5)}',
+          emailAdd: firebaseUser.email ?? '',
+        );
+        await _firestore
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .set(newUser.toMap());
+        return newUser;
+      }
+
+      // pag existing user na nirereturn nalang yung data nila
+      final data = doc.data() as Map<String, dynamic>;
+      return appUser(
+        userId: firebaseUser.uid,
+        username: data['username'],
+        emailAdd: data['email'],
+      );
+
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_handleLoginAuthError(e));
+    } catch (e) {
+      throw Exception('Google sign-in failed: ${e.toString()}');
+    }
+  }
 
 }

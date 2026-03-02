@@ -72,7 +72,34 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-  Future<void> _showForgotPasswordDialog() async {
+  Future<void> signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _authError = null;
+    });
+
+    try {
+      final gUser = await _authService.signInWithGoogle();
+
+      if(gUser == null) return;
+
+      if(!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      setState(() {
+        _authError = e.toString().replaceFirst('Exception: ', '');
+      });
+
+    } finally {
+      if(mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      }
+    }
+  }
+
+  Future<void> showForgotPasswordDialog() async {
     final emailController = TextEditingController();
     String? errorMessage;
 
@@ -233,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      _showForgotPasswordDialog();
+                                      showForgotPasswordDialog();
                                     },
                                     child: Text('Forgot Password?',
                                     style: GoogleFonts.itim(
@@ -304,8 +331,10 @@ class _LoginPageState extends State<LoginPage> {
                                 icon: Image.asset(
                                   'assets/google-icon.png',
                                   height: 35,
-                                  
                                 ),
+                                onTap: () {
+                                  signInWithGoogle();
+                                },
                               ),
                              
                             SizedBox(
