@@ -102,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       Text(
                         'Matthew',
-                        style: GoogleFonts.yesevaOne( 
+                        style: GoogleFonts.lora( 
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontSize: 28,
@@ -164,14 +164,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           '6', 
-                          style: GoogleFonts.yesevaOne(
+                          style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold, 
                             fontSize: 25,  
                             color: const Color(0xFF16056B))),
                         Text(
                           'Decks\nCreated', 
                           textAlign: TextAlign.center, 
-                          style: GoogleFonts.yesevaOne(
+                          style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold,
                             fontSize: 15, 
                             color: const Color(0xFF16056B))),
@@ -185,14 +185,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           '2', 
-                          style: GoogleFonts.yesevaOne(
+                          style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold,
                             fontSize: 25, 
                             color: const Color(0xFF16056B))),
                         Text(
                           'Quiz\nCreated', 
                           textAlign: TextAlign.center, 
-                          style: GoogleFonts.yesevaOne(
+                          style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold,
                             fontSize: 15, 
                             color: const Color(0xFF16056B))),
@@ -206,14 +206,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           '4', 
-                          style: GoogleFonts.yesevaOne(
+                          style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold,
                             fontSize: 25,
                              color: const Color(0xFF16056B))),
                         Text(
                           'Decks\nMastered', 
                           textAlign: TextAlign.center, 
-                          style: GoogleFonts.yesevaOne( 
+                          style: GoogleFonts.lora( 
                             fontWeight: FontWeight.bold,
                             fontSize: 15, 
                             color: const Color(0xFF16056B))),
@@ -238,7 +238,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       'Daily Study (4 / 6)',
-                      style: GoogleFonts.yesevaOne( 
+                      style: GoogleFonts.lora( 
                         fontWeight: FontWeight.bold,
                         fontSize: 20, 
                          color: const Color(0xFF16056B)),
@@ -285,7 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(width: 10),
                         Text(
                           '57%', 
-                          style: GoogleFonts.yesevaOne( 
+                          style: GoogleFonts.lora( 
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                             color: const Color(0xFF16056B))),
@@ -299,7 +299,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     Text(
                       'Weekly Study (10 / 15)',
-                      style: GoogleFonts.yesevaOne(
+                      style: GoogleFonts.lora(
                         fontWeight: FontWeight.bold,
                         fontSize: 20, 
                     
@@ -347,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(width: 10),
                         Text(
                           '70%', 
-                          style: GoogleFonts.yesevaOne( 
+                          style: GoogleFonts.lora( 
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
                             color: const Color(0xFF16056B))),
