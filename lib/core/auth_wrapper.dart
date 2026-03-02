@@ -14,14 +14,14 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const OpeningPage();
+          return OpeningPage();
         }
-
         if (snapshot.hasData) {
-          return const NavButton();
+          print("User is logged in, navigating to NavButton");
+          return NavButton();
         }
 
-        return const LandingPage();
+        return LandingPage();
       },
     );
   }

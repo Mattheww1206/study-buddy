@@ -30,8 +30,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AuthWrapper(),
+      initialRoute: '/',
       routes: {
+        '/': (context) => const AuthWrapper(),
        'landing': (context) => const LandingPage(),
        'login': (context) => const LoginPage(),
        'register':(context) => const RegisterPage(),

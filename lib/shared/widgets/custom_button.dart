@@ -12,6 +12,9 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final double borderRadius;
   final bool isLoading;
+  final Widget? icon;
+  final Color? borderColor;
+  final double borderWidth;
 
   const CustomButton({
     super.key,
@@ -25,6 +28,9 @@ class CustomButton extends StatelessWidget {
     this.fontSize = 18,
     this.borderRadius = 1000,
     this.isLoading = false,
+    this.icon,
+    this.borderColor,
+    this.borderWidth = 1
   });
 
   @override
@@ -32,7 +38,6 @@ class CustomButton extends StatelessWidget {
     final Color currentColor = isLoading
         ? Colors.grey
         : backgroundColor;
-
     return Padding(
       padding: padding,
       child: GestureDetector(
@@ -40,10 +45,15 @@ class CustomButton extends StatelessWidget {
         child: Container(
           width: width,
           height: height,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             color: currentColor,
             borderRadius: BorderRadius.circular(borderRadius),
+            border: borderColor != null ? Border.all(
+              color: borderColor!,
+              width: borderWidth,
+            )
+            : null
           ),
           child: Center(
             child: isLoading
@@ -55,13 +65,23 @@ class CustomButton extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : Text(
-                    text,
-                    style: GoogleFonts.itim(
-                      color: textColor,
-                      fontSize: fontSize,
-                    ),
-                  ),
+                : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[
+                      icon!,
+                      SizedBox(width: 1)
+                    ],
+                    Text(
+                        text,
+                        style: GoogleFonts.itim(
+                          color: textColor,
+                          fontSize: fontSize,
+                        ),
+                      ),
+                  ],
+                ),
           ),
         ),
       ),

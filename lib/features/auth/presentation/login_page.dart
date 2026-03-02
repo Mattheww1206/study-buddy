@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,17 +56,100 @@ class _LoginPageState extends State<LoginPage> {
         emailOrUsername: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      if(!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     
   } catch (e) {
     setState(() {
       _authError = e.toString();
     });
   } finally {
+    if(mounted){
     setState(() {
       _isLoading = false;
     });
+    }
   }
 }
+
+  Future<void> _showForgotPasswordDialog() async {
+    final emailController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context, 
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Reset Password',
+          style: GoogleFonts.itim()),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Enter your email and we will send you the reset link.',
+              style: GoogleFonts.itim(
+                fontSize: 15
+              ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              if(errorMessage != null)...[
+                SizedBox(height: 8),
+                Text(errorMessage!, 
+                style: GoogleFonts.itim(
+                color: Colors.red,
+                 fontSize: 13,
+                ), 
+                )
+              ]
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed:() => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+            onPressed: () async {
+              if(emailController.text.trim().isEmpty){
+                setDialogState(() => errorMessage = 'Email is required',);
+                return;
+              }
+
+              final nav = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+
+              try {
+                await _authService.resetPassword(email: emailController.text.trim());
+                nav.pop();
+                messenger.showSnackBar(
+                  SnackBar(content: Text('Password reset email has been sent! Please check your email.'))
+                );
+              } catch (e) {
+                setDialogState(() {
+                  errorMessage = e.toString().replaceFirst('Exception: ', '');
+                });
+              }
+            },
+            child: Text('Send', 
+            style: GoogleFonts.itim(
+              color: Colors.blueAccent,
+            ),
+            ),
+            )
+          ],
+          ),
+        )
+        );
+  }
 
 
   @override
@@ -84,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset(
                   'assets/studybuddy-logo.png',
                   width: 330,
-                  height: 220,
+                  height: 210,
                   fit: BoxFit.cover,
                 ),
                 Expanded(
@@ -112,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             SizedBox(
-                              height: 25,
+                              height: 20,
                             ),
                             // Email TextField
                             CustomTextfield(
@@ -127,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             ),
                             SizedBox(
-                              height: 30,
+                              height: 20,
                             ),
                            // Password TextField
                             CustomTextfield(
@@ -144,8 +226,28 @@ class _LoginPageState extends State<LoginPage> {
                                 return null;
                               },
                             ),
-                             SizedBox(
-                              height: 50,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      _showForgotPasswordDialog();
+                                    },
+                                    child: Text('Forgot Password?',
+                                    style: GoogleFonts.itim(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                            height: 30,
                             ),
                               CustomButton(
                                 text: 'Login',
@@ -159,21 +261,68 @@ class _LoginPageState extends State<LoginPage> {
                                   await signIn();
                                 },
                               ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 25),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Divider(
+                                        thickness: 0.5,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      child: Text('Or Sign In with',
+                                      style: GoogleFonts.itim()
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Divider(
+                                        thickness: 0.5,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              CustomButton(
+                                text: 'Sign in With Google',
+                                height: 55,
+                                width: 250,
+                                backgroundColor: Colors.white,
+                                textColor: Colors.black,
+                                borderColor: Colors.black,
+                                borderWidth: 1,
+                                fontSize: 18,
+                                icon: Image.asset(
+                                  'assets/google-icon.png',
+                                  height: 35,
+                                  
+                                ),
+                              ),
+                             
                             SizedBox(
-                              height: 42,
+                              height: 30,
                             ),
                             Text('New to StudyBuddy?',
                             style: GoogleFonts.itim(
-                              fontSize: 28,
+                              fontSize: 22,
                             ),
                             ),
                             CustomButton(
                               text: 'Create Account',
                               backgroundColor: const Color(0xFFFD9519),
                               textColor: Colors.black,
-                              fontSize: 28,
+                              fontSize: 27,
                               height: 55,
-                              width: 260,
+                              width: 250,
                               onTap: () {
                                 Navigator.pushNamed(context, 'register');
                               },

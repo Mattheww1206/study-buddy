@@ -150,7 +150,6 @@ class AuthService {
     await _auth.signOut();
   }
 
-
   // error messages
   String _handleLoginAuthError(FirebaseAuthException e) {
     switch (e.code) {
@@ -166,4 +165,28 @@ class AuthService {
         return 'Something went wrong. Please try again.';
     }
   }
+   // forgot password
+   Future<void> resetPassword({
+    required String email
+   }) async {
+    try {
+      await _auth.sendPasswordResetEmail(email : email);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_handleResetPasswordError(e));
+    }
+   }
+   
+   String _handleResetPasswordError(FirebaseAuthException e ){
+    switch(e.code){
+      case 'user-not-found':
+        return 'No account has been found with this email.';
+      case 'invalid-email':
+        return 'Invalid email format';
+      default:
+        return 'Something went wrong. Please try again';  
+
+    }
+   }
+
+
 }

@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:studybuddy/features/profile/presentation/settings_page.dart';
-import 'package:studybuddy/shared/widgets/custom_button.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -13,7 +10,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // --- DESIGNED VALIDATION DIALOG ---
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -218,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       padding: EdgeInsets.zero,
                       foregroundColor: Colors.black,
                     ),
-                    onPressed: () {
+                    onPressed: ()async {
                       _showLogoutDialog(context); 
                     },
                     child: Row(
@@ -240,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ],
-                    ),
+                    )
                   ),
                 ],
               ),
