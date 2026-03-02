@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:studybuddy/features/profile/presentation/settings_page.dart';
+import 'package:studybuddy/shared/widgets/custom_button.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -67,7 +70,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     color: Colors.white,
                                     size: 50,
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context,'settings');
+                                  },
                                 ),
                               ),
                             ],
