@@ -1,4 +1,4 @@
-  import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,21 +53,11 @@ class _LoginPageState extends State<LoginPage> {
   });
 
   try {
-    final loggedInUser = await _authService.signInWithEmailOrUsername(
-      emailOrUsername: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
-    await FirebaseAuth.instance.currentUser?.reload();  
-    if (loggedInUser != null) {
-     // automatic na ma detect ni auth wrapper yung login 
-     // and ma d-direct na sa Nav
-      if (mounted) {
-        Navigator.of(context).pop(); // <-- this pops the LoginPage
-      }
-
-      // authStateChanges() should trigger and AuthWrapper navigates
-      print('Login successful, user: ${FirebaseAuth.instance.currentUser?.email}');
-    }
+      await _authService.signInWithEmailOrUsername(
+        emailOrUsername: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    
   } catch (e) {
     setState(() {
       _authError = e.toString();

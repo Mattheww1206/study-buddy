@@ -10,25 +10,17 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.userChanges(),
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const OpeningPage();
         }
 
-        final user = snapshot.data;
-
-        // User is logged in AND email is verified
-        if (user != null && user.emailVerified) {
+        if (snapshot.hasData) {
           return const NavButton();
         }
 
-        // User is logged in but email is NOT verified
-        if (user != null && !user.emailVerified) {
-          return const LandingPage(); // Or show a page asking to verify email
-        }
-
-        // No user is logged in
         return const LandingPage();
       },
     );

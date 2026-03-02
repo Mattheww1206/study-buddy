@@ -7,7 +7,7 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // sign up
-  Future<user?> signUp({
+  Future<appUser?> signUp({
     required String email,
     required String password,
     required String username,
@@ -32,7 +32,7 @@ class AuthService {
         password: password,
       );
 
-      final newUser = user(
+      final newUser = appUser(
         userId: userCredential.user!.uid,
         username: username,
         emailAdd: email
@@ -71,30 +71,34 @@ class AuthService {
   }
 
 
-  Future<user?> signIn({
+  Future<appUser?> signIn({
     required String email,
     required String password,
   }) async {
     try {
   
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      final firebaseUser = userCredential.user!;
+      User? firebaseUser = credential.user;
+
+      if(firebaseUser == null){
+        throw Exception('User not found after login.');
+      } 
 
       await firebaseUser.reload();
+      firebaseUser = _auth.currentUser;
 
-      if(!firebaseUser.emailVerified){
+      if(!firebaseUser!.emailVerified){
         await _auth.signOut();
         throw Exception('Please verify your email before logging in.');
       }
 
-
       DocumentSnapshot doc = await _firestore
           .collection('users')
-          .doc(userCredential.user!.uid)
+          .doc(firebaseUser.uid)
           .get();
 
       if (!doc.exists) {
@@ -103,8 +107,8 @@ class AuthService {
 
       final data = doc.data() as Map<String, dynamic>;
 
-      return user(
-        userId: userCredential.user!.uid,  
+      return appUser(
+        userId: credential.user!.uid,  
         username: data['username'],
         emailAdd: data['email'],          
       );
@@ -113,7 +117,7 @@ class AuthService {
     }
   }
 
-  Future<user?> signInWithEmailOrUsername({
+  Future<appUser?> signInWithEmailOrUsername({
     required String emailOrUsername,
     required String password,
   }) async {
