@@ -6,6 +6,7 @@ import 'package:studybuddy/features/auth/presentation/nav_button.dart';
 import 'package:studybuddy/features/auth/presentation/register_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/profile/presentation/profile_page.dart';
+import 'package:studybuddy/features/profile/presentation/settings_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
        'create':(context) => const CreatePage(),
        'study':(context) => const StudyPage(),
        'profile':(context) => const ProfilePage(),
+       'settings':(context) => const SettingsPage(),
       },
     );
   }
