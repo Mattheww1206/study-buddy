@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
 import 'package:studybuddy/shared/widgets/custom_button.dart';
 import 'package:studybuddy/shared/widgets/custom_textfield.dart';
@@ -18,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String? _authError;
   bool _isLoading = false;
 
 
@@ -48,46 +49,50 @@ class _LoginPageState extends State<LoginPage> {
 
   setState(() {
     _isLoading = true;
-    _authError = null;
   });
 
   try {
-      await _authService.signInWithEmailOrUsername(
-        emailOrUsername: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      if(!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    final user = await _authService.signInWithEmailOrUsername(
+     emailOrUsername: _emailController.text.trim(),
+     password: _passwordController.text.trim(),
+    );
+
+    if(!mounted) return;
+
+    if(user != null){
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
+    }
+
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     
-  } catch (e) {
-    setState(() {
-      _authError = e.toString();
-    });
-  } finally {
-    if(mounted){
-    setState(() {
-      _isLoading = false;
-    });
+    } catch (e) {
+      setState(() {
+      });
+    } finally {
+      if(mounted){
+      setState(() {
+        _isLoading = false;
+      });
+      }
     }
   }
-}
 
   Future<void> signInWithGoogle() async {
     setState(() {
       _isLoading = true;
-      _authError = null;
     });
 
     try {
       final gUser = await _authService.signInWithGoogle();
 
-      if(gUser == null) return;
-
       if(!mounted) return;
+
+      if(gUser != null){
+        Provider.of<UserProvider>(context, listen: false).setUser(gUser);
+      }
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       setState(() {
-        _authError = e.toString().replaceFirst('Exception: ', '');
       });
 
     } finally {

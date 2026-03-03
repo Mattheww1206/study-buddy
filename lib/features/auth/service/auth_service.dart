@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:studybuddy/features/profile/model/user_model.dart';
+import 'package:studybuddy/features/auth/model/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -149,6 +149,20 @@ class AuthService {
 
   // sign out
   Future<void> signOut() async {
+    final User? loggedUser = _auth.currentUser;
+
+    if(loggedUser != null){
+      final gUser = loggedUser.providerData.any((provider) => provider.providerId == 'google.com');
+
+      if(gUser) {
+        try {
+          await _googleSignIn.signOut();
+          await _googleSignIn.disconnect();
+        } catch (_) {
+         
+        }
+      }
+    }
     await _auth.signOut();
   }
 

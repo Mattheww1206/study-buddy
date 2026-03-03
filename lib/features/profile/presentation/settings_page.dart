@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'package:studybuddy/features/auth/service/auth_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,7 +13,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
 
+  final AuthService _authService = AuthService();
+
   void _showLogoutDialog(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -79,7 +84,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: ElevatedButton(
                         onPressed: () async {
                           final nav = Navigator.of(context);
-                          await FirebaseAuth.instance.signOut();
+                          userProvider.clearUser();
+                          await _authService.signOut(); 
                           nav.pushNamedAndRemoveUntil('/', (route) => false);
                         },
                         style: ElevatedButton.styleFrom(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -13,6 +14,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final loggedUser = Provider.of<UserProvider>(context).user; 
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -99,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 10),
 
                       Text(
-                        'Matthew',
+                        loggedUser?.username ?? 'Foxy',
                         style: GoogleFonts.lora( 
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

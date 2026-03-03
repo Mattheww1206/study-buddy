@@ -1,12 +1,12 @@
 class appUser {
     final String userId;
-    final String username;
+    final String? username;
     final String emailAdd;
    
 
     appUser({
         required this.userId,
-        required this.username,
+        this.username,
         required this.emailAdd,
     });
 

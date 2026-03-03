@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/core/auth_wrapper.dart';
 import 'package:studybuddy/features/auth/presentation/landing_page.dart';
 import 'package:studybuddy/features/auth/presentation/login_page.dart';
 import 'package:studybuddy/features/auth/presentation/nav_button.dart';
 import 'package:studybuddy/features/auth/presentation/register_page.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
@@ -18,9 +20,12 @@ import 'package:studybuddy/services/firebase_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     await FirebaseService.initializeFirebase();
-
-  
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => UserProvider(),
+      child: MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {

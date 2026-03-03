@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
-import 'package:studybuddy/features/profile/model/user_model.dart';
+import 'package:studybuddy/features/auth/model/user_model.dart';
 import 'package:studybuddy/shared/widgets/custom_button.dart';
 import 'package:studybuddy/shared/widgets/custom_textfield.dart'; // Idinagdag ito para sa link
 
