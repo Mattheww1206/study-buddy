@@ -11,13 +11,36 @@ class _CreatePageState extends State<CreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          color: const Color.fromARGB(255, 243, 233, 33),
-          child: Text('this is create page',
-          style: TextStyle(
-            fontSize: 25
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0D0068),
+        elevation: 0,
+        centerTitle: true,
+        title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95, 
+          fit: BoxFit.contain,
+        ),
+      ),
+      
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromRGBO(148, 185, 255, 1), 
+              Color.fromRGBO(205, 255, 216, 1),
+            ],
           ),
+        ),
+        child: const Center(
+          child: Text(
+            'this is create page',
+            style: TextStyle(
+              fontSize: 25,
+            ),
           ),
         ),
       ),
