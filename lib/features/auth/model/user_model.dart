@@ -1,27 +1,32 @@
-class appUser {
+class AppUser {
     final String userId;
     final String? username;
     final String emailAdd;
+    final String provider;
    
 
-    appUser({
+    AppUser({
         required this.userId,
         this.username,
         required this.emailAdd,
+        this.provider = 'password',
     });
 
-  factory appUser.fromMap(String id, Map<String, dynamic> data) {
-    return appUser(
+  factory AppUser.fromMap(String id, Map<String, dynamic> data) {
+    return AppUser(
       userId: id,
-      username: data['username'] ?? '',
-      emailAdd: data['emailAdd'] ?? ''
+      username: data['username'],
+      emailAdd: data['email'] ?? '',
+      provider: data['provider'] ?? 'password',
        );
   }
 
    Map<String, dynamic> toMap() {
     return {
+      'userId' : userId,
       'username': username,
       'email': emailAdd,
+      'provider': provider,
     };
   }
 }

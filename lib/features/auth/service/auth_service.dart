@@ -9,7 +9,7 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(); 
 
   // sign up
-  Future<appUser?> signUp({
+  Future<AppUser?> signUp({
     required String email,
     required String password,
     required String username,
@@ -34,7 +34,7 @@ class AuthService {
         password: password,
       );
 
-      final newUser = appUser(
+      final newUser = AppUser(
         userId: userCredential.user!.uid,
         username: username,
         emailAdd: email
@@ -73,7 +73,7 @@ class AuthService {
   }
 
 
-  Future<appUser?> signIn({
+  Future<AppUser?> signIn({
     required String email,
     required String password,
   }) async {
@@ -109,7 +109,7 @@ class AuthService {
 
       final data = doc.data() as Map<String, dynamic>;
 
-      return appUser(
+      return AppUser(
         userId: credential.user!.uid,  
         username: data['username'],
         emailAdd: data['email'],          
@@ -119,7 +119,7 @@ class AuthService {
     }
   }
 
-  Future<appUser?> signInWithEmailOrUsername({
+  Future<AppUser?> signInWithEmailOrUsername({
     required String emailOrUsername,
     required String password,
   }) async {
@@ -205,7 +205,7 @@ class AuthService {
    }
 
 
-     Future<appUser?> signInWithGoogle() async {
+     Future<AppUser?> signInWithGoogle() async {
     try {
       // oopen yung google account
       final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
@@ -221,6 +221,21 @@ class AuthService {
         idToken: gAuth.idToken,
       );
 
+       // checks kung yung google account na ginamit via google sign in is naka registered naba sa pag create ng account through Email/Password
+      final emailCheck = await _firestore.collection('users')
+                         .where('email', isEqualTo: gUser.email)
+                         .limit(1)
+                         .get();
+
+      if (emailCheck.docs.isNotEmpty){
+        final existingData = emailCheck.docs.first.data();
+        final existingProvider = existingData['provider'] ?? 'password';
+
+        if(existingProvider == 'password'){
+          throw Exception('This email is already registered with a password. Please login with your Email and Password instead.');
+        }
+      }
+      
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
@@ -235,10 +250,11 @@ class AuthService {
 
       if (!doc.exists) {
         // new user is masisave na sa firebase
-        final newUser = appUser(
+        final newUser = AppUser(
           userId: firebaseUser.uid,
           username: firebaseUser.displayName ?? 'user_${firebaseUser.uid.substring(0, 5)}',
           emailAdd: firebaseUser.email ?? '',
+          provider: 'google',
         );
         await _firestore
             .collection('users')
@@ -249,7 +265,7 @@ class AuthService {
 
       // pag existing user na nirereturn nalang yung data nila
       final data = doc.data() as Map<String, dynamic>;
-      return appUser(
+      return AppUser(
         userId: firebaseUser.uid,
         username: data['username'],
         emailAdd: data['email'],

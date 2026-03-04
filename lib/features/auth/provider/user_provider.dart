@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:studybuddy/features/auth/model/user_model.dart';
 
 class UserProvider extends ChangeNotifier {
-  appUser? _user;
+  AppUser? _user;
 
-  appUser? get user => _user;
+  AppUser? get user => _user;
 
-  void setUser(appUser user) {
+  void setUser(AppUser user) {
     _user = user;
     notifyListeners();
   }

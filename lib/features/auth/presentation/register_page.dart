@@ -42,7 +42,7 @@ import 'package:studybuddy/shared/widgets/custom_textfield.dart'; // Idinagdag i
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      appUser? newUser = await _authService.signUp(
+      AppUser? newUser = await _authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         username: _usernameController.text.trim(),
