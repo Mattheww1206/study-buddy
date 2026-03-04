@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/widgets/custom_button.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -21,27 +22,39 @@ class _CreatePageState extends State<CreatePage> {
           fit: BoxFit.contain,
         ),
       ),
-      
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.fromRGBO(148, 185, 255, 1), 
-              Color.fromRGBO(205, 255, 216, 1),
-            ],
-          ),
-        ),
-        child: const Center(
-          child: Text(
-            'this is create page',
-            style: TextStyle(
-              fontSize: 25,
+      body: Center(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(148, 185, 255, 1), 
+                Color.fromRGBO(205, 255, 216, 1),
+              ],
             ),
           ),
+          child: Column(
+                children: [
+                  Text(
+                    'this is create page',
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 300,
+                  ),
+                  CustomButton(
+                    text: '+',
+                    fontSize: 40,
+                    height: 50,
+                    width: 120,
+                  )
+                ],
+              ),
         ),
       ),
     );

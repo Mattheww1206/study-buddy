@@ -1,6 +1,8 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class deck {
+class Deck {
   final String deckId;
   final String userId;
   final String title;
@@ -8,7 +10,7 @@ class deck {
   final DateTime createdAt;
 
 
-  deck({
+  Deck({
     required this.deckId,
     required this.userId,
     required this.title,
@@ -16,8 +18,8 @@ class deck {
     required this.createdAt,
   });
 
-  factory deck.fromMap(String id, Map<String, dynamic> data) {
-    return deck(
+  factory Deck.fromMap(String id, Map<String, dynamic> data) {
+    return Deck(
       deckId: id, 
       userId: data['userId'] ?? '', 
       title: data['title'] ?? '', 

@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
-import 'package:studybuddy/shared/widgets/custom_button.dart';
-import 'package:studybuddy/shared/widgets/custom_textfield.dart';
+import 'package:studybuddy/widgets/custom_button.dart';
+import 'package:studybuddy/widgets/custom_textfield.dart';
+
 
 
 class LoginPage extends StatefulWidget {

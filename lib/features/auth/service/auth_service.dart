@@ -207,6 +207,7 @@ class AuthService {
 
      Future<AppUser?> signInWithGoogle() async {
     try {
+      await _googleSignIn.signOut();
       // oopen yung google account
       final GoogleSignInAccount? gUser = await _googleSignIn.signIn();
 

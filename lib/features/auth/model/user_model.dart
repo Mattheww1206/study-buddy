@@ -1,6 +1,6 @@
 class AppUser {
     final String userId;
-    final String? username;
+    String? username;
     final String emailAdd;
     final String provider;
    

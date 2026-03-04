@@ -11,6 +11,10 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double fontSize;
   final double borderRadius;
+  final bool isLoading;
+  final Widget? icon;
+  final Color? borderColor;
+  final double borderWidth;
 
   const CustomButton({
     super.key,
@@ -22,36 +26,65 @@ class CustomButton extends StatelessWidget {
     this.backgroundColor = const Color(0xFF16056B),
     this.textColor = Colors.white,
     this.fontSize = 18,
-    this.borderRadius = 12,
+    this.borderRadius = 1000,
+    this.isLoading = false,
+    this.icon,
+    this.borderColor,
+    this.borderWidth = 1
   });
-  
+
   @override
   Widget build(BuildContext context) {
+    final Color currentColor = isLoading
+        ? Colors.grey
+        : backgroundColor;
     return Padding(
       padding: padding,
       child: GestureDetector(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         child: Container(
           width: width,
           height: height,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(1000)
+            color: currentColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: borderColor != null ? Border.all(
+              color: borderColor!,
+              width: borderWidth,
+            )
+            : null
           ),
           child: Center(
-            child: Text(text,
-            style: GoogleFonts.itim(
-              color: textColor,
-              fontSize: fontSize,
-            ),
-            ),
+            child: isLoading
+                ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[
+                      icon!,
+                      SizedBox(width: 1)
+                    ],
+                    Text(
+                        text,
+                        style: GoogleFonts.itim(
+                          color: textColor,
+                          fontSize: fontSize,
+                        ),
+                      ),
+                  ],
+                ),
           ),
         ),
       ),
     );
-    
   }
-
-
 }

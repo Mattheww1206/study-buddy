@@ -52,6 +52,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           hintStyle: const TextStyle(fontSize: 18),
           filled: true,
           fillColor: Colors.grey[200],
+          errorMaxLines: 2,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 18,
@@ -59,6 +60,12 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
+          ),
+          errorStyle: const TextStyle(
+            fontSize: 17,     
+            fontWeight: FontWeight.w500,
+            height: 1.2,
+            
           ),
           suffixIcon: widget.isPassword
               ? IconButton(

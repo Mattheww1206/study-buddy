@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 
 class AccountInformationPage extends StatefulWidget {
   const AccountInformationPage({super.key});
@@ -12,7 +14,6 @@ class AccountInformationPage extends StatefulWidget {
 
 class _AccountInformationPageState extends State<AccountInformationPage> {
   File? _selectedImage;
-  String _username = ''; 
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -99,6 +100,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loggedUser = Provider.of<UserProvider>(context).user; 
     return Scaffold(
       backgroundColor: const Color(0xFF1A0B70),
       appBar: AppBar(
@@ -214,13 +216,13 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                _username,
+                                loggedUser?.username ?? '',
                                 style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(width: 8),
                             GestureDetector(
-                              onTap: () => _showEditDialog('Username', _username, (val) => setState(() => _username = val)),
+                              onTap: () => _showEditDialog('Username', loggedUser?.username ?? '', (val) => setState(() => Provider.of<UserProvider>(context, listen: false).updateUsername(val))),
                               child: const Icon(Icons.edit, size: 18, color: Colors.blue),
                             ),
                           ],
@@ -240,7 +242,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         Text('Email', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
                         const SizedBox(height: 2),
                         Text(
-                          'matthew@gmail.com',
+                          loggedUser?.emailAdd ?? '',
                           style: GoogleFonts.lora(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
