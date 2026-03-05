@@ -6,6 +6,7 @@ import 'package:studybuddy/features/auth/presentation/login_page.dart';
 import 'package:studybuddy/features/auth/presentation/nav_button.dart';
 import 'package:studybuddy/features/auth/presentation/register_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
        'account':(context) => const AccountInformationPage(),
        'achievement': (context) => const AchievementPage(),
        'change_password':(context) => const ChangePasswordPage(),
+       'create_deck':(context) => const CreateDeckPage(),
       },
     );
   }
