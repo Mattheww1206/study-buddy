@@ -8,6 +8,7 @@ import 'package:studybuddy/features/auth/presentation/register_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
@@ -22,8 +23,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     await FirebaseService.initializeFirebase();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => UserProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => DeckProvider()),
+      ],
       child: MyApp(),
     )
   );

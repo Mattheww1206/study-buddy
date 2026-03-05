@@ -9,6 +9,7 @@ class DeckService {
   Future<Deck> createDeck ({
     required String userId,
     required String title,
+    required String subject,
     required List<Map<String, String>> cards,
 
   }) async {
@@ -19,6 +20,7 @@ class DeckService {
       deckId: deckDocs.id, 
       userId: userId, 
       title: title, 
+      subject: subject,
       totalCards: cards.length,
       createdAt: DateTime.now()
       );
@@ -32,8 +34,8 @@ class DeckService {
         final flashcard = Flashcard(
           cardId: cardDocs.id, 
           deckId: deckDocs.id, 
-          question: card['question']!, 
-          answer: card['answer']!, 
+          question: card['def']!, 
+          answer: card['term']!, 
           );
           cardBatch.set(cardDocs, flashcard.toMap());
       }
