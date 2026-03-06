@@ -20,8 +20,8 @@ class _ProfilePageState extends State<ProfilePage> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color.fromRGBO(148, 185, 255, 1),
-              Color.fromRGBO(205, 255, 216, 1)
+              Color(0xFF665FBE), // Dominant
+              Color(0xFFFAEEFF)  // Secondary
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 400,
                   width: double.infinity,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF16056B),
+                    color: Color(0xFF665FBE), 
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(40),
                       bottomRight: Radius.circular(40),
@@ -85,14 +85,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 padding: EdgeInsets.only(top: 50),
                                 child: CircleAvatar(
                                   radius: 65,
-                                  backgroundColor: Color(0xFFB4D4FF),
+                                  backgroundColor: Color(0xFFFAEEFF), 
                                   child: CircleAvatar(
                                     radius: 100,
-                                    backgroundColor: Color(0xFFBEE3FF),
+                                    backgroundColor: Colors.white,
                                     child: Icon(
                                       Icons.person,
                                       size: 90,
-                                      color: Colors.black,
+                                      color: Color(0xFF665FBE),
                                     ),
                                   ),
                                 ),
@@ -128,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Text(
                                   '15 Day Study Streak',
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -169,14 +169,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold, 
                                 fontSize: 25,  
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                             Text(
                               'Decks\nCreated', 
                               textAlign: TextAlign.center, 
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15, 
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                           ],
                         ),
                         Container(
@@ -190,14 +190,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25, 
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                             Text(
                               'Quiz\nCreated', 
                               textAlign: TextAlign.center, 
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15, 
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                           ],
                         ),
                         Container(
@@ -211,14 +211,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25,
-                                 color: const Color(0xFF16056B))),
+                                 color: const Color(0xFF665FBE))),
                             Text(
                               'Decks\nMastered', 
                               textAlign: TextAlign.center, 
                               style: GoogleFonts.lora( 
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15, 
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                           ],
                         ),
                       ],
@@ -243,43 +243,26 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: GoogleFonts.lora( 
                             fontWeight: FontWeight.bold,
                             fontSize: 20, 
-                             color: const Color(0xFF16056B)),
+                             color: const Color(0xFF665FBE)),
                         ),
                         const SizedBox(height: 12),
-                        // Progress Bar 1
-                        Container(
-                          height: 15,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFBEE3FF).withOpacity(0.5), 
-                            borderRadius: BorderRadius.circular(10)),
-                          child: FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: 0.66,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF649BFF), 
-                                borderRadius: BorderRadius.circular(10))),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Row with Check and Progress 2
+                        // In-update ang row para sumunod sa sinend mong design
                         Row(
                           children: [
-                            const Icon(Icons.check_circle_outline, color: Color(0xFF16056B), size: 24),
+                            const Icon(Icons.check, color: Color(0xFF665FBE), size: 24),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Container(
                                 height: 15,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFBEE3FF).withOpacity(0.5), 
+                                  color: const Color(0xFFFAEEFF), 
                                   borderRadius: BorderRadius.circular(10)),
                                 child: FractionallySizedBox(
                                   alignment: Alignment.centerLeft,
                                   widthFactor: 0.57,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFB4D4FF),
+                                      color: const Color(0xFF665FBE), 
                                        borderRadius: BorderRadius.circular(10))),
                                 ),
                               ),
@@ -290,7 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.lora( 
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                           ],
                         ),
                   
@@ -304,44 +287,26 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: GoogleFonts.lora(
                             fontWeight: FontWeight.bold,
                             fontSize: 20, 
-                        
-                            color: const Color(0xFF16056B)),
+                            color: const Color(0xFF665FBE)),
                         ),
                         const SizedBox(height: 12),
-                        // Progress Bar 3
-                        Container(
-                          height: 15,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFBEE3FF).withOpacity(0.5), 
-                            borderRadius: BorderRadius.circular(10)),
-                          child: FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: 0.66,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF649BFF), 
-                                borderRadius: BorderRadius.circular(10))),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Row with Check and Progress 4
+                        // In-update ang row para maging isa nalang ang progress bar
                         Row(
                           children: [
-                            const Icon(Icons.check_circle_outline, color: Color(0xFF16056B), size: 24),
+                            const Icon(Icons.check, color: Color(0xFF665FBE), size: 24),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Container(
                                 height: 15,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFBEE3FF).withOpacity(0.5),
+                                  color: const Color(0xFFFAEEFF), 
                                    borderRadius: BorderRadius.circular(10)),
                                 child: FractionallySizedBox(
                                   alignment: Alignment.centerLeft,
                                   widthFactor: 0.70,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFB4D4FF), 
+                                      color: const Color(0xFF665FBE), 
                                       borderRadius: BorderRadius.circular(10))),
                                 ),
                               ),
@@ -352,7 +317,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.lora( 
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: const Color(0xFF16056B))),
+                                color: const Color(0xFF665FBE))),
                           ],
                         ),
                       ],
