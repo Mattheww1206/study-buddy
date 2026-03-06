@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF16056B),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -224,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
@@ -303,8 +303,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                               CustomButton(
                                 text: 'Login',
-                                backgroundColor: Color(0xFF16056B),
-                                textColor: Colors.white,
+                                backgroundColor: Theme.of(context).colorScheme.surface,
+                                textColor: const Color.fromARGB(255, 255, 255, 255),
                                 fontSize: 23,
                                 width: 140,
                                 height: 50,
@@ -372,8 +372,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             CustomButton(
                               text: 'Create Account',
-                              backgroundColor: const Color(0xFFFD9519),
-                              textColor: Colors.black,
+                              backgroundColor:Theme.of(context).colorScheme.secondary,
+                              textColor: Colors.white,
                               fontSize: 27,
                               height: 55,
                               width: 250,

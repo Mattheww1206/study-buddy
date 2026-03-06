@@ -15,6 +15,7 @@ import 'package:studybuddy/features/profile/presentation/change_password_page.da
 import 'package:studybuddy/features/profile/presentation/profile_page.dart';
 import 'package:studybuddy/features/profile/presentation/settings_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
+import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 
 
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: defaultColor,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {

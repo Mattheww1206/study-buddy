@@ -29,12 +29,25 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF16056B),
       body: Center(
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 70),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromARGB(255, 124, 117, 198),
+                Color.fromRGBO(246, 246, 247, 1),
+                Color.fromARGB(255, 68, 13, 92)
+              ],
+              stops: [0, 0.5, 1.0]
+            )
+          ),
+          // margin: EdgeInsets.symmetric(vertical: 70),
+   
           child: Column(
             children: [
+              const  SizedBox(height: 100),
               Image(
               image: const AssetImage('assets/studybuddy.png'),
               width: 400,
@@ -48,14 +61,14 @@ class _LandingPageState extends State<LandingPage> {
                 style: GoogleFonts.itim(
                   fontSize: 42,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: const Color.fromARGB(255, 0, 0, 0),
                 ),
                ),
               ),
               CustomButton(
                 text: 'Create Account',
-                backgroundColor: const Color(0xFFFD9519),
-                textColor: Colors.black,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                textColor: Colors.white,
                 fontSize: 32,
                 height: 66,
                 width: 279,
@@ -68,8 +81,8 @@ class _LandingPageState extends State<LandingPage> {
               ),
               CustomButton(
                 text: 'Login',
-                backgroundColor: const Color(0xFFB4D7FE),
-                textColor: Colors.black,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                textColor: const Color(0xFF4A449A),
                 fontSize: 32,
                 height: 66,
                 width: 279,
