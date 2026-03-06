@@ -22,6 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  String? _emailError;
+  String? _passwordError;
 
 
   @override
@@ -50,6 +52,8 @@ class _LoginPageState extends State<LoginPage> {
 
   setState(() {
     _isLoading = true;
+    _emailError = null;
+    _passwordError = null;
   });
 
   try {
@@ -67,7 +71,17 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     
     } catch (e) {
+      final error = e.toString().replaceFirst('Exception: ', '');
       setState(() {
+        if(error.contains('No account found')) {
+          _emailError = error;
+          _passwordError = null;
+        } else if(error.contains('verify your email')) {
+          _emailError = error;
+          _passwordError = null;
+        } else if(error.contains('Incorrect email or password')) {
+          _passwordError = 'Incorrect email or password.';
+        }
       });
     } finally {
       if(mounted){
@@ -81,6 +95,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> signInWithGoogle() async {
     setState(() {
       _isLoading = true;
+      _emailError = null;
+      _passwordError = null;
     });
 
     try {
@@ -94,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       setState(() {
+        _emailError = e.toString().replaceFirst('Exception: Google sign-in failed.', '');
       });
 
     } finally {
@@ -229,10 +246,11 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 20,
                             ),
-                            // Email TextField
+                            // Email/Username TextField
                             CustomTextfield(
                               controller: _emailController,
                               hintText: 'Email or Username',
+                              errorText: _emailError,
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if(value == null || value.isEmpty) {
@@ -248,6 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                             CustomTextfield(
                               controller: _passwordController,
                               hintText: 'Password',
+                              errorText: _passwordError,
                               isPassword: true,
                               validator: (value) {
                                 if(value == null || value.isEmpty){

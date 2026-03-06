@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/deck/service/deck_service.dart';
 
 class CreateDeckPage extends StatefulWidget {
   const CreateDeckPage({super.key});
@@ -9,7 +13,13 @@ class CreateDeckPage extends StatefulWidget {
 }
 
 class _CreateDeckPageState extends State<CreateDeckPage> {
+  final DeckService _deckService = DeckService();
+  final _titleController = TextEditingController();
+  final _subjectController = TextEditingController();
+  
   bool isEditMode = false;
+  bool _isLoading = false;
+
   
   // Controllers para sa Subject at Title (Biology, Cell Division, etc.)
   final TextEditingController _subjectController = TextEditingController(text: "Biology");
@@ -35,6 +45,72 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       card["def"]?.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _saveDeck() async {
+    if(_titleController.text.trim().isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Title is required.", style: GoogleFonts.itim())),
+      );
+      return;
+    }
+
+    if (_subjectController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Subject is required.", style: GoogleFonts.lora())),
+      );
+      return;
+    }
+
+    for (int i = 0; i < cardControllers.length; i++) {
+      if (cardControllers[i]['term']!.text.trim().isEmpty ||
+          cardControllers[i]['def']!.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Card ${i + 1} is missing a term or definition.", style: GoogleFonts.lora())),
+        );
+        return;
+      }
+    }
+
+    setState(() => _isLoading = true);
+    FocusScope.of(context).unfocus();
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final deckProvider = Provider.of<DeckProvider>(context, listen:  false);
+    final nav = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final cards = cardControllers.map((card) => {
+        'term': card['term']!.text.trim(),
+        'def': card['def']!.text.trim(),
+      }).toList();
+
+      final newDeck = await _deckService.createDeck(
+        userId: userProvider.user!.userId, 
+        title: _titleController.text.trim(), 
+        subject: _subjectController.text.trim(), 
+        cards: cards
+        );
+
+      deckProvider.addDeck(newDeck);
+
+      messenger.showSnackBar(
+        SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
+      );
+      print('Saved naaaa');
+
+      nav.pop();
+
+
+    } catch (e) {
+      print('Error saving deck: $e'); 
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to save deck. Please try again.', style: GoogleFonts.itim()))
+      );
+    } finally {
+      if(mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override

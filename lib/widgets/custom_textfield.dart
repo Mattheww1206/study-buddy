@@ -8,6 +8,7 @@ class CustomTextfield extends StatefulWidget {
   late final bool isPassword;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final String? errorText;
 
   CustomTextfield({
     super.key,
@@ -16,6 +17,7 @@ class CustomTextfield extends StatefulWidget {
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.errorText,
   });
 
   @override
@@ -49,6 +51,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
         style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
           hintText: widget.hintText,
+          errorText: widget.errorText,
           hintStyle: const TextStyle(fontSize: 18),
           filled: true,
           fillColor: Colors.grey[200],

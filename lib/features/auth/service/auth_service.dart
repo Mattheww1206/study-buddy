@@ -143,7 +143,7 @@ class AuthService {
 
       return await signIn(email: email, password: password);
     } catch (e) {
-      throw Exception(e.toString());
+      rethrow;
     }
   }
 
@@ -177,6 +177,8 @@ class AuthService {
         return 'No account found with this email.';
       case 'wrong-password':
         return 'Incorrect password.';
+      case 'invalid-credential':
+        return 'Incorrect email or password.';
       default:
         return 'Something went wrong. Please try again.';
     }
@@ -272,11 +274,12 @@ class AuthService {
         emailAdd: data['email'],
       );
 
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_handleLoginAuthError(e));
     } catch (e) {
-      throw Exception('Google sign-in failed: ${e.toString()}');
-    }
-  }
+      if(e is FirebaseAuthException){
+        throw Exception(_handleLoginAuthError(e));
+      }
+       rethrow;
+    } 
+     }
 
 }

@@ -129,7 +129,7 @@ import 'package:studybuddy/widgets/custom_textfield.dart';
                                 keyboardType: TextInputType.name,
                                 validator: (value) {
                                   if(value == null || value.isEmpty){
-                                    return 'Full Name is required';
+                                    return 'Username is required';
                                   }
                                   return null;
                                 },

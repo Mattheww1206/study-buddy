@@ -30,8 +30,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     await FirebaseService.initializeFirebase();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => UserProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => DeckProvider()),
+      ],
       child: MyApp(),
     )
   );
