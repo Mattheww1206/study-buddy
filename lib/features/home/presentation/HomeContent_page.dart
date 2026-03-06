@@ -16,15 +16,14 @@ class _HomeContentPageState extends State<HomeContentPage> {
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, 
           children: [
             const SizedBox(height: 60),
 
             // --- 1. PINNED DECKS ---
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              // DITO ANG FIX: Naglagay tayo ng padding sa buong container
-              // para ang scroll area ay hindi sasayad sa gilid.
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(35),
@@ -38,28 +37,22 @@ class _HomeContentPageState extends State<HomeContentPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5, bottom: 15),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.push_pin,
-                            color: Colors.redAccent, size: 24),
-                        const SizedBox(width: 10),
-                        Text("Pinned decks",
-                            style: GoogleFonts.lora(
-                                fontSize: 24, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      const Icon(Icons.push_pin, color: Colors.redAccent, size: 24),
+                      const SizedBox(width: 10),
+                      Text("Pinned decks",
+                          style: GoogleFonts.lora(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                    ],
                   ),
-
-                  // Scroll View Area
+                  const SizedBox(height: 15),
                   SizedBox(
                     height: 150,
-                    child: ListView( // Ginamit ang ListView para mas kontrolado ang padding
+                    child: ListView(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       children: [
-                        // Card 1
                         Container(
                           width: 250,
                           padding: const EdgeInsets.all(20),
@@ -89,10 +82,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                             ],
                           ),
                         ),
-                        
                         const SizedBox(width: 12),
-                        
-                        // Card 2
                         Container(
                           width: 250,
                           padding: const EdgeInsets.all(20),
@@ -178,54 +168,53 @@ class _HomeContentPageState extends State<HomeContentPage> {
             // --- 3. PROGRESS SECTION ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    height: 175,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        color: const Color(0xFF6C63FF),
-                        borderRadius: BorderRadius.circular(35)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Continue Last Session!",
-                            style: GoogleFonts.lora(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22)),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 6),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text("85% Progress",
-                              style: GoogleFonts.lora(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14)),
-                        ),
-                        const SizedBox(height: 12),
-                        Text("Modern History",
-                            style: GoogleFonts.lora(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-            // --- 4. RECENT DECKS ---
-            Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Recent Decks",
+              child: Container(
+                padding: const EdgeInsets.all(25),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: const Color(0xFF6C63FF),
+                    borderRadius: BorderRadius.circular(35)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Continue Last Session!",
                         style: GoogleFonts.lora(
-                            fontSize: 22, fontWeight: FontWeight.bold)))),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22)),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text("85% Progress",
+                          style: GoogleFonts.lora(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14)),
+                    ),
+                    const SizedBox(height: 12),
+                    Text("Modern History",
+                        style: GoogleFonts.lora(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // --- 4. RECENT DECKS TITLE ---
+            Padding(
+              padding: const EdgeInsets.only(left: 25), 
+              child: Text("Recent Decks",
+                  style: GoogleFonts.lora(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
             const SizedBox(height: 15),
             SizedBox(
               height: 140,
@@ -237,7 +226,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   width: 200,
                   margin: const EdgeInsets.only(right: 15),
                   decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 182, 164, 224),
+                      color: const Color.fromARGB(255, 116, 110, 222),
                       borderRadius: BorderRadius.circular(30)),
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -248,11 +237,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           style: GoogleFonts.lora(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16)),
+                              fontSize: 22)),
                       const SizedBox(height: 8),
                       Text("50 Cards",
                           style: GoogleFonts.lora(
-                              color: Colors.white70, fontSize: 13)),
+                              color: Colors.black87, fontSize: 16)),
                     ],
                   ),
                 ),
@@ -261,14 +250,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
             const SizedBox(height: 35),
 
-            // --- 5. NEWLY ADDED DECKS ---
+           
             Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Newly added decks",
-                        style: GoogleFonts.lora(
-                            fontSize: 22, fontWeight: FontWeight.bold)))),
+              padding: const EdgeInsets.only(left: 25),
+              child: Text("Newly added decks",
+                  style: GoogleFonts.lora(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
             const SizedBox(height: 15),
             SizedBox(
               height: 140,
@@ -280,7 +268,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   width: 200,
                   margin: const EdgeInsets.only(right: 15),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color.fromARGB(255, 132, 174, 227),
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
                           color: Colors.purple.shade100, width: 1.5)),
@@ -293,11 +281,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           style: GoogleFonts.lora(
                               color: Colors.black87,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16)),
+                              fontSize: 20)),
                       const SizedBox(height: 8),
                       Text("15 Cards",
                           style: GoogleFonts.lora(
-                              color: Colors.grey, fontSize: 13)),
+                              color: Colors.black, fontSize: 15)),
                     ],
                   ),
                 ),
@@ -307,10 +295,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
             const SizedBox(height: 80),
           ],
         ),
-      ),
-          ]
-        ),
-      
       ),
     );
   }

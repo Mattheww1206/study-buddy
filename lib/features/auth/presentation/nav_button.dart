@@ -35,7 +35,7 @@ class _NavButtonState extends State<NavButton> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      backgroundColor: Colors.yellow,
+     
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,

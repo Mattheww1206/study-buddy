@@ -19,9 +19,9 @@ class _LandingPageState extends State<LandingPage> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF16056B),
+        statusBarColor: Color.fromARGB(255, 254, 254, 255),
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF16056B),
+        systemNavigationBarColor: Color.fromARGB(255, 255, 255, 255),
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
@@ -36,9 +36,9 @@ class _LandingPageState extends State<LandingPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.fromARGB(255, 124, 117, 198),
+                Color.fromARGB(255, 82, 76, 146),
                 Color.fromRGBO(246, 246, 247, 1),
-                Color.fromARGB(255, 68, 13, 92)
+                Color.fromARGB(255, 124, 117, 198)
               ],
               stops: [0, 0.5, 1.0]
             )
