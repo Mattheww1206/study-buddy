@@ -81,7 +81,7 @@ import 'package:studybuddy/widgets/custom_textfield.dart';
     @override
     Widget build(BuildContext context) {
       return Scaffold(
-        backgroundColor: const Color(0xFF16056B),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
           child: Center(
             child: Column(
@@ -201,8 +201,8 @@ import 'package:studybuddy/widgets/custom_textfield.dart';
                               ],
                               CustomButton(
                                 text: 'Create Account',
-                                backgroundColor: const Color(0xFFFD9519),
-                                textColor: Colors.black,
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                textColor: Colors.white,
                                 fontSize: 30,
                                 height: 57,
                                 width: 255,
