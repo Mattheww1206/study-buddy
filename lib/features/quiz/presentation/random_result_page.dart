@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-class MultipleResultPage extends StatefulWidget {
-  const MultipleResultPage({super.key});
+class RandomResultPage extends StatefulWidget {
+  const RandomResultPage({super.key});
 
   @override
-  State<MultipleResultPage> createState() => _MultipleResultPageState();
+  State<RandomResultPage> createState() => _RandomResultPageState();
 }
 
-class _MultipleResultPageState extends State<MultipleResultPage> {
+class _RandomResultPageState extends State<RandomResultPage> {
   @override
   Widget build(BuildContext context) {
+    // Ginamit ang eksaktong kulay mula sa iyong IdentificationResultPage
     const Color dominantColor = Color(0xFF665FBE);
     const Color secondaryColor = Color(0xFFFAEEFF);
     const Color accentColor = Color(0xFFFF7900);
@@ -49,7 +50,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
               ),
               const SizedBox(height: 5),
               const Text(
-                "90%",
+                "85%", // Halimbawang score
                 style: TextStyle(
                   fontSize: 50,
                   fontWeight: FontWeight.bold,
@@ -57,7 +58,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                 ),
               ),
               const Text(
-                "Excellent Work! 🎉",
+                "Great Effort! 🧠",
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
@@ -72,7 +73,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: const Text(
-                  "📄 Multiple Choice • 10 Questions • Biology",
+                  "📝 Random • 20 Questions • Science", // Binago lang ang label na 'Random'
                   style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -82,14 +83,13 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(25, 30, 25, 0),
                   decoration: const BoxDecoration(
-                    color: const Color(0xFFFAEEFF),
+                    color: Color(0xFFFAEEFF),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
                   ),
                   child: Column(
-                    // Pinalitan ang spaceBetween ng start para umakyat ang content
                     mainAxisAlignment: MainAxisAlignment.start, 
                     children: [
                       // Total Score Card
@@ -104,7 +104,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         child: const Column(
                           children: [
                             Text(
-                              "9/10",
+                              "17/20",
                               style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: dominantColor),
                             ),
                             Text(
@@ -130,19 +130,19 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.bar_chart_rounded, color: dominantColor, size: 20),
+                                    Icon(Icons.insights, color: dominantColor, size: 20),
                                     SizedBox(width: 8),
                                     Text("Accuracy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                   ],
                                 ),
-                                Text("90%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
+                                Text("85%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
                               ],
                             ),
                             const SizedBox(height: 12),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: const LinearProgressIndicator(
-                                value: 0.9,
+                                value: 0.85,
                                 minHeight: 10,
                                 backgroundColor: Color(0xFFE0E0E0),
                                 valueColor: AlwaysStoppedAnimation<Color>(accentColor),
@@ -170,7 +170,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("14m 22s", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                      Text("10m 05s", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                       Text("TIME USED", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
@@ -205,13 +205,13 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         ],
                       ),
                       
-                      // --- SPACE BAGO ANG BUTTONS (Binawasan para itaas sila) ---
                       const SizedBox(height: 25), 
                       
-                      // 1. Review Wrong Answer Button
+                      // 1. Review Answers Button
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, 'multiple_review');
+                          // Siguraduhing may 'random_review' route ka sa main.dart kung gagawa ka nito
+                          Navigator.pushNamed(context, 'ran_review');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accentColor, 
@@ -223,9 +223,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.menu_book, size: 20),
+                            Icon(Icons.fact_check, size: 20),
                             SizedBox(width: 10),
-                            Text("Review Wrong Answer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text("Review Answers", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ],
                         ),
                       ),
@@ -237,23 +237,24 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor, 
-                          foregroundColor: secondaryColor, 
+                          backgroundColor: Colors.white, 
+                          foregroundColor: dominantColor, 
                           minimumSize: const Size(double.infinity, 58),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: const BorderSide(color: Color(0xFFE8E5FF)),
+                          ),
                           elevation: 0,
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.arrow_back, size: 20),
+                            Icon(Icons.home_rounded, size: 20),
                             SizedBox(width: 10),
                             Text("Back to Deck", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ],
                         ),
                       ),
-                      
-                      // Pinaka-bottom space (Binawasan mula 30+ ginawang 20 para umakyat lahat)
                       const SizedBox(height: 20),
                     ],
                   ),
