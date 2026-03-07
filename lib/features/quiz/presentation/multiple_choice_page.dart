@@ -16,6 +16,10 @@ class MultipleChoicePage extends StatefulWidget {
 
 class _MultipleChoicePageState extends State<MultipleChoicePage> {
   String? selectedOption;
+  
+  // --- DINAGDAG NA VARIABLES PARA SA LOGIC ---
+  int currentIndex = 0; 
+  final int totalQuestions = 10; 
 
   // Color Palette
   final Color dominantColor = const Color(0xFF665FBE);
@@ -31,6 +35,10 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Pag-calculate ng progress percentage
+    double progressValue = (currentIndex + 1) / totalQuestions;
+    int progressPercent = (progressValue * 100).toInt();
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
@@ -48,23 +56,23 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
       body: SafeArea(
         child: Column(
           children: [
-            // --- UPDATED STATUS SECTION (Itinaas pa lalo) ---
+            // --- UPDATED STATUS SECTION ---
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 15), // Binago mula 25 to 10 para tumaas
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Question Number & Percent
+                      // Dynamic Question Number & Percent
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Question 2/10", 
+                          Text("Question ${currentIndex + 1}/$totalQuestions", 
                             style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor, fontSize: 22)),
-                          const Text("20% Completed", 
-                            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16)),
+                          Text("$progressPercent% Completed", 
+                            style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16)),
                         ],
                       ),
                       
@@ -100,11 +108,11 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15), // Space sa pagitan ng Text/Timer at Progress Bar
+                  const SizedBox(height: 15),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
-                      value: 0.2,
+                      value: progressValue, // Dynamic progress
                       backgroundColor: Colors.white,
                       color: accentColor,
                       minHeight: 10,
@@ -193,7 +201,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
               ),
             ),
 
-            // --- CONFIRM BUTTON ---
+            // --- DYNAMIC BUTTON (NEXT O SUBMIT) ---
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: SizedBox(
@@ -206,10 +214,22 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     elevation: 5,
                   ),
-                  onPressed: (){
-                    Navigator.pushNamed(context, 'multiple_result');
+                  onPressed: () {
+                    if (currentIndex < totalQuestions - 1) {
+                      // HINDI PA LAST PAGE: Next Question Logic
+                      setState(() {
+                        currentIndex++;
+                        selectedOption = null; // Ni-reset ang sagot para sa sunod na tanong
+                      });
+                    } else {
+                      // LAST PAGE NA: Submit Logic
+                      Navigator.pushNamed(context, 'multiple_result');
+                    }
                   },
-                  child: const Text("Confirm Answer", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    currentIndex < totalQuestions - 1 ? "Next Question" : "Submit", 
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),

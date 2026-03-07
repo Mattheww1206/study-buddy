@@ -21,15 +21,31 @@ class _RandomPageState extends State<RandomPage> {
   final Color accentColor = const Color(0xFFFF6D00);
 
   // State Variables
-  bool isMultipleChoice = true; // Dito natin lalaruin kung anong design ang lalabas
-  String? selectedOption;
+  int currentIndex = 0; 
   final TextEditingController _answerController = TextEditingController();
+  String? selectedOption;
 
-  final List<String> options = [
-    "Mitosis",
-    "Meiosis",
-    "Binary Fission",
-    "Cytokinesis"
+  // --- SAMPLE DATA STRUCTURE ---
+  // Dito natin ilalagay ang mga tanong. Pwedeng halo ang type.
+  final List<Map<String, dynamic>> quizData = [
+    {
+      "type": "multiple",
+      "question": "What type of cell division produces 4 genetically unique daughter cells?",
+      "options": ["Mitosis", "Meiosis", "Binary Fission", "Cytokinesis"],
+    },
+    {
+      "type": "identification",
+      "question": "What is the powerhouse of the cell?",
+    },
+    {
+      "type": "multiple",
+      "question": "Which organelle is responsible for photosynthesis?",
+      "options": ["Nucleus", "Chloroplast", "Ribosome", "Vacuole"],
+    },
+    {
+      "type": "identification",
+      "question": "What is the basic unit of life?",
+    },
   ];
 
   @override
@@ -40,6 +56,11 @@ class _RandomPageState extends State<RandomPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get current question data
+    var currentData = quizData[currentIndex];
+    bool isMultipleChoice = currentData["type"] == "multiple";
+    bool isLastQuestion = currentIndex == quizData.length - 1;
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
@@ -48,9 +69,10 @@ class _RandomPageState extends State<RandomPage> {
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () {
-            Navigator.pop(context);
-            if (!isMultipleChoice) {
-              setState(() => isMultipleChoice = true);
+            if (currentIndex > 0) {
+              setState(() => currentIndex--);
+            } else {
+              Navigator.pop(context);
             }
           },
         ),
@@ -58,31 +80,22 @@ class _RandomPageState extends State<RandomPage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: SingleChildScrollView( // Para hindi mag-overflow pag lumabas ang keyboard
+        child: SingleChildScrollView( 
           child: Column(
             children: [
-              // --- STATUS SECTION (Common sa dalawang design) ---
               _buildStatusSection(),
-
               const SizedBox(height: 10),
-
-              // --- QUESTION CARD (Common sa dalawang design) ---
-              _buildQuestionCard(isMultipleChoice 
-                ? "What type of cell division produces 4 genetically unique daughter cells?" 
-                : "What is the powerhouse of the cell?"),
-
+              _buildQuestionCard(currentData["question"]),
               const SizedBox(height: 25),
-
-              // --- DYNAMIC CONTENT (Dito magpapalit ang UI) ---
+              
+              // Dynamic Body base sa type ng tanong
               if (isMultipleChoice) 
-                _buildMultipleChoiceOptions() 
+                _buildMultipleChoiceOptions(currentData["options"]) 
               else 
                 _buildIdentificationInput(),
-
+                
               const SizedBox(height: 20),
-
-              // --- ACTION BUTTON ---
-              _buildActionButton(),
+              _buildActionButton(isLastQuestion),
             ],
           ),
         ),
@@ -93,6 +106,7 @@ class _RandomPageState extends State<RandomPage> {
   // --- UI BUILDER METHODS ---
 
   Widget _buildStatusSection() {
+    double progress = (currentIndex + 1) / quizData.length;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
       child: Column(
@@ -103,9 +117,9 @@ class _RandomPageState extends State<RandomPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(isMultipleChoice ? "Question 1/10" : "Question 2/10", 
+                  Text("Question ${currentIndex + 1}/${quizData.length}", 
                     style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor, fontSize: 22)),
-                  Text(isMultipleChoice ? "10% Completed" : "20% Completed", 
+                  Text("${(progress * 100).toInt()}% Completed", 
                     style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16)),
                 ],
               ),
@@ -116,7 +130,7 @@ class _RandomPageState extends State<RandomPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: isMultipleChoice ? 0.1 : 0.2,
+              value: progress,
               backgroundColor: Colors.white,
               color: accentColor,
               minHeight: 10,
@@ -139,7 +153,7 @@ class _RandomPageState extends State<RandomPage> {
         children: [
           Icon(Icons.timer_outlined, color: dominantColor, size: 18),
           const SizedBox(width: 6),
-          Text("18:42", style: TextStyle(color: dominantColor, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text("18:42", style: TextStyle(color: Color(0xFF665FBE), fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -162,14 +176,13 @@ class _RandomPageState extends State<RandomPage> {
     );
   }
 
-  // DESIGN: Multiple Choice
-  Widget _buildMultipleChoiceOptions() {
+  Widget _buildMultipleChoiceOptions(List<dynamic> currentOptions) {
     return Column(
-      children: options.map((option) {
+      children: currentOptions.map((option) {
         bool isSelected = selectedOption == option;
-        String letter = String.fromCharCode(65 + options.indexOf(option));
+        String letter = String.fromCharCode(65 + currentOptions.indexOf(option));
         return GestureDetector(
-          onTap: () => setState(() => selectedOption = option),
+          onTap: () => setState(() => selectedOption = option.toString()),
           child: Container(
             margin: const EdgeInsets.only(bottom: 15, left: 20, right: 20),
             padding: const EdgeInsets.all(18),
@@ -187,7 +200,7 @@ class _RandomPageState extends State<RandomPage> {
                   child: Text(letter, style: TextStyle(color: isSelected ? Colors.white : dominantColor, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(width: 20),
-                Text(option, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                Text(option.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -196,7 +209,6 @@ class _RandomPageState extends State<RandomPage> {
     );
   }
 
-  // DESIGN: Identification
   Widget _buildIdentificationInput() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -227,7 +239,7 @@ class _RandomPageState extends State<RandomPage> {
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(bool isLastQuestion) {
     return Padding(
       padding: const EdgeInsets.all(25.0),
       child: SizedBox(
@@ -238,21 +250,25 @@ class _RandomPageState extends State<RandomPage> {
             backgroundColor: accentColor,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            elevation: 5,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, 'ran_result');
-            setState(() {
-              if (isMultipleChoice) {
-                // Pag confirm sa multiple choice, lilipat sa identification
-                isMultipleChoice = false;
-              } else {
-                // Pag submit sa identification, dito papasok ang result logic
-                print("Final Answer: ${_answerController.text}");
-              }
-            });
+            if (!isLastQuestion) {
+              setState(() {
+                currentIndex++;
+                // Reset fields para sa next question
+                selectedOption = null;
+                _answerController.clear();
+              });
+            } else {
+              // Submit Logic
+              Navigator.pushNamed(context, 'ran_result');
+            }
           },
-          child: Text(isMultipleChoice ? "Confirm Answer" : "Submit Answer", 
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          child: Text(
+            isLastQuestion ? "Submit Quiz" : "Next Question", 
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+          ),
         ),
       ),
     );

@@ -11,6 +11,10 @@ class _IdentificationPageState extends State<IdentificationPage> {
   // Controller para makuha ang text na itatype ng user
   final TextEditingController _answerController = TextEditingController();
 
+  // --- DINAGDAG NA VARIABLES PARA SA LOGIC ---
+  int currentIndex = 0; 
+  final int totalQuestions = 10; 
+
   // Color Palette
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
@@ -18,13 +22,16 @@ class _IdentificationPageState extends State<IdentificationPage> {
 
   @override
   void dispose() {
-    // Mahalagang i-dispose ang controller para iwas memory leaks
     _answerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Pag-calculate ng progress percentage
+    double progressValue = (currentIndex + 1) / totalQuestions;
+    int progressPercent = (progressValue * 100).toInt();
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
@@ -42,7 +49,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // --- STATUS SECTION (Progress Bar & Timer) ---
+              // --- STATUS SECTION (Dynamic na ito) ---
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
                 child: Column(
@@ -53,13 +60,13 @@ class _IdentificationPageState extends State<IdentificationPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Question 2/10",
+                            Text("Question ${currentIndex + 1}/$totalQuestions",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: dominantColor,
                                     fontSize: 22)),
-                            const Text("20% Completed",
-                                style: TextStyle(
+                            Text("$progressPercent% Completed",
+                                style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: Colors.grey,
                                     fontSize: 16)),
@@ -92,7 +99,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
-                        value: 0.2,
+                        value: progressValue, // Dynamic value
                         backgroundColor: Colors.white,
                         color: accentColor,
                         minHeight: 10,
@@ -105,8 +112,6 @@ class _IdentificationPageState extends State<IdentificationPage> {
               const SizedBox(height: 30),
 
               // --- QUESTION CARD ---
-              
-
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 60),
@@ -170,7 +175,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
 
               const SizedBox(height: 40),
 
-              // --- SUBMIT BUTTON ---
+              // --- DYNAMIC BUTTON (NEXT O SUBMIT) ---
               Padding(
                 padding: const EdgeInsets.all(25.0),
                 child: SizedBox(
@@ -185,12 +190,24 @@ class _IdentificationPageState extends State<IdentificationPage> {
                       elevation: 5,
                     ),
                     onPressed: () {
-                      String userAnswer = _answerController.text;
-                     Navigator.pushNamed(context,'iden_result');
-                      print("User answered: $userAnswer");
+                      if (currentIndex < totalQuestions - 1) {
+                        // HINDI PA HULI: Next Question Logic
+                        setState(() {
+                          currentIndex++;
+                          _answerController.clear(); // Nililinis ang input field para sa next
+                        });
+                        print("Moving to next question. Index: $currentIndex");
+                      } else {
+                        // HULI NA: Submit Logic
+                        String userAnswer = _answerController.text;
+                        print("Final Answer Submitted: $userAnswer");
+                        Navigator.pushNamed(context, 'iden_result');
+                      }
                     },
-                    child: const Text("Submit Answer",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      currentIndex < totalQuestions - 1 ? "Next Question" : "Submit Answer",
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
