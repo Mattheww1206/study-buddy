@@ -12,7 +12,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F4FF),
+      // BINAGO: Secondary Color (#FAEEFF) as background
+      backgroundColor: const Color(0xFFFAEEFF), 
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -39,7 +40,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.push_pin, color: Colors.redAccent, size: 24),
+                      // BINAGO: Accent Color (#FF7A01)
+                      const Icon(Icons.push_pin, color: Color(0xFFFF7A01), size: 24), 
                       const SizedBox(width: 10),
                       Text("Pinned decks",
                           style: GoogleFonts.lora(
@@ -57,10 +59,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           width: 250,
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [
-                              Color(0xFF8E84FF),
-                              Color(0xFF6C63FF)
-                            ]),
+                            // BINAGO: Dominant Color (#665FBE)
+                            color: const Color(0xFF665FBE), 
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Column(
@@ -69,7 +69,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               const Align(
                                   alignment: Alignment.topRight,
                                   child: Icon(Icons.push_pin,
-                                      color: Colors.redAccent, size: 20)),
+                                      // BINAGO: Accent Color (#FF7A01)
+                                      color: Color(0xFFFF7A01), size: 20)), 
                               Text("Mathematics",
                                   style: GoogleFonts.lora(
                                       color: Colors.white,
@@ -78,7 +79,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               const SizedBox(height: 8),
                               Text("45 Flashcards",
                                   style: GoogleFonts.lora(
-                                      color: Colors.black87, fontSize: 16)),
+                                      color: Colors.white70, fontSize: 16)),
                             ],
                           ),
                         ),
@@ -87,10 +88,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           width: 250,
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [
-                              Color(0xFF8E84FF),
-                              Color(0xFF6C63FF)
-                            ]),
+                            // BINAGO: Dominant Color (#665FBE)
+                            color: const Color(0xFF665FBE),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Column(
@@ -99,7 +98,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               const Align(
                                   alignment: Alignment.topRight,
                                   child: Icon(Icons.push_pin,
-                                      color: Colors.redAccent, size: 20)),
+                                      color: Color(0xFFFF7A01), size: 20)),
                               Text("Science & Tech",
                                   style: GoogleFonts.lora(
                                       color: Colors.white,
@@ -108,7 +107,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                               const SizedBox(height: 8),
                               Text("32 Flashcards",
                                   style: GoogleFonts.lora(
-                                      color: Colors.black87, fontSize: 16)),
+                                      color: Colors.white70, fontSize: 16)),
                             ],
                           ),
                         ),
@@ -136,7 +135,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           style: GoogleFonts.lora(
                               fontSize: 38,
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 158, 154, 241))),
+                              // BINAGO: Dominant Color (#665FBE)
+                              color: const Color(0xFF665FBE))), 
                       Text("DECKS CREATED",
                           style: GoogleFonts.lora(
                               fontSize: 14,
@@ -151,7 +151,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           style: GoogleFonts.lora(
                               fontSize: 38,
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 158, 154, 241))),
+                              color: const Color(0xFF665FBE))),
                       Text("QUIZ TAKEN",
                           style: GoogleFonts.lora(
                               fontSize: 14,
@@ -172,7 +172,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                 padding: const EdgeInsets.all(25),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: const Color(0xFF6C63FF),
+                    // BINAGO: Dominant Color (#665FBE)
+                    color: const Color(0xFF665FBE), 
                     borderRadius: BorderRadius.circular(35)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,11 +188,12 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
-                          color: Colors.orange,
+                          // BINAGO: Accent Color (#FF7A01)
+                          color: const Color(0xFFFF7A01), 
                           borderRadius: BorderRadius.circular(10)),
                       child: Text("85% Progress",
                           style: GoogleFonts.lora(
-                              color: Colors.black,
+                              color: Colors.white, // Ginawang white para mabasa sa orange
                               fontWeight: FontWeight.bold,
                               fontSize: 14)),
                     ),
@@ -213,6 +215,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
               padding: const EdgeInsets.only(left: 25), 
               child: Text("Recent Decks",
                   style: GoogleFonts.lora(
+                      // BINAGO: Dominant Color para sa text
+                      color: const Color(0xFF665FBE),
                       fontSize: 22, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 15),
@@ -226,7 +230,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   width: 200,
                   margin: const EdgeInsets.only(right: 15),
                   decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 116, 110, 222),
+                      // BINAGO: Dominant Color (#665FBE)
+                      color: const Color(0xFF665FBE),
                       borderRadius: BorderRadius.circular(30)),
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -241,7 +246,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       const SizedBox(height: 8),
                       Text("50 Cards",
                           style: GoogleFonts.lora(
-                              color: Colors.black87, fontSize: 16)),
+                              color: Colors.white70, fontSize: 16)),
                     ],
                   ),
                 ),
@@ -250,11 +255,12 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
             const SizedBox(height: 35),
 
-           
+            // --- 5. NEWLY ADDED ---
             Padding(
               padding: const EdgeInsets.only(left: 25),
               child: Text("Newly added decks",
                   style: GoogleFonts.lora(
+                      color: const Color(0xFF665FBE),
                       fontSize: 22, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 15),
@@ -268,10 +274,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   width: 200,
                   margin: const EdgeInsets.only(right: 15),
                   decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 132, 174, 227),
+                      // BINAGO: Puti ang card pero may border na Dominant
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                          color: Colors.purple.shade100, width: 1.5)),
+                          color: const Color(0xFF665FBE).withOpacity(0.3), width: 1.5)),
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,13 +286,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     children: [
                       Text("New Subject",
                           style: GoogleFonts.lora(
-                              color: Colors.black87,
+                              color: const Color(0xFF665FBE),
                               fontWeight: FontWeight.bold,
                               fontSize: 20)),
                       const SizedBox(height: 8),
                       Text("15 Cards",
                           style: GoogleFonts.lora(
-                              color: Colors.black, fontSize: 15)),
+                              color: Colors.black54, fontSize: 15)),
                     ],
                   ),
                 ),

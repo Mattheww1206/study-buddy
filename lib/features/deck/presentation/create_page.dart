@@ -11,14 +11,13 @@ class CreatePage extends StatefulWidget {
 class _CreatePageState extends State<CreatePage> {
   // Colors
   final Color colorDominant = const Color(0xFF665FBE); // Purple
-  final Color colorSecondary = const Color(0xFFFAEEFF); // Light Pink/White
+  final Color colorSecondary = const Color(0xFFFAEEFF); // Solid background color
   final Color colorAccent = const Color(0xFFFF7A00); // Orange
 
   // Data & State
   final List<Map<String, dynamic>> decks = [];
   bool isDeleteMode = false;
   Set<int> selectedDecks = {}; 
-
 
   Future<void> _navigateToCreateDeck() async {
     final result = await Navigator.push(
@@ -33,7 +32,6 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
-  // Function to handle deletion
   void _deleteSelectedDecks() {
     setState(() {
       List<int> sortedIndices = selectedDecks.toList()..sort((a, b) => b.compareTo(a));
@@ -49,19 +47,10 @@ class _CreatePageState extends State<CreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Container(
+      backgroundColor: colorSecondary, 
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              colorSecondary,
-              const Color(0xFFE8D5F5),
-            ],
-          ),
-        ),
         child: Column(
           children: [
             const SizedBox(height: 60),
@@ -105,9 +94,10 @@ class _CreatePageState extends State<CreatePage> {
 
                     const SizedBox(height: 30),
 
-                    // --- HEADER SECTION ---
+                    // --- HEADER SECTION (UPDATED SIZES) ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end, // Pantay sa ilalim
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,14 +106,13 @@ class _CreatePageState extends State<CreatePage> {
                               'Total No. of\nDecks',
                               style: TextStyle(
                                 color: colorDominant,
-                                fontSize: 26,
+                                fontSize: 22, // Liniitan mula 26
                                 fontWeight: FontWeight.bold,
-                                height: 0.9,
+                                height: 1.1,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             
-                            // --- DELETE / ACTION BUTTON ---
                             GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -144,7 +133,7 @@ class _CreatePageState extends State<CreatePage> {
                                     : 'Delete',
                                 style: TextStyle(
                                   color: isDeleteMode ? (selectedDecks.isEmpty ? Colors.grey : Colors.red) : const Color(0xFF9FB2C8),
-                                  fontSize: 18,
+                                  fontSize: 16, // Liniitan mula 18
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -154,11 +143,12 @@ class _CreatePageState extends State<CreatePage> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(Icons.style_outlined, size: 65, color: colorDominant),
+                            // Icon size adjusted to 40
+                            Icon(Icons.style_outlined, size: 40, color: colorDominant),
                             Text(
                               ' ${decks.length}', 
                               style: TextStyle(
-                                fontSize: 85,
+                                fontSize: 55, // Liniitan mula 85
                                 fontWeight: FontWeight.bold,
                                 color: colorDominant,
                               ),
@@ -168,12 +158,13 @@ class _CreatePageState extends State<CreatePage> {
                       ],
                     ),
 
-                    Divider(color: colorDominant.withOpacity(0.2), thickness: 2, height: 40),
+                    // Divider height adjusted to 25 para mas mataas ang linya
+                    Divider(color: colorDominant.withOpacity(0.2), thickness: 2, height: 25),
 
                     // --- DECKS LIST ---
                     if (decks.isEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 50),
+                        padding: const EdgeInsets.only(top: 250),
                         child: Text(
                           'No Decks Created yet',
                           style: TextStyle(
@@ -218,7 +209,6 @@ class _CreatePageState extends State<CreatePage> {
                             ),
                             child: Row(
                               children: [
-                                
                                 if (isDeleteMode)
                                   Checkbox(
                                     value: isSelected,
@@ -233,7 +223,6 @@ class _CreatePageState extends State<CreatePage> {
                                       });
                                     },
                                   ),
-                                
                                 Icon(Icons.style, color: colorAccent, size: 45),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -253,8 +242,6 @@ class _CreatePageState extends State<CreatePage> {
                                     ],
                                   ),
                                 ),
-                                
-                              
                                 if (!isDeleteMode)
                                   Container(
                                     width: 1,
@@ -301,7 +288,7 @@ class _CreatePageState extends State<CreatePage> {
         : GestureDetector(
             onTap: _navigateToCreateDeck,
             child: Container(
-              width: 180,
+              width: 100,
               height: 60,
               decoration: BoxDecoration(
                 color: colorAccent,

@@ -57,7 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   Image.asset(
                                     'assets/studybuddy-logo.png',
-                                    height: 110,
+                                    height: 80,
                                     fit: BoxFit.contain,
                                   ),
                                   Container(
@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       icon: const Icon(
                                         Icons.settings,
                                         color: Colors.white,
-                                        size: 50,
+                                        size: 30,
                                       ),
                                       onPressed: () {
                                         Navigator.pushNamed(context,'settings');
