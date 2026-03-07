@@ -235,7 +235,7 @@ class AuthService {
         final existingProvider = existingData['provider'] ?? 'password';
 
         if(existingProvider == 'password'){
-          throw Exception('This email is already registered with a password. Please login with your Email and Password instead.');
+          throw Exception('This email is already registered with a password.');
         }
       }
       

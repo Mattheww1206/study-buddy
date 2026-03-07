@@ -5,7 +5,7 @@ import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 class DeckService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;  
  
-
+  // create ng deck
   Future<Deck> createDeck ({
     required String userId,
     required String title,
@@ -44,7 +44,7 @@ class DeckService {
 
        return newDeck;
   }
-
+  // para makuha lahat ng decks ni user for home page
   Stream<List<Deck>> getUserDecks(String userId){
       return _firestore
       .collection('decks')
@@ -53,7 +53,7 @@ class DeckService {
       .snapshots()
       .map((snapshot) => snapshot.docs.map((doc) => Deck.fromMap(doc.id, doc.data())).toList());
   }
-
+  // para makuha yung mga flashcards na nasa isang deck
   Future<List<Flashcard>> getDeckFlashcards(String deckId) async {
     final snapshot = await _firestore 
                      .collection('decks')
@@ -63,7 +63,7 @@ class DeckService {
     
     return snapshot.docs.map((doc) => Flashcard.fromMap(doc.id, doc.data())).toList();
   }
-
+   // delete ng deck
    Future<void> deleteDeck(String deckId) async {
 
     final flashcards = await _firestore.collection('decks')
@@ -78,7 +78,17 @@ class DeckService {
 
     deckBatch.delete(_firestore.collection('decks').doc(deckId));
     await deckBatch.commit();
+   }
 
+   Future<void> updateDeck({
+    required String deckId,
+    required String title,
+    required String subject,
+   }) async {
+    await _firestore.collection('decks').doc(deckId).update({
+      'title': title,
+      'subject': subject,
+    });
    }
 
 

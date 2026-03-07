@@ -110,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       setState(() {
-        _emailError = e.toString().replaceFirst('Exception: Google sign-in failed.', '');
+        _emailError = e.toString().replaceFirst('Exception: ', '');
       });
 
     } finally {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
@@ -44,5 +45,19 @@ class DeckProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateDecks(Deck updateDeck) {
+    final index = _decks.indexWhere((d) => d.deckId == updateDeck.deckId);
+    if(index != -1){
+      _decks[index] = updateDeck;
+      notifyListeners();  
+    }
+  } 
 
+  void removeDecks(String deckId) {
+    _decks.removeWhere((deck) => deck.deckId == deckId);
+    if(_selectedDeck?.deckId == deckId){
+      _selectedDeck = null;
+    }
+    notifyListeners();
+  }
 }
