@@ -19,11 +19,20 @@ import 'package:studybuddy/features/quiz/presentation/flashcard_missed_page.dart
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_again_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_great_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/identification_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/identification_page.dart';
+import 'package:studybuddy/features/quiz/presentation/identification_result_page.dart';
+import 'package:studybuddy/features/quiz/presentation/identification_review_page.dart';
 import 'package:studybuddy/features/quiz/presentation/mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/multiple_choice_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/multiple_choice_page.dart';
 import 'package:studybuddy/features/quiz/presentation/multiple_result_page.dart';
+import 'package:studybuddy/features/quiz/presentation/multiple_review_answer_page.dart';
 import 'package:studybuddy/features/quiz/presentation/quiz_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/random_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/random_page.dart';
+import 'package:studybuddy/features/quiz/presentation/random_result_page.dart';
+import 'package:studybuddy/features/quiz/presentation/random_review_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
@@ -75,7 +84,19 @@ class MyApp extends StatelessWidget {
        'quiz_mode':(context) => const QuizModePage(),
        'multiple_mode':(context) => const MultipleChoiceModePage(),
        'multiple_choice':(context) => const MultipleChoicePage(),
-       'multiple_result':(context) => const MultipleResultPage(),
+       'multiple_result':(context) => const  MultipleResultPage(),
+       'multiple_review':(context) => const MultipleReviewAnswerPage(),
+       'iden_mode':(context) => const IdentificationModePage(),
+       'iden_result':(context) => const IdentificationResultPage(),
+       'identification':(context) => const IdentificationPage(),
+       'iden_review':(context) => const IdentificationReviewPage(),
+       'ran_mode':(context) => const RandomModePage(),
+       'random':(context) => const RandomPage(),
+       'ran_result':(context) => const RandomResultPage(),
+       'ran_review':(context) => const RandomReviewPage(),
+
+     
+
 
       },
     );

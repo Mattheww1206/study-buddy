@@ -112,7 +112,7 @@ class _QuizModePageState extends State<QuizModePage> {
             // 2. Identification
             GestureDetector(
               onTap: () {
-                setState(() => selectedType = 'Identification');
+                setState(() => selectedType = 'iden_mode');
               },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -121,7 +121,7 @@ class _QuizModePageState extends State<QuizModePage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selectedType == 'Identification' ? const Color(0xFF5E5CE6) : Colors.transparent,
+                    color: selectedType == 'iden_mode' ? const Color(0xFF5E5CE6) : Colors.transparent,
                     width: 2
                   ),
                   boxShadow: [
@@ -147,7 +147,7 @@ class _QuizModePageState extends State<QuizModePage> {
                             ],
                           ),
                         ),
-                        if (selectedType == 'Identification') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
+                        if (selectedType == 'iden_mode') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -166,7 +166,7 @@ class _QuizModePageState extends State<QuizModePage> {
             // 3. Random Mix
             GestureDetector(
               onTap: () {
-                setState(() => selectedType = 'Random Mix');
+                setState(() => selectedType = 'ran_mode');
               },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -175,7 +175,7 @@ class _QuizModePageState extends State<QuizModePage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selectedType == 'Random Mix' ? const Color(0xFF5E5CE6) : Colors.transparent,
+                    color: selectedType == 'ran_mode' ? const Color(0xFF5E5CE6) : Colors.transparent,
                     width: 2
                   ),
                   boxShadow: [
@@ -201,7 +201,7 @@ class _QuizModePageState extends State<QuizModePage> {
                             ],
                           ),
                         ),
-                        if (selectedType == 'Random Mix') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
+                        if (selectedType == 'ran_mode') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -225,10 +225,10 @@ class _QuizModePageState extends State<QuizModePage> {
                 // FIXED LOGIC: Dito natin itatama ang paglipat ng screen
                 if (selectedType == 'Multiple Mode') {
                   Navigator.pushNamed(context, 'multiple_mode');
-                } else if (selectedType == 'Identification') {
-                   Navigator.pushNamed(context, 'identification');
-                } else if (selectedType == 'Random Mix') {
-                   Navigator.pushNamed(context, 'random_mix');
+                } else if (selectedType == 'iden_mode') {
+                   Navigator.pushNamed(context, 'iden_mode');
+                } else if (selectedType == 'ran_mode') {
+                   Navigator.pushNamed(context, 'ran_mode');
                 }
               },
               style: ElevatedButton.styleFrom(
