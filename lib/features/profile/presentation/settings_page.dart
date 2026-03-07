@@ -12,7 +12,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   final AuthService _authService = AuthService();
 
   void _showLogoutDialog(BuildContext context) {
@@ -30,11 +29,11 @@ class _SettingsPageState extends State<SettingsPage> {
               borderRadius: BorderRadius.circular(25),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Para sumakto ang height sa content
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.logout_rounded,
-                  color: Color(0xFF1A0B70),
+                  color: Color(0xFF665FBE), // Dominant Color
                   size: 60,
                 ),
                 const SizedBox(height: 20),
@@ -58,13 +57,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 30),
                 Row(
                   children: [
-                    // CANCEL BUTTON
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 15),
-                          side: const BorderSide(color: Color(0xFF1A0B70)),
+                          side: const BorderSide(color: Color(0xFF665FBE)), // Dominant Color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -72,24 +70,23 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: Text(
                           'Stay',
                           style: GoogleFonts.lora(
-                            color: const Color(0xFF1A0B70),
+                            color: const Color(0xFF665FBE), // Dominant Color
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 15),
-                    // LOGOUT BUTTON - UPDATED LOGIC
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
                           final nav = Navigator.of(context);
                           userProvider.clearUser();
-                          await _authService.signOut(); 
+                          await _authService.signOut();
                           nav.pushNamedAndRemoveUntil('/', (route) => false);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1A0B70),
+                          backgroundColor: const Color(0xFF665FBE), // Dominant Color
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -118,33 +115,33 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B70),
+      backgroundColor: const Color(0xFF665FBE), // Dominant Color
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
           'Settings',
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
-            fontSize: 30,
+            fontSize: 25, // Pinaliit mula 30
             color: Colors.black,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
-              size: 30, color: Colors.black),
+              size: 25, color: Colors.black), // Pinaliit mula 30
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 40.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0), // Bahagyang pinaliit ang padding
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(40),
+              padding: const EdgeInsets.all(30), // Pinaliit mula 40
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
+                color: const Color(0xFFFAEEFF), // Secondary Color
+                borderRadius: BorderRadius.circular(25), // Pinaliit mula 30
               ),
               child: Column(
                 children: [
@@ -159,29 +156,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       children: [
                         Container(
-                          height: 60,
-                          width: 60,
+                          height: 50, // Pinaliit mula 60
+                          width: 50,  // Pinaliit mula 60
                           decoration: const BoxDecoration(
-                            color: Color(0xFF1A0B70),
+                            color: Color(0xFF665FBE), // Dominant Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.person,
-                              size: 30, color: Colors.white),
+                              size: 25, color: Colors.white), // Pinaliit mula 30
                         ),
                         const SizedBox(width: 15),
                         Text(
                           'Account',
                           style: GoogleFonts.lora(
-                            fontSize: 25,
+                            fontSize: 20, // Pinaliit mula 25
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 25),
+                        const Icon(Icons.arrow_forward_ios, size: 20), // Pinaliit mula 25
                       ],
                     ),
                   ),
-                  const Divider(height: 30),
+                  const Divider(height: 25), // Pinaliit mula 30
                   TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -193,57 +190,57 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       children: [
                         Container(
-                          height: 60,
-                          width: 60,
+                          height: 50, // Pinaliit mula 60
+                          width: 50,  // Pinaliit mula 60
                           decoration: const BoxDecoration(
-                            color: Colors.orange,
+                            color: Color(0xFFFF810E), // Accent Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.notifications,
-                              size: 30, color: Colors.white),
+                              size: 25, color: Colors.white), // Pinaliit mula 30
                         ),
                         const SizedBox(width: 15),
                         Text(
                           'Achievement',
                           style: GoogleFonts.lora(
-                            fontSize: 25,
+                            fontSize: 20, // Pinaliit mula 25
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 25),
+                        const Icon(Icons.arrow_forward_ios, size: 20), // Pinaliit mula 25
                       ],
                     ),
                   ),
-                  const Divider(height: 30),
+                  const Divider(height: 25), // Pinaliit mula 30
                   TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                       foregroundColor: Colors.black,
                     ),
-                    onPressed: ()async {
-                      _showLogoutDialog(context); 
+                    onPressed: () async {
+                      _showLogoutDialog(context);
                     },
                     child: Row(
                       children: [
                         Container(
-                          height: 60,
-                          width: 60,
+                          height: 50, // Pinaliit mula 60
+                          width: 50,  // Pinaliit mula 60
                           decoration: const BoxDecoration(
-                            color: Color(0xFF1A0B70), 
+                            color: Color(0xFF665FBE), // Dominant Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.lock,
-                              size: 30, color: Colors.white),
+                              size: 25, color: Colors.white), // Pinaliit mula 30
                         ),
-                        const SizedBox(width: 25),
+                        const SizedBox(width: 20), // Pinaliit mula 25
                         Text(
                           'Logout',
                           style: GoogleFonts.lora(
-                              fontSize: 25, fontWeight: FontWeight.bold),
+                              fontSize: 20, fontWeight: FontWeight.bold), // Pinaliit mula 25
                         ),
                       ],
-                    )
+                    ),
                   ),
                 ],
               ),

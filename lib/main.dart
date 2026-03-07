@@ -9,6 +9,7 @@ import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_view_page.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
@@ -19,6 +20,9 @@ import 'package:studybuddy/features/quiz/presentation/flashcard_result_again_pag
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_great_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/multiple_choice_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/multiple_choice_page.dart';
+import 'package:studybuddy/features/quiz/presentation/multiple_result_page.dart';
 import 'package:studybuddy/features/quiz/presentation/quiz_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
@@ -66,10 +70,13 @@ class MyApp extends StatelessWidget {
        'create_view':(context) => const CreateViewPage(),
        'mode':(context) => const ModePage(),
        'flashcard_mode':(context) => const FlashcardModePage(),
-       'flashcard_result_great':(context) => const  FlashcardResultGreatPage(),
-       'flashcard_result_again':(context) => const  FlashcardResultAgainPage(),
+      'flashcard_result_again':(context) => const  FlashcardResultAgainPage(),
        'missed':(context) => const FlashcardMissedPage(),
        'quiz_mode':(context) => const QuizModePage(),
+       'multiple_mode':(context) => const MultipleChoiceModePage(),
+       'multiple_choice':(context) => const MultipleChoicePage(),
+       'multiple_result':(context) => const MultipleResultPage(),
+
       },
     );
   }

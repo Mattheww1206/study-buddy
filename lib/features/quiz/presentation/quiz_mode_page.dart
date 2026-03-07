@@ -8,22 +8,22 @@ class QuizModePage extends StatefulWidget {
 }
 
 class _QuizModePageState extends State<QuizModePage> {
-  String selectedType = 'Multiple Choice';
+  String selectedType = 'Multiple Mode';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF665FBE),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Color(0xFF5E5CE6), size: 28),
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Quiz Mode',
-          style: TextStyle(color: Color(0xFF120E32), fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
@@ -56,13 +56,23 @@ class _QuizModePageState extends State<QuizModePage> {
 
             // 1. Multiple Choice
             GestureDetector(
-              onTap: () => setState(() => selectedType = 'Multiple Choice'),
+              onTap: () {
+                setState(() => selectedType = 'Multiple Mode');
+                // Tinanggal ang Navigator dito para selection lang muna
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selectedType == 'Multiple Choice' ? const Color(0xFF5E5CE6) : Colors.grey.shade200, width: 2),
+                  border: Border.all(
+                    color: selectedType == 'Multiple Mode' ? const Color(0xFF5E5CE6) : Colors.transparent,
+                    width: 2
+                  ),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -83,7 +93,7 @@ class _QuizModePageState extends State<QuizModePage> {
                             ],
                           ),
                         ),
-                        if (selectedType == 'Multiple Choice') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
+                        if (selectedType == 'Multiple Mode') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -101,13 +111,22 @@ class _QuizModePageState extends State<QuizModePage> {
 
             // 2. Identification
             GestureDetector(
-              onTap: () => setState(() => selectedType = 'Identification'),
+              onTap: () {
+                setState(() => selectedType = 'Identification');
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selectedType == 'Identification' ? const Color(0xFF5E5CE6) : Colors.grey.shade200, width: 2),
+                  border: Border.all(
+                    color: selectedType == 'Identification' ? const Color(0xFF5E5CE6) : Colors.transparent,
+                    width: 2
+                  ),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -146,13 +165,22 @@ class _QuizModePageState extends State<QuizModePage> {
 
             // 3. Random Mix
             GestureDetector(
-              onTap: () => setState(() => selectedType = 'Random Mix'),
+              onTap: () {
+                setState(() => selectedType = 'Random Mix');
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: selectedType == 'Random Mix' ? const Color(0xFF5E5CE6) : Colors.grey.shade200, width: 2),
+                  border: Border.all(
+                    color: selectedType == 'Random Mix' ? const Color(0xFF5E5CE6) : Colors.transparent,
+                    width: 2
+                  ),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -193,13 +221,22 @@ class _QuizModePageState extends State<QuizModePage> {
 
             // Start Button
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                // FIXED LOGIC: Dito natin itatama ang paglipat ng screen
+                if (selectedType == 'Multiple Mode') {
+                  Navigator.pushNamed(context, 'multiple_mode');
+                } else if (selectedType == 'Identification') {
+                   Navigator.pushNamed(context, 'identification');
+                } else if (selectedType == 'Random Mix') {
+                   Navigator.pushNamed(context, 'random_mix');
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF8137),
                 minimumSize: const Size(double.infinity, 60),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
-              child: const Text('Start Quiz →', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text('Start Quiz', style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 30),
           ],

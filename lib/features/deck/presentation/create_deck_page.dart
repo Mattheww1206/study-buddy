@@ -14,8 +14,7 @@ class CreateDeckPage extends StatefulWidget {
 
 class _CreateDeckPageState extends State<CreateDeckPage> {
   final DeckService _deckService = DeckService();
-  final _titleController = TextEditingController();
-  final _subjectController = TextEditingController();
+
   
   bool isEditMode = false;
   bool _isLoading = false;
