@@ -3,6 +3,7 @@ class AppUser {
     String? username;
     final String emailAdd;
     final String provider;
+    final String? photoUrl;
    
 
     AppUser({
@@ -10,6 +11,7 @@ class AppUser {
         this.username,
         required this.emailAdd,
         this.provider = 'password',
+        this.photoUrl
     });
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
@@ -18,6 +20,7 @@ class AppUser {
       username: data['username'],
       emailAdd: data['email'] ?? '',
       provider: data['provider'] ?? 'password',
+      photoUrl: data['photoUrl'],
        );
   }
 
@@ -27,6 +30,7 @@ class AppUser {
       'username': username,
       'email': emailAdd,
       'provider': provider,
+      'photoUrl': photoUrl,
     };
   }
 }

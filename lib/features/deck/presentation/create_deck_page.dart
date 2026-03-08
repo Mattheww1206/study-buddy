@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
-import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 
 class CreateDeckPage extends StatefulWidget {
@@ -14,15 +13,12 @@ class CreateDeckPage extends StatefulWidget {
 
 class _CreateDeckPageState extends State<CreateDeckPage> {
   final DeckService _deckService = DeckService();
-
-  
+  final _titleController = TextEditingController();
+  final _subjectController = TextEditingController();
   bool isEditMode = false;
   bool _isLoading = false;
 
-  
-  // Controllers para sa Subject at Title (Biology, Cell Division, etc.)
-  final TextEditingController _subjectController = TextEditingController(text: "Biology");
-  final TextEditingController _titleController = TextEditingController(text: "Cell Division");
+
 
   // List of card data
   List<Map<String, TextEditingController>> cardControllers = [
@@ -75,7 +71,6 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     FocusScope.of(context).unfocus();
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final deckProvider = Provider.of<DeckProvider>(context, listen:  false);
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
@@ -85,14 +80,12 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         'def': card['def']!.text.trim(),
       }).toList();
 
-      final newDeck = await _deckService.createDeck(
+      await _deckService.createDeck(
         userId: userProvider.user!.userId, 
         title: _titleController.text.trim(), 
         subject: _subjectController.text.trim(), 
         cards: cards
         );
-
-      deckProvider.addDeck(newDeck);
 
       messenger.showSnackBar(
         SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
@@ -353,33 +346,28 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                     child: SizedBox(
                       height: 55,
                       child: ElevatedButton(
-                        onPressed: () {
-                          FocusScope.of(context).unfocus();
-                          
-                     
-                          List<Map<String, String>> finalCards = cardControllers.map((c) => {
-                            "term": c["term"]!.text,
-                            "def": c["def"]!.text,
-                          }).toList();
-
-                  
-                          Map<String, dynamic> deckData = {
-                            "subject": _subjectController.text,
-                            "title": _titleController.text,
-                            "cardCount": finalCards.length,
-                            "cards": finalCards,
-                          };
-
-                         
-                          Navigator.pop(context, deckData);
-                        },
+                        onPressed: _isLoading ? null : _saveDeck,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF7B67), 
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                         ),
-                        child: Text("Save Deck", 
-                          style: GoogleFonts.lora(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: _isLoading
+                        ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                        : Text('Save Deck',
+                        style: GoogleFonts.lora(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold
+                        ),
+                        )
                       ),
                     ),
                   ),

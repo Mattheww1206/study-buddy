@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/service/deck_service.dart';
+import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
+import 'package:studybuddy/features/flashcards/service/flashcard_service.dart';
 
 class CreateViewPage extends StatefulWidget {
   const CreateViewPage({super.key});
@@ -8,14 +12,160 @@ class CreateViewPage extends StatefulWidget {
 }
 
 class _CreateViewPageState extends State<CreateViewPage> {
-  List<Map<String, String>> cardsData = [
-    {'term': 'Meiosis', 'definition': 'Produces four genetically unique haploid cells'},
-    {'term': 'Mitosis', 'definition': 'Cell division producing two identical daughter cells'},
-  ];
-
+  final DeckService _deckService = DeckService();
+  final FlashcardService _flashcardService = FlashcardService();
+  late Deck _deck;
+  List<Flashcard> _flashcards = [];
+  bool _isLoading = true;
+  bool _isSaving = false;
   int editingIndex = -1;
   final TextEditingController _termController = TextEditingController();
   final TextEditingController _defController = TextEditingController();
+
+  final List<Map<String, TextEditingController>> _newCards = [];
+
+  @override
+   void initState() {
+  super.initState();
+  // 👇 move deck loading here instead of didChangeDependencies
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _deck = ModalRoute.of(context)!.settings.arguments as Deck;
+    _loadFlashcards();
+  });
+}
+
+
+  @override
+    void dispose() {
+      _termController.dispose();
+      _defController.dispose();
+      for (final card in _newCards) {
+        card['term']?.dispose();
+        card['def']?.dispose();
+      }
+      super.dispose();
+   }
+
+
+   Future<void> _loadFlashcards () async {
+    print('Loading flashcards for deck: ${_deck.deckId}');
+    try {
+      final cards = await _deckService.getDeckFlashcards(_deck.deckId).timeout(const Duration(seconds: 10));
+      print('Loaded ${cards.length} cards');
+      print('Setting isLoading to false');
+      if (mounted) {
+      setState(() {
+        _flashcards = cards;
+        _isLoading = false;
+      });
+      }
+    } catch (e) {
+      print('Error loading flashcards: $e');
+      setState (() => _isLoading = false);
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load Flashcards.'))
+      );
+    }
+   }
+
+   void _addNewCard() {
+    setState(() {
+      _newCards.add({
+        'term': TextEditingController(),
+        'def': TextEditingController(),
+      });
+    });
+  }
+
+
+  Future<void> _deleteFlashcard(String cardId) async {
+    try {
+      await _flashcardService.deleteFlashcard(
+        deckId: _deck.deckId,
+        cardId: cardId,
+      );
+      setState (() {
+        _flashcards.removeWhere((c) => c.cardId == cardId);
+      });
+    } catch (e) {
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete card.'))
+      );
+    }
+  }
+
+  Future<void> _saveCardEdit(int index) async{
+    try {
+      await _flashcardService.updateFlashcard(
+        deckId: _deck.deckId, 
+        cardId: _flashcards[index].cardId, 
+        question: _termController.text.trim(), 
+        answer: _defController.text.trim(),
+        );
+        setState(() {
+          _flashcards[index] = Flashcard(
+          cardId: _flashcards[index].cardId, 
+          deckId: _deck.deckId, 
+          question: _termController.text.trim(), 
+          answer: _defController.text.trim(),
+          );
+          editingIndex = 1;
+        });
+    } catch (e) {
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update card.'))
+      );
+    }
+  }
+
+
+  Future<void> _saveChanges() async {
+    for(int i = 0; i < _newCards.length; i++){
+      if(_newCards[i]['def']!.text.trim().isEmpty ||
+         _newCards[i]['term']!.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('New card ${i + 1} is missing a term or definition.'))
+        );
+        return;
+      }      
+    }
+
+    setState(() => _isSaving = true);
+    FocusScope.of(context).unfocus();
+
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+
+    try {
+      await _deckService.updateDeck(
+        deckId: _deck.deckId, 
+        title: _deck.title, 
+        subject: _deck.subject,
+      );
+
+      for(final card in _newCards){
+        await _flashcardService.addFlashcard(
+          deckId: _deck.deckId, 
+          question: card['def']!.text.trim(), 
+          answer: card['term']!.text.trim(),
+        );
+      }
+
+      messenger.showSnackBar(
+        SnackBar(content: Text('Deck updated Successfully.')),
+      );
+      nav.pop();
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to save changes. Please try again.'))
+      );
+    } finally {
+      if(mounted) setState(() => _isSaving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +181,11 @@ class _CreateViewPageState extends State<CreateViewPage> {
         ),
         title: const Text("StudyBuddy", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: Column(
+      body: _isLoading 
+      ? Center(child: CircularProgressIndicator())
+      : Column(
         children: [
           const SizedBox(height: 20),
-          
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -47,12 +198,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
                       borderRadius: BorderRadius.circular(15),
                       border: Border.all(color: const Color(0xFFFAEEFF), width: 2), 
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('SUBJECT', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text('Biology', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text('SUBJECT', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(_deck.subject, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -66,12 +217,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
                       borderRadius: BorderRadius.circular(15),
                       border: Border.all(color: const Color(0xFFFAEEFF), width: 2),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TITLE', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text('Cell Division', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFED9E4F))), 
+                        const Text('TITLE', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(_deck.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFED9E4F))), 
                       ],
                     ),
                   ),
@@ -81,151 +232,348 @@ class _CreateViewPageState extends State<CreateViewPage> {
           ),
 
           Expanded(
-            child: ListView.builder(
+            child: ListView(
               padding: const EdgeInsets.all(16),
-              itemCount: cardsData.length,
-              itemBuilder: (context, index) {
-                bool isCurrentlyEditing = editingIndex == index;
+              children: [
+                      // 👇 existing flashcards from Firestore
+                      ..._flashcards.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        Flashcard card = entry.value;
+                        bool isCurrentlyEditing = editingIndex == index;
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFED9E4F),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: Text('${index + 1}',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight:
+                                                      FontWeight.bold)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text('Card',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Color(0xFF665FBE))),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () async {
+                                          if (isCurrentlyEditing) {
+                                            await _saveCardEdit(index);
+                                          } else {
+                                            setState(() {
+                                              editingIndex = index;
+                                              _termController.text = card.question;
+                                              _defController.text = card.answer;
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          isCurrentlyEditing ? 'Done' : 'Edit',
+                                          style: const TextStyle(
+                                              color: Color(0xFF665FBE),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      const Text(' | ',
+                                          style:
+                                              TextStyle(color: Colors.grey)),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            _deleteFlashcard(card.cardId),
+                                        child: const Text('Delete',
+                                            style: TextStyle(
+                                                color: Colors.redAccent)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              const Text('TERM',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF665FBE),
+                                      fontWeight: FontWeight.bold)),
                               Container(
-                                width: 24, height: 24,
-                                decoration: const BoxDecoration(color: Color(0xFFED9E4F), shape: BoxShape.circle), 
-                                child: Center(child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(
+                                    top: 5, bottom: 15),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isCurrentlyEditing
+                                      ? Colors.white
+                                      : const Color(0xFFFAEEFF),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isCurrentlyEditing
+                                        ? const Color(0xFF665FBE)
+                                        : Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: isCurrentlyEditing
+                                    ? TextField(
+                                        controller: _termController,
+                                        decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            isDense: true),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        // 👇 shows actual question from Flashcard
+                                        child: Text(card.question),
+                                      ),
                               ),
-                              const SizedBox(width: 8),
-                        
-                              const Text('Card', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF665FBE))), 
+                              const Text('DEFINITION',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF665FBE),
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(top: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isCurrentlyEditing
+                                      ? Colors.white
+                                      : const Color(0xFFFAEEFF),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isCurrentlyEditing
+                                        ? const Color(0xFF665FBE)
+                                        : Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: isCurrentlyEditing
+                                    ? TextField(
+                                        controller: _defController,
+                                        maxLines: null,
+                                        decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            isDense: true),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        // 👇 shows actual answer from Flashcard
+                                        child: Text(card.answer),
+                                      ),
+                              ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    if (isCurrentlyEditing) {
-                                      cardsData[index]['term'] = _termController.text;
-                                      cardsData[index]['definition'] = _defController.text;
-                                      editingIndex = -1;
-                                    } else {
-                                      editingIndex = index;
-                                      _termController.text = cardsData[index]['term']!;
-                                      _defController.text = cardsData[index]['definition']!;
-                                    }
-                                  });
-                                },
-                             
-                                child: Text(isCurrentlyEditing ? 'Done' : 'Edit', style: const TextStyle(color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
-                              ),
-                              const Text(' | ', style: TextStyle(color: Colors.grey)),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    cardsData.removeAt(index);
-                                    if (isCurrentlyEditing) editingIndex = -1;
-                                  });
-                                },
-                                child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      // INAPPLY: Dominant #665FBE sa labels
-                      const Text('TERM', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)), 
-                      
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 5, bottom: 15),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                
-                          color: isCurrentlyEditing ? Colors.white : const Color(0xFFFAEEFF), 
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: isCurrentlyEditing ? const Color(0xFF665FBE) : Colors.transparent, width: 1.5),
-                        ),
-                        child: isCurrentlyEditing 
-                          ? TextField(
-                              controller: _termController,
-                              decoration: const InputDecoration(border: InputBorder.none, isDense: true),
-                            )
-                          : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(cardsData[index]['term']!)),
-                      ),
+                        );
+                      }).toList(),
 
-                      const Text('DEFINITION', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
-                      
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          // INAPPLY: Secondary #FAEEFF as background fill
-                          color: isCurrentlyEditing ? Colors.white : const Color(0xFFFAEEFF), 
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: isCurrentlyEditing ? const Color(0xFF665FBE) : Colors.transparent, width: 1.5),
+                      // 👇 new cards added locally (not yet saved)
+                      ..._newCards.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: const Color(0xFF665FBE), width: 1.5),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF665FBE),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${_flashcards.length + index + 1}',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text('New Card',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Color(0xFF665FBE))),
+                                    ],
+                                  ),
+                                  // remove new card before saving
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _newCards[index]['term']?.dispose();
+                                        _newCards[index]['def']?.dispose();
+                                        _newCards.removeAt(index);
+                                      });
+                                    },
+                                    child: const Text('Remove',
+                                        style: TextStyle(
+                                            color: Colors.redAccent)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              const Text('TERM',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF665FBE),
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(top: 5, bottom: 15),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: const Color(0xFF665FBE),
+                                      width: 1.5),
+                                ),
+                                child: TextField(
+                                  controller: _newCards[index]['term'],
+                                  decoration: const InputDecoration(
+                                      hintText: 'Enter term...',
+                                      border: InputBorder.none,
+                                      isDense: true),
+                                ),
+                              ),
+                              const Text('DEFINITION',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF665FBE),
+                                      fontWeight: FontWeight.bold)),
+                              Container(
+                                margin: const EdgeInsets.only(top: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: const Color(0xFF665FBE),
+                                      width: 1.5),
+                                ),
+                                child: TextField(
+                                  controller: _newCards[index]['def'],
+                                  maxLines: null,
+                                  decoration: const InputDecoration(
+                                      hintText: 'Enter definition...',
+                                      border: InputBorder.none,
+                                      isDense: true),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+
+                      const SizedBox(height: 80),
+                    ],
+                  ),
+                ),
+
+                // bottom buttons
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _isSaving ? null : _saveChanges,
+                          child: Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: _isSaving
+                                  ? Colors.grey
+                                  : const Color(0xFFED9E4F),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Center(
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : const Text('Save Deck',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                            ),
+                          ),
                         ),
-                        child: isCurrentlyEditing 
-                          ? TextField(
-                              controller: _defController,
-                              maxLines: null,
-                              decoration: const InputDecoration(border: InputBorder.none, isDense: true),
-                            )
-                          : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(cardsData[index]['definition']!)),
+                      ),
+                      const SizedBox(width: 15),
+                      // add new card button
+                      GestureDetector(
+                        onTap: _addNewCard,
+                        child: Container(
+                          height: 60,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF665FBE),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Icon(Icons.add,
+                              color: Colors.white, size: 30),
+                        ),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 60,
+                ),
                 
-                    decoration: BoxDecoration(color: const Color(0xFFED9E4F), borderRadius: BorderRadius.circular(30)), 
-                    child: const Center(
-                      child: Text('Save Deck', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 15),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      cardsData.add({'term': 'New Term', 'definition': 'New Definition'});
-                    });
-                  },
-                  child: Container(
-                    height: 60, width: 60,
-                    decoration: BoxDecoration(color: const Color(0xFF665FBE), borderRadius: BorderRadius.circular(15)), 
-                    child: const Icon(Icons.add, color: Colors.white, size: 30),
-                  ),
-                ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

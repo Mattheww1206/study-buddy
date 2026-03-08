@@ -34,8 +34,8 @@ class DeckService {
         final flashcard = Flashcard(
           cardId: cardDocs.id, 
           deckId: deckDocs.id, 
-          question: card['def']!, 
-          answer: card['term']!, 
+          question: card['term']!, 
+          answer: card['def']!, 
           );
           cardBatch.set(cardDocs, flashcard.toMap());
       }
@@ -55,13 +55,24 @@ class DeckService {
   }
   // para makuha yung mga flashcards na nasa isang deck
   Future<List<Flashcard>> getDeckFlashcards(String deckId) async {
+    print('Fetching from path: decks/$deckId/flashcards');
+    try {
     final snapshot = await _firestore 
                      .collection('decks')
                      .doc(deckId)
                      .collection('flashcards')
-                     .get();
-    
-    return snapshot.docs.map((doc) => Flashcard.fromMap(doc.id, doc.data())).toList();
+                     .get(const GetOptions(source: Source.server));
+    print('Snapshot docs count: ${snapshot.docs.length}');
+    return snapshot.docs.map((doc) {
+      print('Doc data: ${doc.data()}'); 
+          return Flashcard.fromMap(doc.id, doc.data());
+    })
+    .toList();
+    } catch (e) {
+      print('getDeckFlashcards error: $e');
+    rethrow;
+    }
+
   }
    // delete ng deck
    Future<void> deleteDeck(String deckId) async {

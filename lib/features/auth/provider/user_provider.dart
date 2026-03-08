@@ -16,8 +16,29 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateUsername(String newUsername){
-    _user?.username = newUsername;
-    notifyListeners();
-  }
+  void updateUsername(String username) {
+  if (_user == null) return;
+  _user = AppUser(
+    userId: _user!.userId,
+    username: username, // 👈 updated
+    emailAdd: _user!.emailAdd,
+    provider: _user!.provider,
+    photoUrl: _user!.photoUrl,
+  );
+  notifyListeners();
+}
+
+void updatePhotoUrl(String url) {
+  if(_user == null) return;
+  _user = AppUser(
+    userId: _user!.userId, 
+    username: _user!.username,
+    emailAdd: _user!.emailAdd,
+    provider: _user!.provider,
+    photoUrl: url,
+  );
+  notifyListeners();
+}
+
+
 }

@@ -10,6 +10,7 @@ import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_view_page.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/flashcards/provider/flashcard_provider.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
@@ -17,7 +18,6 @@ import 'package:studybuddy/features/profile/presentation/profile_page.dart';
 import 'package:studybuddy/features/profile/presentation/settings_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_missed_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_again_page.dart';
-import 'package:studybuddy/features/quiz/presentation/flashcard_result_great_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/identification_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/identification_page.dart';
@@ -34,6 +34,7 @@ import 'package:studybuddy/features/quiz/presentation/random_page.dart';
 import 'package:studybuddy/features/quiz/presentation/random_result_page.dart';
 import 'package:studybuddy/features/quiz/presentation/random_review_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
+import 'package:studybuddy/features/quiz/provider/quiz_provider.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 
@@ -47,6 +48,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DeckProvider()),
+        ChangeNotifierProvider(create: (_) => FlashcardProvider()),
+        ChangeNotifierProvider(create: (_) => QuizProvider()),
+
       ],
       child: MyApp(),
     )

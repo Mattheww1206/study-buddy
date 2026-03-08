@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'dart:convert';
 
 class AccountInformationPage extends StatefulWidget {
   const AccountInformationPage({super.key});
@@ -14,15 +16,52 @@ class AccountInformationPage extends StatefulWidget {
 
 class _AccountInformationPageState extends State<AccountInformationPage> {
   File? _selectedImage;
+  bool _isUploadingPhoto = false;
 
-  Future<void> _pickImage() async {
+
+  Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 256,
+      maxWidth: 256,
+      imageQuality: 80
+    );
 
-    if (image != null) {
-      setState(() {
-        _selectedImage = File(image.path);
-      });
+    if (image == null) return;
+
+    setState(() {
+      _selectedImage = File(image.path);
+      _isUploadingPhoto = true;
+    });
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.user!.userId;
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+
+      final bytes = await File(image.path).readAsBytes();
+      final base64String = base64Encode(bytes);
+
+    
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'photoUrl': base64String});
+
+      userProvider.updatePhotoUrl(base64String);
+
+      messenger.showSnackBar(
+        SnackBar(content: Text('Profile photo updated.'))
+      );
+    } catch (e) {
+      print('Error saving photo: $e');
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to save the photo. Please try again.'))
+      );
+    } finally {
+      if (mounted) setState(() => _isUploadingPhoto = false);
     }
   }
 
@@ -101,6 +140,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
   @override
   Widget build(BuildContext context) {
     final loggedUser = Provider.of<UserProvider>(context).user; 
+    final photoUrl = loggedUser?.photoUrl;
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A0B70),
       appBar: AppBar(
@@ -156,33 +197,64 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: _selectedImage != null
-                                ? DecorationImage(
-                                    image: FileImage(_selectedImage!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
+                        Stack(
+                          children: [
+                            ClipOval(
+                              child: SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: _selectedImage != null
+                                    ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                                    : photoUrl != null
+                                        ? Image.memory(
+                                            base64Decode(photoUrl),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stack) => Container(
+                                              decoration: const BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
+                                                ),
+                                              ),
+                                              child: const Icon(Icons.person, size: 90, color: Colors.black54),
+                                            ),
+                                          )
+                                        : Container(
+                                            decoration: const BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
+                                              ),
+                                            ),
+                                            child: const Icon(Icons.person, size: 90, color: Colors.black54),
+                                          ),
+                              ),
                             ),
-                          ),
-                          child: _selectedImage == null
-                              ? const Icon(Icons.person, size: 90, color: Colors.black54)
-                              : null,
+                            if (_isUploadingPhoto)
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withOpacity(0.4),
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
 
+                       
                         GestureDetector(
-                          onTap: _pickImage,
+                          onTap: _isUploadingPhoto ? null : _pickAndUploadImage,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.orange,
+                              color: _isUploadingPhoto ? Colors.grey : Colors.orange,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
