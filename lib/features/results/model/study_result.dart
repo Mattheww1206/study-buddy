@@ -9,8 +9,7 @@ class StudyResult {
   final int totalCards;
   final int correctCount;
   final int easyCount;
-  final int mediumCount;
-  final int hardCount;
+  final int againCount;
   final DateTime completedAt;
  
 
@@ -23,8 +22,7 @@ class StudyResult {
   required this.totalCards,
   this.correctCount = 0,
   this.easyCount = 0,
-  this.mediumCount = 0,
-  this.hardCount = 0,
+  this.againCount = 0,
   required this.completedAt,
  });
 
@@ -38,8 +36,7 @@ class StudyResult {
   totalCards: data['totalCards'] ?? 0,
   correctCount: data['totalCards'] ?? 0,
   easyCount: data['easyCount'] ?? 0,
-  mediumCount: data['mediumCount'] ?? 0,
-  hardCount: data['hardCount'] ?? 0,
+  againCount: data['againCount'] ?? 0,
   completedAt: (data['completedAt'] as Timestamp).toDate(), 
   );
  }
@@ -53,8 +50,7 @@ class StudyResult {
     'totalCards': totalCards,
     'correctCount': correctCount,
     'easyCount': easyCount,
-    'mediumCount': mediumCount,
-    'hardCount': hardCount,
+    'againCount': againCount,
     'completedAt': completedAt,
   };
  }

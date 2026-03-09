@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
+
 class FlashcardMissedPage extends StatefulWidget {
   const FlashcardMissedPage({super.key});
 
@@ -9,28 +12,69 @@ class FlashcardMissedPage extends StatefulWidget {
 }
 
 class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
-  // Data Source
-  final List<Map<String, String>> _cards = [
-    {
-      "term": "Meiosis",
-      "def": "Process where a single cell divides twice to produce four cells."
-    },
-    {
-      "term": "Mitosis",
-      "def": "A type of cell division that results in two daughter cells."
-    },
-    {
-      "term": "Cytoplasm",
-      "def": "The gelatinous liquid that fills the inside of a cell."
-    },
-  ];
-
+  double _dragX = 0;
   bool _isFront = true;
+  bool _initialized = false;
+
+  late Deck deck;
+  List<Flashcard> missedCards = [];
+
   int _currentIndex = 0;
+  int _gotItCount = 0;
+  int _stillUnsureCount = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+    missedCards = args['missedCards'] as List<Flashcard>;
+    deck = args['deck'] as Deck;
+  }
+
+  void _nextCard() {
+    if (_currentIndex >= missedCards.length - 1) {
+      Navigator.pop(context, {
+        'gotItCount': _gotItCount,
+        'stillUnsureCount': _stillUnsureCount,
+      });
+    } else {
+      setState(() {
+        _currentIndex++;
+        _isFront = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    double progressValue = ((_currentIndex + 1) / _cards.length).clamp(0.0, 1.0);
+    if (missedCards.isEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFEBE6FF),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('No missed cards!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Go Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final card = missedCards[_currentIndex];
+    final totalCards = missedCards.length;
+    final progress = (_currentIndex + 1) / totalCards;
 
     return Scaffold(
       backgroundColor: const Color(0xFFEBE6FF),
@@ -49,14 +93,14 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               const SizedBox(height: 20),
-              // Header
+
               Row(
                 children: [
-                  Text("${_currentIndex + 1} / ${_cards.length}",
+                  Text("${_currentIndex + 1} / $totalCards",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF5C5C9D),
@@ -66,7 +110,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
-                        value: progressValue,
+                        value: progress,
                         minHeight: 12,
                         backgroundColor: const Color(0xFFDCD6F7),
                         valueColor: const AlwaysStoppedAnimation<Color>(
@@ -75,191 +119,121 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text("Missed",
+                  const Text('Missed',
                       style: TextStyle(
                           color: Color(0xFFFF6B6B),
                           fontWeight: FontWeight.bold)),
                 ],
               ),
+
               const SizedBox(height: 20),
 
-              // Review Mode Label
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFE5E5),
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.push_pin, size: 16, color: Color(0xFFFF6B6B)),
-                    SizedBox(width: 6),
-                    Text("Review Mode — Missed Cards",
-                        style: TextStyle(
+                    const Icon(Icons.push_pin,
+                        size: 16, color: Color(0xFFFF6B6B)),
+                    const SizedBox(width: 6),
+                    Text('Review Mode — ${deck.title}',
+                        style: const TextStyle(
                             color: Color(0xFFFF6B6B),
                             fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
+
               const SizedBox(height: 20),
 
-              // --- MAIN FLASHCARD WITH DISMISSIBLE SWIPE ---
               Expanded(
-                child: Dismissible(
-                  key: UniqueKey(),
-                  onDismissed: (direction) {
-                    setState(() {
-                      if (_currentIndex < _cards.length - 1) {
-                        _currentIndex++;
-                        _isFront = true;
-                      } else {
-                        _currentIndex = 0; // O i-pop ang page pag tapos na
-                      }
-                    });
+                child: GestureDetector(
+                  onTap: () => setState(() => _isFront = !_isFront),
+                  onHorizontalDragUpdate: (details) =>
+                      setState(() => _dragX += details.delta.dx),
+                  onHorizontalDragEnd: (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+
+                    if (_dragX > 80 || velocity > 300) {
+                      setState(() => _dragX = 0);
+                      _gotItCount++;
+                      _nextCard();
+                    } else if (_dragX < -80 || velocity < -300) {
+                      setState(() => _dragX = 0);
+                      _stillUnsureCount++;
+                      _nextCard();
+                    } else {
+                      setState(() => _dragX = 0);
+                    }
                   },
-                  // Green Icon pag swipe pakanan
-                  background: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                  ),
-                  // Red Icon pag swipe pakaliwa
-                  secondaryBackground: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    child: const Icon(Icons.cancel, color: Colors.red, size: 50),
-                  ),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _isFront = !_isFront),
-                    child: TweenAnimationBuilder(
-                      tween: Tween<double>(begin: 0, end: _isFront ? 0 : pi),
-                      duration: const Duration(milliseconds: 500),
-                      builder: (context, double val, __) {
-                        final isBackSide = val > (pi / 2);
-                        return Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.001)
-                            ..rotateY(val),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: isBackSide ? Colors.white : const Color(0xFF51459E),
-                              borderRadius: BorderRadius.circular(35),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10)
-                              ],
-                            ),
-                            child: isBackSide
-                                ? Transform(
-                                    alignment: Alignment.center,
-                                    transform: Matrix4.identity()..rotateY(pi),
-                                    child: Stack(
-                                      children: [
-                                        Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(30),
-                                            child: Text(
-                                                _cards[_currentIndex]['def']!,
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 18,
-                                                    height: 1.5)),
-                                          ),
-                                        ),
-                                        const Positioned(
-                                            bottom: 25,
-                                            right: 25,
-                                            child: Text("tap to go back to term",
-                                                style: TextStyle(
-                                                    color: Colors.black26,
-                                                    fontSize: 12))),
-                                      ],
-                                    ),
-                                  )
-                                : Stack(
-                                    children: [
-                                      Positioned(
-                                          top: 25,
-                                          left: 25,
-                                          child: Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8)),
-                                              child: const Text("MISSED • TERM",
-                                                  style: TextStyle(
-                                                      color: Colors.white70,
-                                                      fontWeight:
-                                                          FontWeight.bold)))),
-                                      Center(
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                            Text(_cards[_currentIndex]['term']!,
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 42,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            const Text("Tap to see definition",
-                                                style: TextStyle(
-                                                    color: Colors.white70,
-                                                    fontSize: 18))
-                                          ])),
-                                      const Positioned(
-                                          bottom: 25,
-                                          right: 25,
-                                          child: Text("tap to flip →",
-                                              style: TextStyle(
-                                                  color: Colors.white54))),
-                                    ],
+                  child: Transform.translate(
+                    offset: Offset(_dragX, 0),
+                    child: Transform.rotate(
+                      angle: _dragX / 1000,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        child: _isFront
+                            ? Container(
+                                key: const ValueKey(true),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF912C2C),
+                                    borderRadius: BorderRadius.circular(35)),
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(30),
+                                    child: Text(card.question,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 42,
+                                            fontWeight: FontWeight.bold)),
                                   ),
-                          ),
-                        );
-                      },
+                                ),
+                              )
+                            : Container(
+                                key: const ValueKey(false),
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF5C5C9D),
+                                    borderRadius: BorderRadius.circular(35)),
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Text(card.answer,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 22)),
+                                  ),
+                                ),
+                              ),
+                      ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
 
-              const Center(
-                child: Text(
-                  "← Still unsure | Got it now! →",
-                  style: TextStyle(
-                      color: Color(0xFF665FBE),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _cards.length,
-                  (i) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    height: 8,
-                    width: i == _currentIndex ? 20 : 8,
-                    decoration: BoxDecoration(
-                      color: i <= _currentIndex
-                          ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('← Still unsure',
+                      style: TextStyle(
+                          color: Color(0xFFFF6B6B),
+                          fontWeight: FontWeight.bold)),
+                  Text('swipe', style: TextStyle(color: Colors.grey)),
+                  Text('Got it now! →',
+                      style: TextStyle(
+                          color: Color(0xFF4CAF50),
+                          fontWeight: FontWeight.bold)),
+                ],
               ),
+
               const SizedBox(height: 25),
             ],
           ),

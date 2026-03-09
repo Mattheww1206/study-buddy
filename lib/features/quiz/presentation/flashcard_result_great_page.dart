@@ -1,25 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 
 class FlashcardResultGreatPage extends StatefulWidget {
   const FlashcardResultGreatPage({super.key});
 
   @override
-  State<FlashcardResultGreatPage> createState() => _FlashcardResultGreatPageState();
+  State<FlashcardResultGreatPage> createState() =>
+      _FlashcardResultGreatPageState();
 }
 
-class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
-  // Dito mo i-input ang counts
-  final int gotItCount = 14;
-  final int hardCount = 3;
-  final int againCount = 3;
+class _FlashcardResultGreatPageState
+    extends State<FlashcardResultGreatPage> {
+  int gotItCount = 0;
+  int againCount = 0;
+  List<Flashcard> missedCards = [];
+  late Deck deck;
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    gotItCount = args['easyCount'] as int;
+    againCount = args['againCount'] as int;
+    missedCards = args['missedCards'] as List<Flashcard>;
+    deck = args['deck'] as Deck;
+  }
 
   @override
   Widget build(BuildContext context) {
-    // LOGIC PARA SA ACCURACY
-    int totalCards = gotItCount + hardCount + againCount;
-    // Accuracy = (Got It / Total)
-    double accuracyRatio = totalCards > 0 ? gotItCount / totalCards : 0.0;
-    int accuracyPercentage = (accuracyRatio * 100).toInt();
+    final int totalCards = gotItCount + againCount;
+    final double accuracyRatio =
+        totalCards > 0 ? gotItCount / totalCards : 0.0;
+    final int accuracyPercentage = (accuracyRatio * 100).toInt();
 
     return Scaffold(
       backgroundColor: const Color(0xFF6C63FF),
@@ -28,30 +46,30 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Header Section
-            const Text(
-              'Flashcard Mode',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'Biology • Cell Division',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
-            ),
+
+            // Header
+            const Text('Flashcard Mode',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold)),
+            Text('${deck.subject} • ${deck.title}',
+                style:
+                    const TextStyle(color: Colors.white70, fontSize: 14)),
             const SizedBox(height: 30),
             const Text('🏆', style: TextStyle(fontSize: 60)),
             const SizedBox(height: 10),
-            const Text(
-              'Amazing Session!',
-              style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            // Ginawang dynamic ang total cards text
-            Text(
-              'You went through all $totalCards cards',
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
-            ),
+            const Text('Amazing Session!',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold)),
+            Text('You went through all $totalCards cards',
+                style:
+                    const TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 30),
 
-            // White Card Section
+            // White card
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -66,43 +84,50 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Top Row Stats (Got it, Hard, Again)
+                      // Stats row
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Got It Box
                           Expanded(
                             child: Container(
                               margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(20)),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 15),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFE8F5E9),
+                                  borderRadius: BorderRadius.circular(20)),
                               child: Column(children: [
-                                Text('$gotItCount', style: const TextStyle(color: Colors.green, fontSize: 24, fontWeight: FontWeight.bold)),
-                                const Text('GOT IT!', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
+                                Text('$gotItCount',
+                                    style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold)),
+                                const Text('GOT IT!',
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold)),
                               ]),
                             ),
                           ),
-                          // Hard Box
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              decoration: BoxDecoration(color: const Color(0xFFFFF9C4), borderRadius: BorderRadius.circular(20)),
-                              child: Column(children: [
-                                Text('$hardCount', style: const TextStyle(color: Colors.orange, fontSize: 24, fontWeight: FontWeight.bold)),
-                                const Text('HARD', style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
-                              ]),
-                            ),
-                          ),
-                          // Again Box
                           Expanded(
                             child: Container(
                               margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              decoration: BoxDecoration(color: const Color(0xFFFFEBEE), borderRadius: BorderRadius.circular(20)),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 15),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFFFEBEE),
+                                  borderRadius: BorderRadius.circular(20)),
                               child: Column(children: [
-                                Text('$againCount', style: const TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.bold)),
-                                const Text('AGAIN', style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                                Text('$againCount',
+                                    style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold)),
+                                const Text('AGAIN',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold)),
                               ]),
                             ),
                           ),
@@ -110,17 +135,27 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Accuracy Section
+                      // Accuracy
                       Container(
                         padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: const Color(0xFFF3F2FF), borderRadius: BorderRadius.circular(20)),
+                        decoration: BoxDecoration(
+                            color: const Color(0xFFF3F2FF),
+                            borderRadius: BorderRadius.circular(20)),
                         child: Column(
                           children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Accuracy', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                Text('$accuracyPercentage%', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF6C63FF))),
+                                const Text('Accuracy',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                Text('$accuracyPercentage%',
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF6C63FF))),
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -136,46 +171,88 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                       ),
                       const SizedBox(height: 30),
 
-
+                      // Study Again button
                       SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // DITO NILAGAY ANG NAVIGATION:
-                            Navigator.pushNamed(context, 'missed');
-                          },
-                          icon: const Icon(Icons.push_pin, color: Color(0xFF6C63FF)),
-                          label: Text('Review Missed ($againCount)', style: const TextStyle(color: Color(0xFF6C63FF), fontSize: 18, fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF3E5F5), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                          onPressed: () => Navigator.pushReplacementNamed(
+                            context,
+                            'flashcard_mode',
+                            arguments: deck,
+                          ),
+                          icon: const Icon(Icons.refresh, color: Colors.white),
+                          label: const Text('Study Again',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF27F21),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
                         ),
                       ),
-                      // -------------------------
-
                       const SizedBox(height: 15),
+
+                      // Review Missed button — only show if there are missed cards
+                      if (againCount > 0)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 60,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              final result = await Navigator.pushNamed(
+                                context,
+                                'flashcard_missed',
+                                arguments: {
+                                  'missedCards': missedCards,
+                                  'deck': deck,
+                                },
+                              );
+                              if (result != null && mounted) {
+                                final map = result as Map<String, dynamic>;
+                                setState(() {
+                                  final newGotIt = map['gotItCount'] as int;
+                                  gotItCount = gotItCount + newGotIt;
+                                  againCount = againCount - newGotIt;
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.push_pin,
+                                color: Color(0xFF6C63FF)),
+                            label: Text('Review Missed ($againCount)',
+                                style: const TextStyle(
+                                    color: Color(0xFF6C63FF),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF3E5F5),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(30))),
+                          ),
+                        ),
+                      const SizedBox(height: 15),
+
+                      // Back to Home button
                       SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (route) => false),
                           icon: const Icon(Icons.check, color: Colors.white),
-                          label: const Text('Mark as Done', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                        ),
-                      ),
-
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pushNamed(context, 'study');
-                          },
-                          icon: const Icon(Icons.home_rounded, size: 20),
-                          label: const Text('Back to Deck', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-
+                          label: const Text('Back to Home',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6C63FF),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
                         ),
                       ),
                     ],
