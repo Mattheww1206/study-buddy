@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Deck {
@@ -9,7 +7,7 @@ class Deck {
   final String subject;
   int totalCards;
   final DateTime createdAt;
-
+  final bool isPinned; 
 
   Deck({
     required this.deckId,
@@ -18,6 +16,7 @@ class Deck {
     required this.subject,
     this.totalCards = 0,
     required this.createdAt,
+    this.isPinned = false, 
   });
 
   factory Deck.fromMap(String id, Map<String, dynamic> data) {
@@ -28,7 +27,8 @@ class Deck {
       subject: data['subject'] ?? '',
       totalCards: data['totalCards'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      );
+      isPinned: data['isPinned'] ?? false, 
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -38,11 +38,7 @@ class Deck {
       'subject': subject,
       'totalCards': totalCards,
       'createdAt': createdAt,
+      'isPinned': isPinned, 
     };
   }
-
-
-
-
-
 }

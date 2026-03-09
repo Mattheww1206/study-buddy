@@ -34,8 +34,8 @@ class DeckService {
         final flashcard = Flashcard(
           cardId: cardDocs.id, 
           deckId: deckDocs.id, 
-          question: card['term']!, 
-          answer: card['def']!, 
+          question: card['def']!, 
+          answer: card['term']!, 
           );
           cardBatch.set(cardDocs, flashcard.toMap());
       }
@@ -91,19 +91,10 @@ class DeckService {
     await deckBatch.commit();
    }
 
-   Future<void> updateDeck({
-    required String deckId,
-    required String title,
-    required String subject,
-   }) async {
-    await _firestore.collection('decks').doc(deckId).update({
-      'title': title,
-      'subject': subject,
-    });
+
+   Future<void> updateDeck(String deckId, Map<String, dynamic> data) async {
+    await _firestore.collection('decks').doc(deckId).update(data);
    }
-
-
-
 
 }
 

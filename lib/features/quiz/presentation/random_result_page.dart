@@ -234,7 +234,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                       // 2. Back to Deck Button
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, 'study');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white, 

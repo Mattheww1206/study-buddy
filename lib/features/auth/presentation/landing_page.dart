@@ -29,22 +29,8 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAEEFF), 
       body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromARGB(255, 82, 76, 146),
-                Color.fromRGBO(246, 246, 247, 1),
-                Color.fromARGB(255, 124, 117, 198)
-              ],
-              stops: [0, 0.5, 1.0]
-            )
-          ),
-          // margin: EdgeInsets.symmetric(vertical: 70),
-   
           child: Column(
             children: [
               const  SizedBox(height: 100),
@@ -81,8 +67,8 @@ class _LandingPageState extends State<LandingPage> {
               ),
               CustomButton(
                 text: 'Login',
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                textColor: const Color(0xFF4A449A),
+                backgroundColor: const Color(0xFF4A449A),
+                textColor: const Color.fromARGB(255, 255, 255, 255),
                 fontSize: 32,
                 height: 66,
                 width: 279,
@@ -93,7 +79,6 @@ class _LandingPageState extends State<LandingPage> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

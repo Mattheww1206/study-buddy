@@ -19,6 +19,7 @@ import 'package:studybuddy/features/profile/presentation/settings_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_missed_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_again_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_mode_page.dart';
+import 'package:studybuddy/features/quiz/presentation/flashcard_result_great_page.dart';
 import 'package:studybuddy/features/quiz/presentation/identification_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/identification_page.dart';
 import 'package:studybuddy/features/quiz/presentation/identification_result_page.dart';
@@ -85,6 +86,7 @@ class MyApp extends StatelessWidget {
        'flashcard_mode':(context) => const FlashcardModePage(),
       'flashcard_result_again':(context) => const  FlashcardResultAgainPage(),
        'missed':(context) => const FlashcardMissedPage(),
+       'flashcard_result_great':(context) => const FlashcardResultGreatPage(),
        'quiz_mode':(context) => const QuizModePage(),
        'multiple_mode':(context) => const MultipleChoiceModePage(),
        'multiple_choice':(context) => const MultipleChoicePage(),

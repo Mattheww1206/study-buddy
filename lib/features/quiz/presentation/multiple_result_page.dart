@@ -223,7 +223,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.menu_book, size: 20),
+                            Icon(Icons.fact_check, size: 20),
                             SizedBox(width: 10),
                             Text("Review Wrong Answer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ],
@@ -234,11 +234,11 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                       // 2. Back to Deck Button
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, 'study');
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor, 
-                          foregroundColor: secondaryColor, 
+                          backgroundColor: const Color.fromARGB(255, 255, 255, 255), 
+                          foregroundColor: dominantColor, 
                           minimumSize: const Size(double.infinity, 58),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           elevation: 0,
@@ -246,7 +246,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.arrow_back, size: 20),
+                            Icon(Icons.home_rounded, size: 20),
                             SizedBox(width: 10),
                             Text("Back to Deck", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ],

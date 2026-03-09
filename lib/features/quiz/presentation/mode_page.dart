@@ -31,15 +31,7 @@ class _ModePageState extends State<ModePage> {
           "STUDY BUDDY",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              backgroundColor: Colors.orange,
-              child: Icon(Icons.face, color: Colors.white),
-            ),
-          )
-        ],
+       
       ),
       body: SafeArea(
         child: SingleChildScrollView(

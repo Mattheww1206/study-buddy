@@ -134,36 +134,9 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 15),
-
-                      // XP Section
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(color: const Color(0xFF5E548E), borderRadius: BorderRadius.circular(20)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('XP Earned', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                            Text('+${gotItCount * 10} XP', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orangeAccent)),
-                          ],
-                        ),
-                      ),
                       const SizedBox(height: 30),
 
-                      // Action Buttons
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.refresh, color: Colors.white),
-                          label: const Text('Study Again', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF27F21), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      
-                      // --- ETO NA ANG BINAGO ---
+
                       SizedBox(
                         width: double.infinity,
                         height: 60,
@@ -188,6 +161,21 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                           icon: const Icon(Icons.check, color: Colors.white),
                           label: const Text('Mark as Done', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                        ),
+                      ),
+
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'study');
+                          },
+                          icon: const Icon(Icons.home_rounded, size: 20),
+                          label: const Text('Back to Deck', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+
                         ),
                       ),
                     ],

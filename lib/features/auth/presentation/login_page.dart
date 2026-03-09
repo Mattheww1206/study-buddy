@@ -7,8 +7,6 @@ import 'package:studybuddy/features/auth/service/auth_service.dart';
 import 'package:studybuddy/widgets/custom_button.dart';
 import 'package:studybuddy/widgets/custom_textfield.dart';
 
-
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -25,6 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   String? _emailError;
   String? _passwordError;
 
+  // Define the background color as a constant for easy reuse
+  final Color _themeBackgroundColor = const Color(0xFFFAEEFF);
 
   @override
   void dispose() {
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF16056B),
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
@@ -46,48 +46,46 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   Future<void> signIn() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() {
-    _isLoading = true;
-    _emailError = null;
-    _passwordError = null;
-  });
+    setState(() {
+      _isLoading = true;
+      _emailError = null;
+      _passwordError = null;
+    });
 
-  try {
-    final user = await _authService.signInWithEmailOrUsername(
-     emailOrUsername: _emailController.text.trim(),
-     password: _passwordController.text.trim(),
-    );
+    try {
+      final user = await _authService.signInWithEmailOrUsername(
+        emailOrUsername: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-    if(!mounted) return;
+      if (!mounted) return;
 
-    if(user != null){
+      if (user != null) {
         Provider.of<UserProvider>(context, listen: false).setUser(user);
-    }
+      }
 
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-    
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       final error = e.toString().replaceFirst('Exception: ', '');
       setState(() {
-        if(error.contains('No account found')) {
+        if (error.contains('No account found')) {
           _emailError = error;
           _passwordError = null;
-        } else if(error.contains('verify your email')) {
+        } else if (error.contains('verify your email')) {
           _emailError = error;
           _passwordError = null;
-        } else if(error.contains('Incorrect email or password')) {
+        } else if (error.contains('Incorrect email or password')) {
           _passwordError = 'Incorrect email or password.';
         }
       });
     } finally {
-      if(mounted){
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -102,9 +100,9 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final gUser = await _authService.signInWithGoogle();
 
-      if(!mounted) return;
+      if (!mounted) return;
 
-      if(gUser != null){
+      if (gUser != null) {
         Provider.of<UserProvider>(context, listen: false).setUser(gUser);
       }
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
@@ -112,12 +110,11 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _emailError = e.toString().replaceFirst('Exception: ', '');
       });
-
     } finally {
-      if(mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -127,269 +124,281 @@ class _LoginPageState extends State<LoginPage> {
     String? errorMessage;
 
     await showDialog(
-      context: context, 
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text('Reset Password',
-          style: GoogleFonts.itim()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Enter your email and we will send you the reset link.',
-              style: GoogleFonts.itim(
-                fontSize: 15
-              ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Email',
-                  border: OutlineInputBorder(),
+        context: context,
+        builder: (context) => StatefulBuilder(
+              builder: (context, setDialogState) => AlertDialog(
+                title: Text('Reset Password', style: GoogleFonts.itim()),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Enter your email and we will send you the reset link.',
+                      style: GoogleFonts.itim(fontSize: 15),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        errorMessage!,
+                        style: GoogleFonts.itim(
+                          color: Colors.red,
+                          fontSize: 13,
+                        ),
+                      )
+                    ]
+                  ],
                 ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      if (emailController.text.trim().isEmpty) {
+                        setDialogState(
+                          () => errorMessage = 'Email is required',
+                        );
+                        return;
+                      }
+
+                      final nav = Navigator.of(context);
+                      final messenger = ScaffoldMessenger.of(context);
+
+                      try {
+                        await _authService.resetPassword(
+                            email: emailController.text.trim());
+                        nav.pop();
+                        messenger.showSnackBar(const SnackBar(
+                            content: Text(
+                                'Password reset email has been sent! Please check your email.')));
+                      } catch (e) {
+                        setDialogState(() {
+                          errorMessage =
+                              e.toString().replaceFirst('Exception: ', '');
+                        });
+                      }
+                    },
+                    child: Text(
+                      'Send',
+                      style: GoogleFonts.itim(
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              if(errorMessage != null)...[
-                SizedBox(height: 8),
-                Text(errorMessage!, 
-                style: GoogleFonts.itim(
-                color: Colors.red,
-                 fontSize: 13,
-                ), 
-                )
-              ]
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed:() => Navigator.pop(context),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-            onPressed: () async {
-              if(emailController.text.trim().isEmpty){
-                setDialogState(() => errorMessage = 'Email is required',);
-                return;
-              }
-
-              final nav = Navigator.of(context);
-              final messenger = ScaffoldMessenger.of(context);
-
-              try {
-                await _authService.resetPassword(email: emailController.text.trim());
-                nav.pop();
-                messenger.showSnackBar(
-                  SnackBar(content: Text('Password reset email has been sent! Please check your email.'))
-                );
-              } catch (e) {
-                setDialogState(() {
-                  errorMessage = e.toString().replaceFirst('Exception: ', '');
-                });
-              }
-            },
-            child: Text('Send', 
-            style: GoogleFonts.itim(
-              color: Colors.blueAccent,
-            ),
-            ),
-            )
-          ],
-          ),
-        )
-        );
+            ));
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: _themeBackgroundColor,
       body: SafeArea(
-        child: Center(
+        child: SingleChildScrollView(
           child: Column(
-              children: [
-                SizedBox(
-                  height: 20,
+            children: [
+              const SizedBox(height: 40),
+              // Circular Logo Wrapper
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFE082), Color(0xFFFFB74D)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    )
+                  ],
                 ),
-                Image.asset(
+                child: Image.asset(
                   'assets/studybuddy-logo.png',
-                  width: 330,
-                  height: 210,
-                  fit: BoxFit.cover,
+                  width: 70,
+                  height: 70,
                 ),
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: SingleChildScrollView(
-                        child: Column(
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Welcome! ',
+                style: GoogleFonts.fredoka(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Login to continue your study journey',
+                style: GoogleFonts.itim(
+                  color: Colors.black.withOpacity(0.8),
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // The White Card Container
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 25, vertical: 35),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                    // Idinagdag ang shadow para magmukhang nakalutang
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        // Email/Username TextField with custom fillColor
+                        CustomTextfield(
+                          controller: _emailController,
+                          hintText: 'Email or Username',
+                          errorText: _emailError,
+                          keyboardType: TextInputType.emailAddress,
+                          fillColor: _themeBackgroundColor, // Color applied here
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email or Username is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        // Password TextField with custom fillColor
+                        CustomTextfield(
+                          controller: _passwordController,
+                          hintText: 'Password',
+                          errorText: _passwordError,
+                          isPassword: true,
+                          fillColor: _themeBackgroundColor, // Color applied here
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required';
+                            }
+                            if (value.length < 8) {
+                              return 'Password must be at least 8 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => showForgotPasswordDialog(),
+                            child: Text(
+                              'Forgot Password?',
+                              style: GoogleFonts.itim(
+                                color: const Color(0xFF4A449A),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Login Button
+                        CustomButton(
+                          text: 'Login',
+                          backgroundColor: const Color(0xFF5D54D0),
+                          textColor: Colors.white,
+                          fontSize: 22,
+                          width: 160,
+                          height: 60,
+                          isLoading: _isLoading,
+                          onTap: () async {
+                            await signIn();
+                          },
+                        ),
+                        const SizedBox(height: 25),
+                        Row(
                           children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text('Login',
-                              style: GoogleFonts.sourceSerif4(
-                                fontSize: 38,
-                              ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            // Email/Username TextField
-                            CustomTextfield(
-                              controller: _emailController,
-                              hintText: 'Email or Username',
-                              errorText: _emailError,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (value) {
-                                if(value == null || value.isEmpty) {
-                                  return 'Email or Username is required';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                           // Password TextField
-                            CustomTextfield(
-                              controller: _passwordController,
-                              hintText: 'Password',
-                              errorText: _passwordError,
-                              isPassword: true,
-                              validator: (value) {
-                                if(value == null || value.isEmpty){
-                                  return 'Password is required';
-                                }
-                                if(value.length < 8) {
-                                  return 'Password must be at least 8 characters';
-                                }
-                                return null;
-                              },
-                            ),
+                            const Expanded(child: Divider()),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 30),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      showForgotPasswordDialog();
-                                    },
-                                    child: Text('Forgot Password?',
-                                    style: GoogleFonts.itim(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                    ),
-                                  ),
-                                ],
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10),
+                              child: Text(
+                                'OR SIGN IN WITH',
+                                style: GoogleFonts.itim(
+                                    color: Colors.grey, fontSize: 13),
                               ),
                             ),
-                            SizedBox(
+                            const Expanded(child: Divider()),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Google Login Button
+                        CustomButton(
+                          text: 'Sign in with Google',
+                          height: 60,
+                          width: double.infinity,
+                          backgroundColor: Colors.white,
+                          textColor: Colors.black87,
+                          borderColor: Colors.grey.shade300,
+                          borderWidth: 1.5,
+                          fontSize: 18,
+                          icon: Image.asset(
+                            'assets/google-icon.png',
                             height: 30,
+                          ),
+                          onTap: () {
+                            signInWithGoogle();
+                          },
+                        ),
+                        const SizedBox(height: 30),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'New to StudyBuddy? ',
+                              style: GoogleFonts.itim(fontSize: 16),
                             ),
-                              CustomButton(
-                                text: 'Login',
-                                backgroundColor: Theme.of(context).colorScheme.surface,
-                                textColor: const Color.fromARGB(255, 255, 255, 255),
-                                fontSize: 23,
-                                width: 140,
-                                height: 50,
-                                isLoading: _isLoading,
-                                onTap: () async {
-                                  await signIn();
-                                },
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 25),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Divider(
-                                        thickness: 0.5,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                                      child: Text('Or Sign In with',
-                                      style: GoogleFonts.itim()
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Divider(
-                                        thickness: 0.5,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, 'register'),
+                              child: Text(
+                                'Create Account',
+                                style: GoogleFonts.itim(
+                                  fontSize: 16,
+                                  color: Colors.orange.shade800,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              CustomButton(
-                                text: 'Sign in With Google',
-                                height: 55,
-                                width: 250,
-                                backgroundColor: Colors.white,
-                                textColor: Colors.black,
-                                borderColor: Colors.black,
-                                borderWidth: 1,
-                                fontSize: 18,
-                                icon: Image.asset(
-                                  'assets/google-icon.png',
-                                  height: 35,
-                                ),
-                                onTap: () {
-                                  signInWithGoogle();
-                                },
-                              ),
-                             
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Text('New to StudyBuddy?',
-                            style: GoogleFonts.itim(
-                              fontSize: 22,
-                            ),
-                            ),
-                            CustomButton(
-                              text: 'Create Account',
-                              backgroundColor:Theme.of(context).colorScheme.secondary,
-                              textColor: Colors.white,
-                              fontSize: 27,
-                              height: 55,
-                              width: 250,
-                              onTap: () {
-                                Navigator.pushNamed(context, 'register');
-                              },
                             ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
-                   ),
                   ),
-                ]
-            ),
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
           ),
+        ),
       ),
     );
   }

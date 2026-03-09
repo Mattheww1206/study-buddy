@@ -139,21 +139,7 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                       ),
                       const SizedBox(height: 30),
 
-                      // Study Again Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF8A3D),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          ),
-                          child: const Text("🔄 Study Again", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
+                     
                       // Focus on Missed Button
                       SizedBox(
                         width: double.infinity,
@@ -177,12 +163,14 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                         width: double.infinity,
                         height: 55,
                         child: OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'study');
+                          },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Color(0xFFD1C4E9)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
-                          child: const Text("← Back to Deck", style: TextStyle(color: Color(0xFF706FD3), fontSize: 18, fontWeight: FontWeight.bold)),
+                          child: const Text("Back to Deck", style: TextStyle(color: Color(0xFF706FD3), fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],

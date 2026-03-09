@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -20,8 +19,8 @@ class _ProfilePageState extends State<ProfilePage> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF665FBE), // Dominant
-              Color(0xFFFAEEFF)  // Secondary
+              Color(0xFFFAEEFF), 
+              Color(0xFFFAEEFF)  
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -79,8 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ],
                               ),
-                  
-                              // Profile Avatar 
                               const Padding(
                                 padding: EdgeInsets.only(top: 50),
                                 child: CircleAvatar(
@@ -99,9 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                  
                           const SizedBox(height: 10),
-                  
                           Text(
                             loggedUser?.username ?? 'Foxy',
                             style: GoogleFonts.lora( 
@@ -110,10 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               fontSize: 28,
                             ),
                           ),
-                  
                           const SizedBox(height: 15),
-                  
-                          // Streak Badge
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
@@ -142,9 +134,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                   
-                // Stats Container
+                // Stats Container - Initaas ko pa lalo para dumikit sa header
                 Transform.translate(
-                  offset: const Offset(0, -40), 
+                  offset: const Offset(0, -60), // Mula -40, ginawa nating -60
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.symmetric(vertical: 20),
@@ -226,14 +218,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                   
+                // Pangatlong Card - Binabaan ko ng konti para sakto lang ang distansya
                 Transform.translate(
-                  offset: const Offset(0, -5),
+                  offset: const Offset(0, -40), // Inadjust para hindi dikit sa stats card
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +246,6 @@ class _ProfilePageState extends State<ProfilePage> {
                              color: const Color(0xFF665FBE)),
                         ),
                         const SizedBox(height: 12),
-                        // In-update ang row para sumunod sa sinend mong design
                         Row(
                           children: [
                             const Icon(Icons.check, color: Color(0xFF665FBE), size: 24),
@@ -276,12 +275,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 color: const Color(0xFF665FBE))),
                           ],
                         ),
-                  
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 15),
                           child: Divider(color: Colors.grey, thickness: 0.5),
                         ),
-                  
                         Text(
                           'Weekly Study (10 / 15)',
                           style: GoogleFonts.lora(
@@ -289,8 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontSize: 20, 
                             color: const Color(0xFF665FBE)),
                         ),
-                        const SizedBox(height: 12),
-                        // In-update ang row para maging isa nalang ang progress bar
+                        const SizedBox(height:3),
                         Row(
                           children: [
                             const Icon(Icons.check, color: Color(0xFF665FBE), size: 24),
@@ -311,7 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 5),
                             Text(
                               '70%', 
                               style: GoogleFonts.lora( 
@@ -324,6 +320,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20), 
               ],
             ),
           ),

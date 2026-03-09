@@ -18,6 +18,79 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
   File? _selectedImage;
   bool _isUploadingPhoto = false;
 
+  // --- START NG DAGDAG: DELETE VALIDATION DIALOG ---
+  void _showDeleteConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        child: Container(
+          padding: const EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 60),
+              const SizedBox(height: 20),
+              Text(
+                'Delete Account?',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lora(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red.shade900,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                'Are you sure you want to delete your account? This action is permanent and all your data will be lost.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[700]),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: Colors.grey.shade400),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: Text('Cancel', style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Dito mo ilalagay ang logic para burahin ang account sa Firebase
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Processing account deletion...')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: Text('Delete', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  // --- END NG DAGDAG ---
 
   Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
@@ -40,11 +113,9 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-
       final bytes = await File(image.path).readAsBytes();
       final base64String = base64Encode(bytes);
 
-    
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -53,12 +124,12 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
       userProvider.updatePhotoUrl(base64String);
 
       messenger.showSnackBar(
-        SnackBar(content: Text('Profile photo updated.'))
+        const SnackBar(content: Text('Profile photo updated.'))
       );
     } catch (e) {
       print('Error saving photo: $e');
       messenger.showSnackBar(
-        SnackBar(content: Text('Failed to save the photo. Please try again.'))
+        const SnackBar(content: Text('Failed to save the photo. Please try again.'))
       );
     } finally {
       if (mounted) setState(() => _isUploadingPhoto = false);
@@ -142,10 +213,25 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
     final loggedUser = Provider.of<UserProvider>(context).user; 
     final photoUrl = loggedUser?.photoUrl;
 
+    // --- Binago: Header color at shadow decoration ---
+    final Color headerColor = const Color(0xFF514BB0); // Mas madilim na purple
+    final cardDecoration = BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(30),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.12), // Soft shadow
+          spreadRadius: 1,
+          blurRadius: 10,
+          offset: const Offset(0, 5), // Shadow offset sa baba
+        ),
+      ],
+    );
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B70),
+      backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor:const Color(0xFF665FBE),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
@@ -157,7 +243,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             fontSize: 30,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
       ),
@@ -166,18 +252,15 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
         child: Column(
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
+              decoration: cardDecoration, // BINAGO: Shadow added
               child: Column(
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE3F2FD),
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: headerColor, // BINAGO: Darker header
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
                       ),
@@ -188,6 +271,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       style: GoogleFonts.lora(
                         fontWeight: FontWeight.bold,
                         fontSize: 23,
+                        color: Colors.white, // BINAGO: Puti para mabasa sa dark header
                       ),
                     ),
                   ),
@@ -248,7 +332,6 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                           ],
                         ),
 
-                       
                         GestureDetector(
                           onTap: _isUploadingPhoto ? null : _pickAndUploadImage,
                           child: Container(
@@ -327,24 +410,28 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25), // Spacing adjusted for shadow
 
             // SECURITY 
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
+              decoration: cardDecoration, // BINAGO: Shadow added
               child: Column(
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE3F2FD),
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+                    decoration: BoxDecoration(
+                      color: headerColor, // BINAGO: Darker header
+                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
                     ),
-                    child: Text('Security', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Security',
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // BINAGO: White text
+                      ),
+                    ),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
@@ -369,37 +456,44 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25), // Spacing adjusted for shadow
 
-            // DELETE ACCOUNT
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE3F2FD),
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+            // DELETE ACCOUNT SECTION 
+            GestureDetector(
+              onTap: _showDeleteConfirmation, 
+              child: Container(
+                decoration: cardDecoration, // BINAGO: Shadow added
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: headerColor, // BINAGO: Darker header
+                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 28), // BINAGO: Lighter red for visibility
+                          const SizedBox(width: 10),
+                          Text(
+                            'Delete Account',
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromARGB(255, 255, 255, 255), // BINAGO: Light red text
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
-                        const SizedBox(width: 10),
-                        Text('Delete Account', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red.shade900)),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text('This action is permanent and cannot be undone.', style: GoogleFonts.lora(fontSize: 20, color: Colors.black87)),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text('This action is permanent and cannot be undone.', style: GoogleFonts.lora(fontSize: 20, color: Colors.black87)),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

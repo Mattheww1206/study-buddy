@@ -73,20 +73,27 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                 child: Dismissible(
                   key: UniqueKey(),
                   onDismissed: (direction) {
+                    // DITO ANG LOGIC NG PAGLIPAT NG PAGE
                     setState(() {
-                      _isFlipped = false;
+                      // 1. Dagdagan ang score kung "Got it" (Swipe Right)
                       if (direction == DismissDirection.startToEnd) {
                         _score++;
                       }
+
+                      // 2. I-check kung huling card na
                       if (_currentIndex >= _totalCards) {
-                        double percentage = (_score / _totalCards);
-                        if (percentage >= 0.75) {
+                        double result = _score / _totalCards;
+                        
+                        // 3. 75% pataas = GREAT PAGE, else AGAIN PAGE
+                        if (result >= 0.75) {
                           Navigator.pushReplacementNamed(context, 'flashcard_result_great');
                         } else {
                           Navigator.pushReplacementNamed(context, 'flashcard_result_again');
                         }
                       } else {
+                        // Kung hindi pa huli, proceed sa next card
                         _currentIndex++;
+                        _isFlipped = false;
                       }
                     });
                   },
@@ -141,7 +148,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                               : Stack(
                                   children: [
                                     Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                      Text("Mitosis", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                                      const Text("Mitosis", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
                                       const SizedBox(height: 8),
                                       const Text("Tap to see definition", style: TextStyle(color: Colors.white70, fontSize: 14)),
                                     ])),

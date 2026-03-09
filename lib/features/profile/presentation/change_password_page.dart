@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
 
@@ -19,6 +18,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _isNewRequired = false;
   bool _isLengthValid = true;
   bool _isPasswordMatch = true;
+  bool _isLoading = false; 
 
   bool _obscureCurrent = true;
   bool _obscureNew = true;
@@ -47,19 +47,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: const Color(0xFFCBE4FF),
+          backgroundColor: Colors.white, 
           title: Column(
             children: [
               const Icon(
                 Icons.lock_reset, 
                 size: 50, 
-                color: Color(0xFF1A0B70)),
+                color: Color(0xFF665FBE)), 
               const SizedBox(height: 10),
               Text(
                 'Confirm Change',
                 style: GoogleFonts.lora(
                   fontWeight: FontWeight.bold, 
-                  color: const Color(0xFF1A0B70)),
+                  color: const Color(0xFF665FBE)), 
               ),
             ],
           ),
@@ -72,11 +72,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           actions: [
             OutlinedButton(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                  color: Colors.red, 
-                  width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                side: const BorderSide(color: Colors.red, width: 2),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               onPressed: () => Navigator.pop(context),
@@ -85,10 +82,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 style: GoogleFonts.lora(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
-            //  CONFIRM BUTTON 
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1A0B70),
+                backgroundColor: const Color(0xFF665FBE), 
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
@@ -108,17 +104,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Future<void> _saveNewPassword() async {
+    setState(() => _isLoading = true);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await Future.delayed(const Duration(seconds: 2)); 
     await prefs.setString('saved_password', _newController.text);
     
     if (mounted) {
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Password Saved Successfully!', style: GoogleFonts.lora()),
           backgroundColor: Colors.green,
         ),
       );
-      
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) Navigator.pop(context);
       });
@@ -128,20 +126,21 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B70),
+      backgroundColor: const Color(0xFFFAEEFF), // Background Lavender
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF665FBE), // Dark Purple App Bar
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Change Password',
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
-            fontSize: 28,
-            color: Colors.black,
+            fontSize: 24,
+            color: Colors.white,
           ),
         ),
       ),
@@ -152,13 +151,18 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFCBE4FF),
+                // Gradient Card: Puti patungong Lavender
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.white, Color(0xFFFAEEFF)],
+                ),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    color: const Color(0xFF665FBE).withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   )
                 ],
               ),
@@ -167,26 +171,22 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 children: [
                   Text(
                     'Current Password', 
-                    style: GoogleFonts.lora(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.w500)),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                    ),
                     child: TextFormField(
                       controller: _currentController,
                       obscureText: _obscureCurrent,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.lock, 
-                          color: Colors.grey),
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
                         suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureCurrent ? Icons.visibility_off : Icons.visibility, 
-                            color: Colors.grey),
+                          icon: Icon(_obscureCurrent ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
                         ),
                         border: InputBorder.none,
@@ -196,33 +196,27 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   if (_isCurrentRequired)
                     Padding(
                       padding: const EdgeInsets.only(top: 5, left: 5),
-                      child: Text(
-                        "Current password is required", 
-                        style: GoogleFonts.lora(
-                          color: Colors.red, 
-                          fontSize: 11)),
+                      child: Text("Current password is required", style: GoogleFonts.lora(color: Colors.red, fontSize: 11)),
                     ),
 
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
 
                   Text(
                     'New Password', 
-                    style: GoogleFonts.lora(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.w500)),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                    ),
                     child: TextFormField(
                       controller: _newController,
                       obscureText: _obscureNew,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.lock, 
-                          color: Colors.grey),
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
                         suffixIcon: IconButton(
                           icon: Icon(_obscureNew ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureNew = !_obscureNew),
@@ -234,42 +228,32 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   if (_isNewRequired)
                     Padding(
                       padding: const EdgeInsets.only(top: 5, left: 5),
-                      child: Text(
-                        "New password is required", 
-                        style: GoogleFonts.lora(
-                          color: Colors.red, 
-                          fontSize: 11)),
+                      child: Text("New password is required", style: GoogleFonts.lora(color: Colors.red, fontSize: 11)),
                     )
                   else if (!_isLengthValid)
                     Padding(
                       padding: const EdgeInsets.only(top: 5, left: 5),
-                      child: Text(
-                        "Must be 8-16 characters long", 
-                        style: GoogleFonts.lora(
-                          color: Colors.red, 
-                          fontSize: 11)),
+                      child: Text("Must be 8-16 characters long", style: GoogleFonts.lora(color: Colors.red, fontSize: 11)),
                     ),
 
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
 
                   Text(
                     'Confirm New Password', 
-                    style: GoogleFonts.lora(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.w500)),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                    ),
                     child: TextFormField(
                       controller: _confirmController,
                       obscureText: _obscureConfirm,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.lock, 
-                          color: Colors.grey),
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
                         suffixIcon: IconButton(
                           icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
@@ -281,11 +265,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   if (!_isPasswordMatch)
                     Padding(
                       padding: const EdgeInsets.only(top: 5, left: 5),
-                      child: Text(
-                        "Passwords do not match",
-                         style: GoogleFonts.lora(
-                          color: Colors.red, 
-                          fontSize: 11)),
+                      child: Text("Passwords do not match", style: GoogleFonts.lora(color: Colors.red, fontSize: 11)),
                     ),
                 ],
               ),
@@ -294,22 +274,32 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             const SizedBox(height: 40),
 
             GestureDetector(
-              onTap: _showConfirmDialog,
+              onTap: _isLoading ? null : _showConfirmDialog,
               child: Container(
                 width: double.infinity,
                 height: 55,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF63A7FF),
+                  color: const Color(0xFFFF7A01), // Accent (Orange)
                   borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF7A01).withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    )
+                  ],
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Update Password',
-                  style: GoogleFonts.lora(
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 18, 
-                    color: Colors.black),
-                ),
+                child: _isLoading 
+                  ? const SizedBox(
+                      width: 25, 
+                      height: 25, 
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(
+                      'Update Password',
+                      style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                    ),
               ),
             ),
           ],

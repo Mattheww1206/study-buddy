@@ -115,21 +115,21 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF665FBE), // Dominant Color
+      backgroundColor: const Color(0xFFFAEEFF), // Dominant Color
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF665FBE),
         title: Text(
           'Settings',
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             fontSize: 25, // Pinaliit mula 30
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
-              size: 25, color: Colors.black), // Pinaliit mula 30
+              size: 25, color: Colors.white), // Pinaliit mula 30
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -140,7 +140,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Container(
               padding: const EdgeInsets.all(30), // Pinaliit mula 40
               decoration: BoxDecoration(
-                color: const Color(0xFFFAEEFF), // Secondary Color
+                color: const Color.fromARGB(255, 255, 255, 255), // Secondary Color
                 borderRadius: BorderRadius.circular(25), // Pinaliit mula 30
               ),
               child: Column(
@@ -224,7 +224,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       children: [
                         Container(
-                          height: 50, // Pinaliit mula 60
+                          height: 50, 
                           width: 50,  // Pinaliit mula 60
                           decoration: const BoxDecoration(
                             color: Color(0xFF665FBE), // Dominant Color
