@@ -16,6 +16,7 @@ import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
 import 'package:studybuddy/features/profile/presentation/profile_page.dart';
 import 'package:studybuddy/features/profile/presentation/settings_page.dart';
+import 'package:studybuddy/features/quiz/presentation/True_False_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_missed_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_result_again_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_mode_page.dart';
@@ -35,6 +36,9 @@ import 'package:studybuddy/features/quiz/presentation/random_page.dart';
 import 'package:studybuddy/features/quiz/presentation/random_result_page.dart';
 import 'package:studybuddy/features/quiz/presentation/random_review_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
+import 'package:studybuddy/features/quiz/presentation/true_false_page.dart';
+import 'package:studybuddy/features/quiz/presentation/true_false_result_page.dart';
+import 'package:studybuddy/features/quiz/presentation/true_false_review_page.dart';
 import 'package:studybuddy/features/quiz/provider/quiz_provider.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
@@ -105,6 +109,10 @@ class MyApp extends StatelessWidget {
        'random':(context) => const RandomPage(),
        'ran_result':(context) => const RandomResultPage(),
        'ran_review':(context) => const RandomReviewPage(),
+       'tf_mode':(context) => const TrueFalseModePage(),
+       'tf':(context) => const TrueFalsePage(),
+       'tf_result':(context) => const TrueFalseResultPage(),
+       'tf_review':(context) => const TrueFalseReviewPage()
 
      
 

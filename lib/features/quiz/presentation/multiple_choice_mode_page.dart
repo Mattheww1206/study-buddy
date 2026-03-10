@@ -111,7 +111,7 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.bar_chart, color: Color(0xFF665FBE), size: 24), 
+                      Icon(Icons.quiz_outlined, color: Color(0xFF665FBE), size: 24), 
                       SizedBox(width: 8), 
                       Text("Number of Questions", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)), 
                     ],
