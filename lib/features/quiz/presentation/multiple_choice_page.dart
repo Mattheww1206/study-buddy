@@ -1,4 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
+import 'package:studybuddy/features/quiz/service/quiz_service.dart';
+import 'package:studybuddy/features/results/model/study_result.dart';
+import 'package:studybuddy/features/results/service/result_service.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -15,29 +24,223 @@ class MultipleChoicePage extends StatefulWidget {
 }
 
 class _MultipleChoicePageState extends State<MultipleChoicePage> {
-  String? selectedOption;
+  final ResultService _resultService = ResultService();
+  final QuizService _quizService = QuizService();
+  late Deck _deck;
+  late DateTime _startTime;
+  late int _numberOfQuestions;
+  int? _timerMinutes;
+  List<Flashcard> _flashcards = [];
+  List<Map<String, dynamic>> _quizData = [];
+  bool _isLoading = true;
+  bool _isFinished = false;
+  bool _initialized = false;
+  int _currentIndex = 0; 
+  int _correctCount = 0;
+  String? _selectedOption;
+  Timer? _timer;
+  int _secondsLeft = 0;
   
-  // --- DINAGDAG NA VARIABLES PARA SA LOGIC ---
-  int currentIndex = 0; 
-  final int totalQuestions = 10; 
 
   // Color Palette
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF6D00);
 
-  final List<String> options = [
-    "Mitosis",
-    "Meiosis",
-    "Binary Fission",
-    "Cytokinesis"
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _deck = args['deck'] as Deck;
+    _numberOfQuestions = args['numberOfQuestions'] as int;
+    _timerMinutes = args['timerMinutes'] as int?;
+
+    if (_timerMinutes != null) {
+      _secondsLeft = _timerMinutes! * 60;
+    }
+
+    _loadQuiz();
+  }
+
+  Future<void> _loadQuiz() async {
+  try {
+    final quizData = await _quizService.generateMultipleChoiceQuiz(
+      deckId: _deck.deckId,
+      numberOfQuestions: _numberOfQuestions,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _flashcards = quizData
+          .map((d) => d['flashcard'] as Flashcard)
+          .toList();
+      _quizData = quizData;
+      _isLoading = false;
+    });
+    _startTime = DateTime.now();
+
+    if (_timerMinutes != null) _startTimer();
+  } catch (e) {
+    setState(() => _isLoading = false);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to load quiz.')),
+    );
+  }
+}
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsLeft <= 0) {
+        timer.cancel();
+        _finishQuiz(); // time's up
+      } else {
+        setState(() => _secondsLeft--);
+      }
+    });
+  }
+
+  String get _timerDisplay {
+    final minutes = _secondsLeft ~/ 60;
+    final seconds = _secondsLeft % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _onNextTapped() {
+    if (_selectedOption == null) return; // must select before proceeding
+
+    final currentData = _quizData[_currentIndex];
+    final isCorrect = _selectedOption == currentData['correctAnswer'];
+
+    _quizData[_currentIndex]['selectedAnswer'] = _selectedOption;
+
+    if (isCorrect) _correctCount++;
+
+    if (_currentIndex >= _flashcards.length - 1) {
+      _finishQuiz();
+    } else {
+      setState(() {
+        _currentIndex++;
+        _selectedOption = null;
+      });
+    }
+  }
+
+  Future<void> _finishQuiz() async {
+    if (_isFinished) return;
+    _isFinished = true;
+    _timer?.cancel();
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.user!.userId;
+    final totalCards = _flashcards.length;
+    final wrongAnswers = _quizService.getWrongAnswers(_quizData);
+    final elapsed = DateTime.now().difference(_startTime);
+    final minutes = elapsed.inMinutes;
+    final seconds = elapsed.inSeconds % 60;
+    final timeUsed = '${minutes}m ${seconds}s';
+    
+
+    try {
+      await _resultService.saveResult(StudyResult(
+        resultId: '',
+        userId: userId,
+        deckId: _deck.deckId,
+        deckTitle: _deck.title,
+        mode: 'multiple_choice',
+        totalCards: totalCards,
+        correctCount: _correctCount,
+        easyCount: _correctCount,
+        againCount: totalCards - _correctCount,
+        completedAt: DateTime.now(),
+      ));
+    } catch (e) {
+      print('Error saving result: $e');
+    }
+
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(
+      context,
+      'multiple_result',
+      arguments: {
+        'correctCount': _correctCount,
+        'totalCards': totalCards,
+        'wrongAnswers': wrongAnswers,
+        'deck': _deck,
+        'timeUsed': timeUsed,
+      },
+    );
+  }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  
+  @override
   Widget build(BuildContext context) {
-    // Pag-calculate ng progress percentage
-    double progressValue = (currentIndex + 1) / totalQuestions;
-    int progressPercent = (progressValue * 100).toInt();
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: secondaryColor,
+        appBar: AppBar(
+          backgroundColor: dominantColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            _deck.title, 
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          centerTitle: true,
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text('Generating quiz questions...',
+                  style: TextStyle(
+                      color: Color(0xFF665FBE), fontSize: 16)),
+            ],
+          ),
+        ),
+      );
+    }
+    if (_flashcards.isEmpty) {
+      return Scaffold(
+        backgroundColor: secondaryColor,
+        appBar: AppBar(
+          backgroundColor: dominantColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            _deck.title,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          centerTitle: true,
+        ),
+        body: const Center(child: Text('No flashcards in this deck.')),
+      );
+    }
+
+    final currentData = _quizData[_currentIndex];
+    final flashcard = currentData['flashcard'] as Flashcard;
+    final choices = currentData['choices'] as List<dynamic>;
+    final totalQuestions = _flashcards.length;
+    final progressValue = (_currentIndex + 1) / totalQuestions;
+    final progressPercent = (progressValue * 100).toInt();
+    final isLastQuestion = _currentIndex >= totalQuestions - 1;
 
     return Scaffold(
       backgroundColor: secondaryColor,
@@ -69,43 +272,45 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Question ${currentIndex + 1}/$totalQuestions", 
+                          Text("Question ${_currentIndex + 1}/$totalQuestions", 
                             style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor, fontSize: 22)),
                           Text("$progressPercent% Completed", 
                             style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16)),
                         ],
                       ),
-                      
-                      // Timer Pill
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: dominantColor.withOpacity(0.2), width: 1.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 5,
-                              offset: const Offset(0, 2),
-                            )
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.timer_outlined, color: dominantColor, size: 18),
-                            const SizedBox(width: 6),
-                            Text(
-                              "18:42",
-                              style: TextStyle(
-                                color: dominantColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                      // Timer 
+                      if (_timerMinutes != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: _secondsLeft < 60
+                            ? Colors.red
+                            : dominantColor.withOpacity(0.2),
+                            width: 1.5),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.timer_outlined,
+                                  color: _secondsLeft < 60
+                                  ? Colors.red
+                                  : dominantColor,
+                                  size: 18),
+                              const SizedBox(width: 6),
+                              Text(
+                                _timerDisplay,
+                                style: TextStyle(
+                                    color: _secondsLeft < 60
+                                    ? Colors.red
+                                    : dominantColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 15),
@@ -124,7 +329,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
 
             const SizedBox(height: 5),
 
-            // --- QUESTION CARD ---
+            // Question Card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 35),
@@ -134,7 +339,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
               ),
               child: Text(
-                "What type of cell division produces 4 genetically unique daughter cells?",
+                flashcard.question,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: dominantColor, fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -146,14 +351,14 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: options.length,
+                itemCount: choices.length,
                 itemBuilder: (context, index) {
-                  String optionText = options[index];
-                  bool isSelected = selectedOption == optionText;
+                  String choice = choices[index];
+                  bool isSelected = _selectedOption == choice;
                   String letter = String.fromCharCode(65 + index);
 
                   return GestureDetector(
-                    onTap: () => setState(() => selectedOption = optionText),
+                    onTap: () => setState(() => _selectedOption = choice),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(bottom: 15),
@@ -185,7 +390,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                           const SizedBox(width: 20),
                           Expanded(
                             child: Text(
-                              optionText,
+                              choice,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -201,7 +406,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
               ),
             ),
 
-            // --- DYNAMIC BUTTON (NEXT O SUBMIT) ---
+            // Next and Submit Button
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: SizedBox(
@@ -214,21 +419,12 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     elevation: 5,
                   ),
-                  onPressed: () {
-                    if (currentIndex < totalQuestions - 1) {
-                      // HINDI PA LAST PAGE: Next Question Logic
-                      setState(() {
-                        currentIndex++;
-                        selectedOption = null; // Ni-reset ang sagot para sa sunod na tanong
-                      });
-                    } else {
-                      // LAST PAGE NA: Submit Logic
-                      Navigator.pushNamed(context, 'multiple_result');
-                    }
-                  },
+                  onPressed:
+                      _selectedOption != null ? _onNextTapped : null,
                   child: Text(
-                    currentIndex < totalQuestions - 1 ? "Next Question" : "Submit", 
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    isLastQuestion ? 'Submit' : 'Next Question',
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -239,3 +435,4 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     );
   }
 }
+

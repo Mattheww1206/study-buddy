@@ -109,7 +109,7 @@ class _StudyPageState extends State<StudyPage> {
                                     color: dominantColor, size: 35),
                                 const SizedBox(width: 10),
                                 Text(
-                                  '${decks.length}', // 👈 real deck count
+                                  '${filteredDecks.length}', 
                                   style: TextStyle(
                                     fontSize: 55,
                                     fontWeight: FontWeight.w900,
@@ -145,7 +145,7 @@ class _StudyPageState extends State<StudyPage> {
                                   onTap: () => Navigator.pushNamed(
                                     context,
                                     'mode',
-                                    arguments: deck, // 👈 pass real deck
+                                    arguments: deck, 
                                   ),
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 16),
@@ -187,7 +187,7 @@ class _StudyPageState extends State<StudyPage> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                '${deck.totalCards} Flashcards • ${deck.subject}', // 👈 real data
+                                                '${deck.totalCards} Flashcards • ${deck.subject}',
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                   color: Colors.grey,

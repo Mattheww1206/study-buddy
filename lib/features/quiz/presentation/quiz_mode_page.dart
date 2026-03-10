@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class QuizModePage extends StatefulWidget {
   const QuizModePage({super.key});
@@ -9,6 +10,17 @@ class QuizModePage extends StatefulWidget {
 
 class _QuizModePageState extends State<QuizModePage> {
   String selectedType = 'Multiple Mode';
+  late Deck deck;
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    deck = ModalRoute.of(context)!.settings.arguments as Deck; 
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -32,29 +44,28 @@ class _QuizModePageState extends State<QuizModePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 10),
-            // Biology Card
+            SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 30),
               decoration: BoxDecoration(
                 color: const Color(0xFF4C49A7),
                 borderRadius: BorderRadius.circular(25),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Text('BIOLOGY', style: TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)),
+                  Text(deck.subject.toUpperCase as String, style: const TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  Text('Cell Division', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  Text(deck.title.toUpperCase as String, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  Text('20 cards available', style: TextStyle(color: Colors.white60, fontSize: 13)),
+                   Text('${deck.totalCards} cards available', style: TextStyle(color: Colors.white60, fontSize: 13)),
                 ],
               ),
             ),
-            const SizedBox(height: 25),
-            const Text('Choose Quiz Type', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF120E32))),
-            const SizedBox(height: 20),
-
-            // 1. Multiple Choice
+             SizedBox(height: 25),
+             Text('Choose Quiz Type', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF120E32))),
+             SizedBox(height: 20),
+             
+            // 1. Multiple Choice Quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'Multiple Mode');
@@ -83,8 +94,8 @@ class _QuizModePageState extends State<QuizModePage> {
                           decoration: BoxDecoration(color: const Color(0xFF7B78E1), borderRadius: BorderRadius.circular(12)),
                           child: const Icon(Icons.edit_document, color: Colors.white, size: 22),
                         ),
-                        const SizedBox(width: 12),
-                        const Expanded(
+                        SizedBox(width: 12),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -96,8 +107,8 @@ class _QuizModePageState extends State<QuizModePage> {
                         if (selectedType == 'Multiple Mode') const Icon(Icons.check_circle, color: Color(0xFF5E5CE6)),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    const Row(
+                    SizedBox(height: 12),
+                    Row(
                       children: [
                         Chip(label: Text('⚡ Most Common', style: TextStyle(fontSize: 10, color: Color(0xFF5E5CE6), fontWeight: FontWeight.bold)), backgroundColor: Color(0xFFF0EFFF), side: BorderSide.none),
                         SizedBox(width: 8),
@@ -108,8 +119,7 @@ class _QuizModePageState extends State<QuizModePage> {
                 ),
               ),
             ),
-
-            // 2. Identification
+            // 2. Identification Quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'iden_mode');
@@ -163,7 +173,7 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
             ),
 
-            // 3. Random Mix
+            // 3. Mixed quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'ran_mode');
@@ -222,13 +232,12 @@ class _QuizModePageState extends State<QuizModePage> {
             // Start Button
             ElevatedButton(
               onPressed: () {
-                // FIXED LOGIC: Dito natin itatama ang paglipat ng screen
                 if (selectedType == 'Multiple Mode') {
-                  Navigator.pushNamed(context, 'multiple_mode');
+                  Navigator.pushNamed(context, 'multiple_mode', arguments: deck);
                 } else if (selectedType == 'iden_mode') {
-                   Navigator.pushNamed(context, 'iden_mode');
+                   Navigator.pushNamed(context, 'iden_mode', arguments: deck);
                 } else if (selectedType == 'ran_mode') {
-                   Navigator.pushNamed(context, 'ran_mode');
+                   Navigator.pushNamed(context, 'ran_mode', arguments: deck);
                 }
               },
               style: ElevatedButton.styleFrom(
