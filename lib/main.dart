@@ -38,20 +38,24 @@ import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/features/quiz/provider/quiz_provider.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ai/firebase_ai.dart';
+import 'firebase_options.dart';
 
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     await FirebaseService.initializeFirebase();
+    await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
+    
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DeckProvider()),
-        ChangeNotifierProvider(create: (_) => FlashcardProvider()),
-        ChangeNotifierProvider(create: (_) => QuizProvider()),
-
       ],
       child: MyApp(),
     )

@@ -1,28 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class IdentificationResultPage extends StatefulWidget {
   const IdentificationResultPage({super.key});
 
   @override
-  State<IdentificationResultPage> createState() => _IdentificationResultPageState();
+  State<IdentificationResultPage> createState() =>
+      _IdentificationResultPageState();
 }
 
 class _IdentificationResultPageState extends State<IdentificationResultPage> {
+  int _correctCount = 0;
+  int _totalCards = 0;
+  List<Map<String, String>> wrongAnswers = [];
+  late Deck deck;
+  bool _initialized = false;
+  String timeUsed = '';
+
+  final Color dominantColor = const Color(0xFF665FBE);
+  final Color secondaryColor = const Color(0xFFFAEEFF);
+  final Color accentColor = const Color(0xFFFF7900);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _correctCount = args['correctCount'] as int;
+    _totalCards = args['totalCards'] as int;
+    wrongAnswers =
+        List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    deck = args['deck'] as Deck;
+    timeUsed = args['timeUsed'] as String;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Kinopya ang color constants para sa consistency
-    const Color dominantColor = Color(0xFF665FBE);
-    const Color secondaryColor = Color(0xFFFAEEFF);
-    const Color accentColor = Color(0xFFFF7900);
+    final double accuracy =
+        _totalCards > 0 ? _correctCount / _totalCards : 0.0;
+    final int accuracyPercent = (accuracy * 100).toInt();
+    final bool isExcellent = accuracy >= 0.75;
 
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [dominantColor, Color(0xFF7A73D1)],
+            colors: [dominantColor, const Color(0xFF7A73D1)],
           ),
         ),
         child: SafeArea(
@@ -31,9 +60,9 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
             children: [
               const SizedBox(height: 10),
               const Text(
-                "QUIZ COMPLETE!",
+                'QUIZ COMPLETE!',
                 style: TextStyle(
-                  color: Color.fromARGB(244, 255, 245, 245),
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
                   fontSize: 15,
@@ -46,38 +75,47 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white24, width: 2),
                 ),
-                child: const Icon(Icons.emoji_events, size: 45, color: Colors.white),
+                child: Icon(
+                  isExcellent
+                      ? Icons.emoji_events
+                      : Icons.sentiment_satisfied,
+                  size: 45,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 5),
-              const Text(
-                "85%", // Halimbawang score para sa Identification
+              Text(
+                '$accuracyPercent%',
                 style: TextStyle(
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                  color: accentColor,
-                ),
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                    color: accentColor),
               ),
-              const Text(
-                "Great Effort! 🧠",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+              Text(
+                isExcellent ? 'Excellent Work! 🎉' : 'Keep Practicing! 💪',
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: const Text(
-                  "📝 Identification • 20 Questions • Science",
-                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                child: Text(
+                  '📝 Identification • $_totalCards Questions • ${deck.subject}',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 25), 
+              const SizedBox(height: 25),
+
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -89,174 +127,230 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                       topRight: Radius.circular(40),
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start, 
-                    children: [
-                      // Total Score Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 22),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F7FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE8E5FF)),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // total score
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F7FF),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: const Color(0xFFE8E5FF)),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '$_correctCount/$_totalCards',
+                                style: TextStyle(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                    color: dominantColor),
+                              ),
+                              const Text(
+                                'TOTAL SCORE',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.black38,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: const Column(
+                        const SizedBox(height: 12),
+
+                        // accuracy
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F7FF),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: const Color(0xFFE8E5FF)),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.insights,
+                                          color: dominantColor, size: 20),
+                                      const SizedBox(width: 8),
+                                      const Text('Accuracy',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16)),
+                                    ],
+                                  ),
+                                  Text('$accuracyPercent%',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: dominantColor)),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: LinearProgressIndicator(
+                                  value: accuracy,
+                                  minHeight: 10,
+                                  backgroundColor:
+                                      const Color(0xFFE0E0E0),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      accentColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // time and streak row
+                        Row(
                           children: [
-                            Text(
-                              "17/20",
-                              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: dominantColor),
-                            ),
-                            Text(
-                              "TOTAL SCORE",
-                              style: TextStyle(fontSize: 11, color: Colors.black38, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Accuracy Progress Card
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F7FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE8E5FF)),
-                        ),
-                        child: Column(
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F7FF),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                      color: const Color(0xFFE8E5FF)),
+                                ),
+                                child: Row(
                                   children: [
-                                    Icon(Icons.insights, color: dominantColor, size: 20),
-                                    SizedBox(width: 8),
-                                    Text("Accuracy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                    const Icon(Icons.timer_outlined,
+                                        color: Colors.black26, size: 22),
+                                    const SizedBox(width: 8),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(timeUsed,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14)),
+                                        const Text('TIME USED',
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                color: Colors.black38,
+                                                fontWeight:
+                                                    FontWeight.bold)),
+                                      ],
+                                    ),
                                   ],
                                 ),
-                                Text("85%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F7FF),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                      color: const Color(0xFFE8E5FF)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.local_fire_department,
+                                        color: accentColor, size: 22),
+                                    const SizedBox(width: 8),
+                                    const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('+1 day',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14)),
+                                        Text('STREAK',
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                color: Colors.black38,
+                                                fontWeight:
+                                                    FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 25),
+
+                        // review wrong answers
+                        if (wrongAnswers.isNotEmpty) ...[
+                          ElevatedButton(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              'iden_review',
+                              arguments: {
+                                'wrongAnswers': wrongAnswers,
+                                'deck': deck,
+                              },
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentColor,
+                              foregroundColor: secondaryColor,
+                              minimumSize: const Size(double.infinity, 58),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fact_check, size: 20),
+                                SizedBox(width: 10),
+                                Text('Review Answers',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: const LinearProgressIndicator(
-                                value: 0.85,
-                                minHeight: 10,
-                                backgroundColor: Color(0xFFE0E0E0),
-                                valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Time and Streak Row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.timer_outlined, color: Colors.black26, size: 22),
-                                  SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("10m 05s", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      Text("TIME USED", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.local_fire_department, color: accentColor, size: 22),
-                                  SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("+1 day", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      Text("STREAK", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          const SizedBox(height: 12),
                         ],
-                      ),
-                      
-                      const SizedBox(height: 25), 
-                      
-                      // 1. Review Identification Answers Button
-                      ElevatedButton(
-                        onPressed: () {
-                          // Siguraduhing may 'identification_review' route ka sa main.dart
-                          Navigator.pushNamed(context, 'iden_review');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor, 
-                          foregroundColor: secondaryColor, 
-                          minimumSize: const Size(double.infinity, 58),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: 0,
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.fact_check, size: 20),
-                            SizedBox(width: 10),
-                            Text("Review Answers", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // 2. Back to Deck Button
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'study');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white, 
-                          foregroundColor: dominantColor, 
-                          minimumSize: const Size(double.infinity, 58),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: const BorderSide(color: Color(0xFFE8E5FF)),
+
+                        // back to home
+                        ElevatedButton(
+                          onPressed: () =>
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/', (route) => false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: dominantColor,
+                            minimumSize: const Size(double.infinity, 58),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: const BorderSide(
+                                  color: Color(0xFFE8E5FF)),
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 0,
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.home_rounded, size: 20),
+                              SizedBox(width: 10),
+                              Text('Back to Home',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                            ],
+                          ),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.home_rounded, size: 20),
-                            SizedBox(width: 10),
-                            Text("Back to Deck", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ),

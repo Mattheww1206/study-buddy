@@ -53,9 +53,9 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
               child: Column(
                 children: [
-                  Text(deck.subject.toUpperCase as String, style: const TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)),
+                  Text(deck.subject.toUpperCase(), style: const TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  Text(deck.title.toUpperCase as String, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  Text(deck.title.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                    Text('${deck.totalCards} cards available', style: TextStyle(color: Colors.white60, fontSize: 13)),
                 ],
@@ -235,7 +235,7 @@ class _QuizModePageState extends State<QuizModePage> {
                 if (selectedType == 'Multiple Mode') {
                   Navigator.pushNamed(context, 'multiple_mode', arguments: deck);
                 } else if (selectedType == 'iden_mode') {
-                   Navigator.pushNamed(context, 'iden_mode', arguments: deck);
+                   Navigator.pushNamed(context, 'iden_mode', arguments: {'deck': deck});
                 } else if (selectedType == 'ran_mode') {
                    Navigator.pushNamed(context, 'ran_mode', arguments: deck);
                 }

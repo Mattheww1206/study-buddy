@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
@@ -8,13 +7,6 @@ import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: MultipleChoicePage(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
 
 class MultipleChoicePage extends StatefulWidget {
   const MultipleChoicePage({super.key});
@@ -134,14 +126,15 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     _isFinished = true;
     _timer?.cancel();
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userId = userProvider.user!.userId;
-    final totalCards = _flashcards.length;
-    final wrongAnswers = _quizService.getWrongAnswers(_quizData);
     final elapsed = DateTime.now().difference(_startTime);
     final minutes = elapsed.inMinutes;
     final seconds = elapsed.inSeconds % 60;
     final timeUsed = '${minutes}m ${seconds}s';
+    
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.user!.userId;
+    final totalCards = _flashcards.length;
+    final wrongAnswers = _quizService.getWrongAnswers(_quizData);
     
 
     try {
@@ -253,7 +246,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text("Biology Quiz", style: TextStyle(color: Colors.white, fontSize: 18)),
+        title: Text(_deck.title, style: TextStyle(color: Colors.white, fontSize: 18)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -346,14 +339,13 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
             ),
 
             const SizedBox(height: 20),
-
             // --- OPTIONS LIST ---
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: choices.length,
                 itemBuilder: (context, index) {
-                  String choice = choices[index];
+                  String choice = choices[index].toString();
                   bool isSelected = _selectedOption == choice;
                   String letter = String.fromCharCode(65 + index);
 
