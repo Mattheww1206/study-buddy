@@ -249,7 +249,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                           children: [
                             Icon(Icons.home_rounded, size: 20),
                             SizedBox(width: 10),
-                            Text("Back to Deck", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text("Back to Home", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ],
                         ),
                       ),

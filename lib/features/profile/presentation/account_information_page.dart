@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// Tinanggal ang google_fonts import
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
@@ -47,7 +47,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               Text(
                 'Delete Account?',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
+                // Pinalitan ng default TextStyle
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.red.shade900,
@@ -57,7 +58,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               Text(
                 'Are you sure you want to delete your account? This action is permanent and all your data will be lost.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[700]),
+                // Pinalitan ng default TextStyle
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
               const SizedBox(height: 30),
               Row(
@@ -70,7 +72,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         side: BorderSide(color: Colors.grey.shade400),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       ),
-                      child: Text('Cancel', style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold)),
+                      // Pinalitan ng default TextStyle
+                      child: Text('Cancel', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -93,7 +96,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       ),
-                      child: Text('Delete', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                      // Pinalitan ng default TextStyle
+                      child: Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -194,7 +198,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               Text(
                 'Edit Username',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
+                // Pinalitan ng default TextStyle
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -204,7 +209,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               TextField(
                 controller: controller,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 18),
+                // Pinalitan ng default TextStyle
+                style: TextStyle(fontSize: 18),
                 decoration: InputDecoration(
                   enabledBorder: UnderlineInputBorder(
                       borderSide:
@@ -228,8 +234,9 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                       ),
+                      // Pinalitan ng default TextStyle
                       child: Text('Cancel',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                               color: const Color(0xFF665FBE),
                               fontWeight: FontWeight.bold)),
                     ),
@@ -239,7 +246,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        _saveUsername(controller.text); // 👈 saves to Firestore + provider
+                        _saveUsername(controller.text);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF665FBE),
@@ -248,8 +255,9 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                       ),
+                      // Pinalitan ng default TextStyle
                       child: Text('Save',
-                          style: GoogleFonts.inter(
+                          style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold)),
                     ),
@@ -284,7 +292,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
       borderRadius: BorderRadius.circular(30),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.12), 
+          color: Colors.black.withOpacity(0.12), 
           spreadRadius: 1,
           blurRadius: 10,
           offset: const Offset(0, 5), 
@@ -297,13 +305,14 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
         backgroundColor:const Color(0xFF665FBE),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: Text(
           'Account',
-          style: GoogleFonts.lora(
+          // Pinalitan ng default TextStyle
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 30,
             color: Colors.white,
@@ -331,7 +340,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     child: Text(
                       'Profile Information',
                       textAlign: TextAlign.left,
-                      style: GoogleFonts.lora(
+                      // Pinalitan ng default TextStyle
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 23,
                         color: Colors.white, 
@@ -352,7 +362,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                                   child: _selectedImage != null
                                       ? Image.file(_selectedImage!,
                                           fit: BoxFit.cover)
-                                      : photoUrl != null
+                                      : (photoUrl != null && photoUrl.isNotEmpty)
                                           ? Image.memory(
                                               base64Decode(photoUrl),
                                               fit: BoxFit.cover,
@@ -370,7 +380,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color:
-                                        Colors.black.withValues(alpha: 0.4),
+                                        Colors.black.withOpacity(0.4),
                                   ),
                                   child: const Center(
                                     child: CircularProgressIndicator(
@@ -379,8 +389,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                            ],
+                          ),
                           GestureDetector(
                             onTap: _isUploadingPhoto
                                 ? null
@@ -391,20 +401,28 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                               decoration: BoxDecoration(
                                 color: _isUploadingPhoto
                                     ? Colors.grey
-                                    : Colors.orange,
+                                    // GINAWANG ORANGE PARA SA EDIT AT UPLOAD
+                                    : Colors.orange, 
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(Icons.camera_alt,
+                                  Icon(
+                                    (photoUrl != null && photoUrl.isNotEmpty) 
+                                        ? Icons.edit 
+                                        : Icons.camera_alt,
                                       color: Colors.white, size: 23),
-                                  SizedBox(width: 5),
-                                  Text('Edit Photo',
-                                      style: TextStyle(
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    (photoUrl != null && photoUrl.isNotEmpty) 
+                                        ? 'Edit Photo' 
+                                        : 'Upload Photo',
+                                      // Pinalitan ng default TextStyle
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
-                                ],
+                                ]
                               ),
                             ),
                           ),
@@ -424,7 +442,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Username',
-                              style: GoogleFonts.inter(
+                              // Pinalitan ng default TextStyle
+                              style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600])),
                           const SizedBox(height: 2),
@@ -440,7 +459,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                                       )
                                     : Text(
                                         loggedUser?.username ?? '',
-                                        style: GoogleFonts.lora(
+                                        // Pinalitan ng default TextStyle
+                                        style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -467,11 +487,13 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Email', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
+                          // Pinalitan ng default TextStyle
+                          Text('Email', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                           const SizedBox(height: 2),
                           Text(
                             loggedUser?.emailAdd ?? '',
-                            style: GoogleFonts.lora(
+                            // Pinalitan ng default TextStyle
+                            style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline),
@@ -497,7 +519,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     ),
                     child: Text(
                       'Security',
-                      style: GoogleFonts.inter(
+                      // Pinalitan ng default TextStyle
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white, 
@@ -517,7 +540,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       children: [
                         const Icon(Icons.lock_outline, color: Colors.blue, size: 35),
                         const SizedBox(width: 15),
-                        Text('Change Password', style: GoogleFonts.lora(fontSize: 20, fontWeight: FontWeight.bold)),
+                        // Pinalitan ng default TextStyle
+                        Text('Change Password', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         const Spacer(),
                         const Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20),
                       ],
@@ -550,7 +574,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                           const SizedBox(width: 10),
                           Text(
                             'Delete Account',
-                            style: GoogleFonts.inter(
+                            // Pinalitan ng default TextStyle
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: const Color.fromARGB(255, 255, 255, 255), 
@@ -561,7 +586,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Text('This action is permanent and cannot be undone.', style: GoogleFonts.lora(fontSize: 20, color: Colors.black87)),
+                      // Pinalitan ng default TextStyle
+                      child: Text('This action is permanent and cannot be undone.', style: TextStyle(fontSize: 20, color: Colors.black87)),
                     ),
                   ],
                 ),
