@@ -48,12 +48,14 @@ class GeminiService {
   Future<List<List<String>>> generateDistractors({
     required List<Map<String, String>> flashcards,
   }) async {
+    print('Gemini generating distractors for ${flashcards.length} cards');
     final fallback = List.generate(
       flashcards.length,
       (_) => ['None of the above', 'All of the above', 'Cannot be determined'],
     );
 
     final result = await _callWithRetry(() async {
+      print('calling gemini for distractors');
       final formatted = flashcards
           .asMap()
           .entries
@@ -78,6 +80,7 @@ class GeminiService {
       final content = [Content.text(prompt)];
       final response = await _model.generateContent(content);
       final text = response.text!;
+      print('Gemini raw response: $text');
       final cleaned = text
           .replaceAll('```json', '')
           .replaceAll('```', '')
@@ -86,13 +89,26 @@ class GeminiService {
           .trim();
 
       final List<dynamic> parsed = jsonDecode(cleaned);
-      return parsed
+      final distractors = parsed
           .map((inner) => (inner as List<dynamic>)
               .map((e) => e.toString())
               .take(3)
               .toList())
           .toList();
+
+          for (int i = 0; i < flashcards.length; i++) {
+          print('Card ${i + 1}: "${flashcards[i]["question"]}"');
+          print('Answer: "${flashcards[i]["answer"]}"');
+          print('Distractors: ${distractors[i]}');
+    }
+       return distractors;
     });
+
+    if (result == null) {
+    print('Gemini failed — using fallback distractors');
+  } else {
+    print('Gemini success — ${result.length} distractor sets generated');
+  }
 
     return result ?? fallback;
   }
@@ -100,7 +116,9 @@ class GeminiService {
   Future<List<Map<String, String>>> generateIdentificationQuestionsBatch({
     required List<Map<String, String>> flashcards,
   }) async {
+    print('Gemini generateIdentification called for ${flashcards.length} cards');
     final result = await _callWithRetry(() async {
+       print('calling gemini for identification questions');
       final flashcardsJson = jsonEncode(flashcards);
 
       final prompt =
@@ -119,6 +137,7 @@ class GeminiService {
       final content = [Content.text(prompt)];
       final response = await _model.generateContent(content);
       final text = response.text!;
+      print('Gemini Raw response: $text'); 
       final cleaned = text
           .replaceAll('```json', '')
           .replaceAll('```', '')
@@ -127,7 +146,7 @@ class GeminiService {
           .trim();
 
       final List<dynamic> parsed = jsonDecode(cleaned);
-      return List.generate(
+      final questions = List.generate(
         parsed.length,
         (i) => {
           'question': parsed[i]['question']?.toString() ??
@@ -136,7 +155,22 @@ class GeminiService {
               parsed[i]['answer']?.toString() ?? flashcards[i]['answer']!,
         },
       );
+          for (int i = 0; i < questions.length; i++) {
+          print('  Card ${i + 1}:');
+          print('  Original:  "${flashcards[i]["question"]}"');
+          print('  Rephrased: "${questions[i]["question"]}"');
+          print('  Answer:    "${questions[i]["answer"]}"');
+        }
+
+        return questions;
     });
+
+    if (result == null) {
+    print('Gemini failed — returning original flashcards as fallback');
+  } else {
+    print('Gemini success — ${result.length} identification questions generated');
+  }
+
 
     return result ?? flashcards;
   }

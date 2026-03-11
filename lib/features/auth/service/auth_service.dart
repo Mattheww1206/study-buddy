@@ -37,7 +37,7 @@ class AuthService {
       final newUser = AppUser(
         userId: userCredential.user!.uid,
         username: username,
-        emailAdd: email
+        email: email
       );
       
       await _firestore
@@ -72,7 +72,7 @@ class AuthService {
     }
   }
 
-
+  // Sign In
   Future<AppUser?> signIn({
     required String email,
     required String password,
@@ -112,7 +112,9 @@ class AuthService {
       return AppUser(
         userId: credential.user!.uid,  
         username: data['username'],
-        emailAdd: data['email'],          
+        email: data['email'],   
+        provider: data['provider'] ?? 'password',
+        photoUrl: data['photoUrl'],       
       );
     } on FirebaseAuthException catch (e) {
       throw Exception(_handleLoginAuthError(e));
@@ -256,8 +258,9 @@ class AuthService {
         final newUser = AppUser(
           userId: firebaseUser.uid,
           username: firebaseUser.displayName ?? 'user_${firebaseUser.uid.substring(0, 5)}',
-          emailAdd: firebaseUser.email ?? '',
+          email: firebaseUser.email ?? '',
           provider: 'google',
+          
         );
         await _firestore
             .collection('users')
@@ -271,7 +274,9 @@ class AuthService {
       return AppUser(
         userId: firebaseUser.uid,
         username: data['username'],
-        emailAdd: data['email'],
+        email: data['email'],
+        provider: data['provider'] ?? 'google',
+        photoUrl: data['photoUrl'],
       );
 
     } catch (e) {

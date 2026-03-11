@@ -1,7 +1,7 @@
 class AppUser {
     final String userId;
     String? username;
-    final String emailAdd;
+    final String email;
     final String provider;
     final String? photoUrl;
    
@@ -9,7 +9,7 @@ class AppUser {
     AppUser({
         required this.userId,
         this.username,
-        required this.emailAdd,
+        required this.email,
         this.provider = 'password',
         this.photoUrl
     });
@@ -18,7 +18,7 @@ class AppUser {
     return AppUser(
       userId: id,
       username: data['username'],
-      emailAdd: data['email'] ?? '',
+      email: data['email'] ?? '',
       provider: data['provider'] ?? 'password',
       photoUrl: data['photoUrl'],
        );
@@ -28,7 +28,7 @@ class AppUser {
     return {
       'userId' : userId,
       'username': username,
-      'email': emailAdd,
+      'email': email,
       'provider': provider,
       'photoUrl': photoUrl,
     };

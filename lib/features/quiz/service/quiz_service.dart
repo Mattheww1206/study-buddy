@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/gemini/service/gemini_service.dart';
@@ -5,102 +6,190 @@ import 'package:studybuddy/features/gemini/service/gemini_service.dart';
 class QuizService {
   final DeckService _deckService = DeckService();
   final GeminiService _geminiService = GeminiService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final Map<String, List<Map<String, dynamic>>> _multipleChoiceCache = {};
-  final Map<String, List<Map<String, dynamic>>> _identificationCache = {};
-
-  String _cacheKey(String deckId, int numberOfQuestions) =>
-      '${deckId}_$numberOfQuestions';
-
+  // ─── Multiple Choice ────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> generateMultipleChoiceQuiz({
     required String deckId,
     required int numberOfQuestions,
   }) async {
-    final key = _cacheKey(deckId, numberOfQuestions);
-
-    if (_multipleChoiceCache.containsKey(key)) {
-      return _multipleChoiceCache[key]!;
-    }
-
     final cards = await _deckService.getDeckFlashcards(deckId);
     cards.shuffle();
     final selected = cards.take(numberOfQuestions).toList();
 
+
+    final saved = await _getFromFirestore(deckId, 'multiple_choice');
+    if (saved != null) {
+      print('Firestore — MC quiz for $deckId');
+      return _buildMCQuizData(selected, saved);
+    }
+
+    print('Gemini generating distractors - MC quiz for $deckId');
     final flashcardMaps = selected
-        .map((card) => {'question': card.question, 'answer': card.answer})
+        .map((c) => {'question': c.question, 'answer': c.answer})
         .toList();
 
-    final allDistractors =
-        await _geminiService.generateDistractors(flashcards: flashcardMaps);
+    final allDistractors = await _geminiService.generateDistractors(flashcards: flashcardMaps);
 
-    final quizData = List.generate(selected.length, (i) {
-      final card = selected[i];
-      final distractors = allDistractors[i];
-      final choices = [card.answer, ...distractors]..shuffle();
-      return {
-        'flashcard': card,
-        'choices': choices,
-        'selectedAnswer': null,
-        'correctAnswer': card.answer,
-      };
-    });
 
-    _multipleChoiceCache[key] = quizData;
-    return quizData;
+    await _saveMCToFirestore(deckId, selected, allDistractors);
+    print('Firestore saved MC quiz for $deckId');
+
+  
+    final freshSaved = await _getFromFirestore(deckId, 'multiple_choice');
+    return _buildMCQuizData(selected, freshSaved!);
   }
 
+  // ─── Identification ─────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> generateIdentificationQuiz({
     required String deckId,
     required int numberOfQuestions,
   }) async {
-    final key = _cacheKey(deckId, numberOfQuestions);
-
-
-    if (_identificationCache.containsKey(key)) {
-      return _identificationCache[key]!;
-    }
-
-    final cards = List<Flashcard>.from(
-      await _deckService.getDeckFlashcards(deckId),
-    );
+    final cards = await _deckService.getDeckFlashcards(deckId);
     cards.shuffle();
     final selected = cards.take(numberOfQuestions).toList();
 
-    final flashcardsInput = selected
-        .map((card) => {'question': card.question, 'answer': card.answer})
+    // 1. Check Firestore
+    final saved = await _getFromFirestore(deckId, 'identification');
+    if (saved != null) {
+      print('Firestore — identification quiz for $deckId');
+      return _buildIdenQuizData(saved);
+    }
+
+    // 2. Call Gemini
+    print('Gemini generating modified questions - identification quiz for $deckId');
+    final flashcardMaps = selected
+        .map((c) => {'question': c.question, 'answer': c.answer})
         .toList();
 
-    final generated =
-        await _geminiService.generateIdentificationQuestionsBatch(
-      flashcards: flashcardsInput,
+    final generated = await _geminiService.generateIdentificationQuestionsBatch(
+      flashcards: flashcardMaps,
     );
 
-    final quizData = List.generate(
-      selected.length,
-      (i) => {
-        'flashcard': selected[i],
-        'question': generated[i]['question'],
-        'correctAnswer': generated[i]['answer'],
-        'userAnswer': '',
-        'isCorrect': false,
-      },
-    );
+    // 3. Save to Firestore
+    await _saveIdenToFirestore(deckId, selected, generated);
+    print('Firestore saved identification quiz for $deckId');
 
-    _identificationCache[key] = quizData;
-    return quizData;
+    // 4. Return built quiz
+    final freshSaved = await _getFromFirestore(deckId, 'identification');
+    return _buildIdenQuizData(freshSaved!);
   }
 
-  void clearCache({String? deckId, int? numberOfQuestions}) {
-    if (deckId != null && numberOfQuestions != null) {
-      final key = _cacheKey(deckId, numberOfQuestions);
-      _multipleChoiceCache.remove(key);
-      _identificationCache.remove(key);
-    } else {
-      _multipleChoiceCache.clear();
-      _identificationCache.clear();
+  // ─── Firestore Read ──────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>?> _getFromFirestore(
+      String deckId, String quizType) async {
+    try {
+      final doc = await _firestore
+          .collection('decks')
+          .doc(deckId)
+          .collection('generatedQuiz')
+          .doc(quizType)
+          .get();
+
+      if (!doc.exists) return null;
+      return List<Map<String, dynamic>>.from(doc.data()!['questions']);
+    } catch (e) {
+      print('Firestore error reading quiz: $e');
+      return null;
     }
   }
 
+  // ─── Firestore Write ─────────────────────────────────────────────────
+  Future<void> _saveMCToFirestore(
+    String deckId,
+    List<Flashcard> flashcards,
+    List<List<String>> distractors,
+  ) async {
+    final questions = List.generate(flashcards.length, (i) => {
+      'flashcardId': flashcards[i].cardId,
+      'question': flashcards[i].question,
+      'correctAnswer': flashcards[i].answer,
+      'distractors': distractors[i],
+    });
+
+    await _firestore
+        .collection('decks')
+        .doc(deckId)
+        .collection('generatedQuiz')
+        .doc('multiple_choice')
+        .set({
+      'generatedAt': FieldValue.serverTimestamp(),
+      'questions': questions,
+    });
+  }
+
+  Future<void> _saveIdenToFirestore(
+    String deckId,
+    List<Flashcard> flashcards,
+    List<Map<String, String>> generated,
+  ) async {
+    final questions = List.generate(flashcards.length, (i) => {
+      'flashcardId': flashcards[i].cardId,
+      'question': generated[i]['question'] ?? flashcards[i].question,
+      'answer': generated[i]['answer'] ?? flashcards[i].answer,
+    });
+
+    await _firestore
+        .collection('decks')
+        .doc(deckId)
+        .collection('generatedQuiz')
+        .doc('identification')
+        .set({
+      'generatedAt': FieldValue.serverTimestamp(),
+      'questions': questions,
+    });
+  }
+
+  // ─── Build Quiz Data ──────────────────────────────────────────────────
+  List<Map<String, dynamic>> _buildMCQuizData(
+    List<Flashcard> flashcards,
+    List<Map<String, dynamic>> saved,
+  ) {
+    // align saved questions to shuffled flashcards by flashcardId
+    return List.generate(flashcards.length, (i) {
+      final match = saved.firstWhere(
+        (s) => s['flashcardId'] == flashcards[i].cardId,
+        orElse: () => saved[i],
+      );
+      final choices = [
+        match['correctAnswer'].toString(),
+        ...List<String>.from(match['distractors']),
+      ]..shuffle();
+      return {
+        'flashcard': flashcards[i],
+        'choices': choices,
+        'correctAnswer': match['correctAnswer'],
+        'selectedAnswer': null,
+      };
+    });
+  }
+
+  List<Map<String, dynamic>> _buildIdenQuizData(
+    List<Map<String, dynamic>> saved,
+  ) {
+    return saved.map((q) => {
+      'question': q['question'],
+      'correctAnswer': q['answer'],
+      'userAnswer': '',
+      'isCorrect': false,
+    }).toList();
+  }
+
+  // ─── Delete when deck is edited ───────────────────────────────────────
+  Future<void> deleteGeneratedQuiz(String deckId) async {
+    final types = ['multiple_choice', 'identification'];
+    for (final type in types) {
+      await _firestore
+          .collection('decks')
+          .doc(deckId)
+          .collection('generatedQuiz')
+          .doc(type)
+          .delete();
+    }
+    print('Firestore deletes generated quizzes for $deckId');
+  }
+
+  // ─── Wrong Answers (unchanged) ────────────────────────────────────────
   List<Map<String, String>> getWrongAnswers(
       List<Map<String, dynamic>> quizData) {
     final wrongAnswers = <Map<String, String>>[];

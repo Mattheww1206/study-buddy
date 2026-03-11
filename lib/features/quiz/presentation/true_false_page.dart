@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/quiz/service/quiz_service.dart';
+import 'package:studybuddy/features/results/service/result_service.dart';
 
 class TrueFalsePage extends StatefulWidget {
   const TrueFalsePage({super.key});
@@ -8,6 +10,8 @@ class TrueFalsePage extends StatefulWidget {
 }
 
 class _TrueFalsePageState extends State<TrueFalsePage> {
+  final QuizService _quizService = QuizService();
+  final ResultService _resultService = ResultService();
   int currentQuestion = 1;
   int totalQuestions = 11;
   String? selectedAnswer;

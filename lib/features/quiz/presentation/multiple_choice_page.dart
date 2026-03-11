@@ -155,11 +155,6 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
       print('Error saving result: $e');
     }
 
-    _quizService.clearCache(
-    deckId: _deck.deckId,
-    numberOfQuestions: _numberOfQuestions,
-  );
-
     if (!mounted) return;
     Navigator.pushReplacementNamed(
       context,

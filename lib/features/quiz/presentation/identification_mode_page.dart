@@ -26,8 +26,7 @@ import 'package:studybuddy/features/deck/model/deck_model.dart';
     if (_initialized) return;
     _initialized = true;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
         _deck = args['deck'] as Deck;
 
     // cap default to deck total

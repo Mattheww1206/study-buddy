@@ -8,6 +8,7 @@ import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'dart:convert';
 
 import 'package:studybuddy/features/auth/service/auth_service.dart';
+import 'package:studybuddy/features/profile/service/profile_service.dart';
 
 class AccountInformationPage extends StatefulWidget {
   const AccountInformationPage({super.key});
@@ -18,6 +19,7 @@ class AccountInformationPage extends StatefulWidget {
 
 class _AccountInformationPageState extends State<AccountInformationPage> {
   final AuthService _authService = AuthService();
+  final ProfileService _profileService = ProfileService();
   File? _selectedImage;
   bool _isUploadingPhoto = false;
   bool _isSavingUsername = false;
@@ -126,14 +128,10 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      final bytes = await File(image.path).readAsBytes();
-      final base64String = base64Encode(bytes);
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'photoUrl': base64String});
-
+      final base64String = await _profileService.uploadPhoto(
+        userId: userId, 
+        imageFile: File(image.path)
+        );
       userProvider.updatePhotoUrl(base64String);
 
       messenger.showSnackBar(
@@ -158,11 +156,10 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
     setState(() => _isSavingUsername = true);
 
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'username': newUsername.trim()});
-
+      await _profileService.updateUsername(
+        userId: userId, 
+        username: newUsername
+        );
       userProvider.updateUsername(newUsername.trim());
 
       messenger.showSnackBar(
@@ -470,7 +467,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                           Text('Email', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
                           const SizedBox(height: 2),
                           Text(
-                            loggedUser?.emailAdd ?? '',
+                            loggedUser?.email ?? '',
                             style: GoogleFonts.lora(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

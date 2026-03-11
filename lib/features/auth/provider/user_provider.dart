@@ -21,7 +21,7 @@ class UserProvider extends ChangeNotifier {
   _user = AppUser(
     userId: _user!.userId,
     username: username, 
-    emailAdd: _user!.emailAdd,
+    email: _user!.email,
     provider: _user!.provider,
     photoUrl: _user!.photoUrl,
   );
@@ -33,7 +33,7 @@ void updatePhotoUrl(String url) {
   _user = AppUser(
     userId: _user!.userId, 
     username: _user!.username,
-    emailAdd: _user!.emailAdd,
+    email: _user!.email,
     provider: _user!.provider,
     photoUrl: url,
   );

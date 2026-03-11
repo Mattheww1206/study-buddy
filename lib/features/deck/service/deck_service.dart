@@ -79,8 +79,17 @@ class DeckService {
                        .collection('flashcards')
                        .get();
 
+    final generatedQuiz = await _firestore
+                          .collection('decks')
+                          .doc(deckId)
+                          .collection('generatedQuiz')
+                          .get();
+
     final deckBatch = _firestore.batch();
     for (final doc in flashcards.docs){
+      deckBatch.delete(doc.reference);
+    }
+    for(final doc in generatedQuiz.docs){
       deckBatch.delete(doc.reference);
     }
 

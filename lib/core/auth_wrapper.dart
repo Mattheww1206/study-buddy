@@ -59,8 +59,9 @@ class AuthWrapper extends StatelessWidget {
       userProvider.setUser(AppUser(
         userId: uid,
         username: data['username'],
-        emailAdd: data['email'],
+        email: data['email'],
         provider: data['provider'] ?? 'password',
+        photoUrl: data['photoUrl'],
       ));
     }
   }
