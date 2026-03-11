@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
@@ -15,7 +16,7 @@ class _StudyPageState extends State<StudyPage> {
   final DeckService _deckService = DeckService();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  // Hex color constants
+  
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF7A00);
@@ -28,7 +29,21 @@ class _StudyPageState extends State<StudyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final userId = Provider.of<UserProvider>(context, listen: false).user!.userId;
+    final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
+    
+
+    if (userId == null) {
+    return Scaffold(
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+          },
+          child: const Text('Force Logout'),
+        ),
+      ),
+    );
+  }
     
     return Scaffold(
       backgroundColor: secondaryColor,
@@ -40,14 +55,14 @@ class _StudyPageState extends State<StudyPage> {
             children: [
               const SizedBox(height: 20),
 
-              // search bar — outside StreamBuilder to prevent keyboard dismiss
+              // search bar 
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: dominantColor.withOpacity(0.1),
+                      color: dominantColor.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -131,7 +146,7 @@ class _StudyPageState extends State<StudyPage> {
                                     ? 'No decks yet.\nCreate one to start studying!'
                                     : 'No decks found for "$_searchQuery"',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: dominantColor.withOpacity(0.5), fontSize: 16),
+                                style: TextStyle(color: dominantColor.withValues(alpha: 0.5), fontSize: 16),
                               ),
                             ),
                           )
@@ -155,7 +170,7 @@ class _StudyPageState extends State<StudyPage> {
                                       borderRadius: BorderRadius.circular(25),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.03),
+                                          color: Colors.black.withValues(alpha: 0.03),
                                           blurRadius: 15,
                                           offset: const Offset(0, 8),
                                         ),
@@ -178,7 +193,7 @@ class _StudyPageState extends State<StudyPage> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                deck.title, // 👈 real title
+                                                deck.title, 
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -197,7 +212,7 @@ class _StudyPageState extends State<StudyPage> {
                                           ),
                                         ),
                                         Icon(Icons.chevron_right,
-                                            color: dominantColor.withOpacity(0.4)),
+                                            color: dominantColor.withValues(alpha: 0.4)),
                                       ],
                                     ),
                                   ),

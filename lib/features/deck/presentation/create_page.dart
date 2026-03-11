@@ -13,7 +13,6 @@ class CreatePage extends StatefulWidget {
 
 class _CreatePageState extends State<CreatePage> {
 
-  // Colors based on your palette
   final Color colorDominant = const Color(0xFF665FBE);
   final Color colorSecondary = const Color(0xFFFAEEFF);
   final Color colorAccent = const Color(0xFFFF7A00);
@@ -21,19 +20,17 @@ class _CreatePageState extends State<CreatePage> {
   String _searchQuery = "";
   final DeckService _deckService = DeckService();
 
-  // State
+  
   bool isEditMode = false;
   Set<String> selectedDecksIds = {};
   bool _isProcessing = false;
-
-  // Stream variable para maiwasan ang blinking
   late Stream<List<Deck>> _decksStream;
   bool _isStreamInitialized = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Initialize stream dito para hindi mag-flicker tuwing nag-setState sa selection
+    // Initialize stream dito para hindi magflicker tuwing nagsetState sa selection
     if (!_isStreamInitialized) {
       final userId = Provider.of<UserProvider>(context).user?.userId ?? '';
       _decksStream = _deckService.getUserDecks(userId);
@@ -41,12 +38,8 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
-  // Data & State
   final List<Map<String, dynamic>> decks = [];
   bool isDeleteMode = false;
-  
-
-  // --- ACTIONS ---
 
   void _toggleSelection(String deckId) {
     setState(() {
@@ -321,7 +314,7 @@ Widget build(BuildContext context) {
                                 boxShadow: [
                                   BoxShadow(
                                     color: colorDominant
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   )
@@ -338,7 +331,7 @@ Widget build(BuildContext context) {
                                   hintText: 'Search deck',
                                   hintStyle: TextStyle(
                                     color: colorDominant
-                                    .withOpacity(0.5),
+                                    .withValues(alpha: 0.5),
                                     fontSize: 20,
                                   ),
                                   suffixIcon: Padding(
@@ -417,7 +410,7 @@ Widget build(BuildContext context) {
                                 ),
                                 Divider(
                                   color: colorDominant
-                                  .withOpacity(0.2),
+                                  .withValues(alpha: 0.2),
                                   thickness: 2,
                                   height: 25,
                                 ),
@@ -459,9 +452,9 @@ Widget build(BuildContext context) {
                                                     boxShadow: [
                                                       BoxShadow(
                                                           color: isSelected ? colorDominant
-                                                          .withOpacity(0.2)
+                                                          .withValues(alpha: 0.2)
                                                           : Colors.black
-                                                          .withOpacity(0.05),
+                                                          .withValues(alpha: 0.05),
                                                           blurRadius: 10,
                                                           offset: const Offset(0,5))
                                                     ],

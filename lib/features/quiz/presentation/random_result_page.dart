@@ -10,7 +10,6 @@ class RandomResultPage extends StatefulWidget {
 class _RandomResultPageState extends State<RandomResultPage> {
   @override
   Widget build(BuildContext context) {
-    // Ginamit ang eksaktong kulay mula sa iyong IdentificationResultPage
     const Color dominantColor = Color(0xFF665FBE);
     const Color secondaryColor = Color(0xFFFAEEFF);
     const Color accentColor = Color(0xFFFF7900);
@@ -69,11 +68,11 @@ class _RandomResultPageState extends State<RandomResultPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: const Text(
-                  "📝 Random • 20 Questions • Science", // Binago lang ang label na 'Random'
+                  "📝 Random • 20 Questions • Science", 
                   style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -92,7 +91,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start, 
                     children: [
-                      // Total Score Card
+                      // Score card
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 22),
@@ -115,7 +114,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Accuracy Progress Card
+                      // Progress Card
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
@@ -152,7 +151,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Time and Streak Row
+                      // Time and streak
                       Row(
                         children: [
                           Expanded(
@@ -207,10 +206,9 @@ class _RandomResultPageState extends State<RandomResultPage> {
                       
                       const SizedBox(height: 25), 
                       
-                      // 1. Review Answers Button
+                      // Review Answers Button
                       ElevatedButton(
                         onPressed: () {
-                          // Siguraduhing may 'random_review' route ka sa main.dart kung gagawa ka nito
                           Navigator.pushNamed(context, 'ran_review');
                         },
                         style: ElevatedButton.styleFrom(
@@ -231,7 +229,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                       ),
                       const SizedBox(height: 12),
                       
-                      // 2. Back to Deck Button
+                      // Back to Deck Button
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, 'study');

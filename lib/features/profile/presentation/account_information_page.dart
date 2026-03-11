@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'dart:convert';
 
+import 'package:studybuddy/features/auth/service/auth_service.dart';
+
 class AccountInformationPage extends StatefulWidget {
   const AccountInformationPage({super.key});
 
@@ -15,11 +17,18 @@ class AccountInformationPage extends StatefulWidget {
 }
 
 class _AccountInformationPageState extends State<AccountInformationPage> {
+  final AuthService _authService = AuthService();
   File? _selectedImage;
   bool _isUploadingPhoto = false;
-
-  // --- START NG DAGDAG: DELETE VALIDATION DIALOG ---
+  bool _isSavingUsername = false;
+  
+  // Delete Confirmation of account
   void _showDeleteConfirmation() {
+     final userProvider = Provider.of<UserProvider>(context, listen: false);
+     final userId = userProvider.user!.userId;
+     final messenger = ScaffoldMessenger.of(context);
+     final navigator = Navigator.of(context);
+     
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -67,12 +76,17 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                   const SizedBox(width: 15),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Dito mo ilalagay ang logic para burahin ang account sa Firebase
+                      onPressed: () async {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Processing account deletion...')),
-                        );
+                        try {
+                          await _authService.deleteAccount(userId);
+                          userProvider.clearUser();
+                          navigator.pushNamedAndRemoveUntil('landing', (_) => false);
+                        } catch (e) {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text('Failed to Delete Account. Please try again.'))
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -90,9 +104,8 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
       ),
     );
   }
-  // --- END NG DAGDAG ---
-
-  Future<void> _pickAndUploadImage() async {
+  // upload ng image
+  Future<void> _pickAndUploadImage() async { 
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery,
@@ -127,7 +140,6 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
         const SnackBar(content: Text('Profile photo updated.'))
       );
     } catch (e) {
-      print('Error saving photo: $e');
       messenger.showSnackBar(
         const SnackBar(content: Text('Failed to save the photo. Please try again.'))
       );
@@ -135,13 +147,41 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
       if (mounted) setState(() => _isUploadingPhoto = false);
     }
   }
+  // save ng new username
+  Future<void> _saveUsername(String newUsername) async {
+    if (newUsername.trim().isEmpty) return;
 
-  void _showEditDialog(String title, String currentValue, Function(String) onSave) {
-    TextEditingController controller = TextEditingController(text: currentValue);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userId = userProvider.user!.userId;
+    final messenger = ScaffoldMessenger.of(context);
+
+    setState(() => _isSavingUsername = true);
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'username': newUsername.trim()});
+
+      userProvider.updateUsername(newUsername.trim());
+
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Username updated.')));
+    } catch (e) {
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Failed to update username.')));
+    } finally {
+      if (mounted) setState(() => _isSavingUsername = false);
+    }
+  }
+
+  void _showEditUsernameDialog(String currentValue) {
+    final controller = TextEditingController(text: currentValue);
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         child: Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
@@ -152,7 +192,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Edit $title',
+                'Edit Username',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lora(
                   fontSize: 24,
@@ -166,8 +206,12 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(fontSize: 18),
                 decoration: InputDecoration(
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
-                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF1A0B70))),
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.grey.shade300)),
+                  focusedBorder: const UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color(0xFF665FBE))),
                 ),
               ),
               const SizedBox(height: 30),
@@ -177,26 +221,37 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: Color(0xFF1A0B70)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(
+                            color: Color(0xFF665FBE)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
                       ),
-                      child: Text('Stay', style: GoogleFonts.inter(color: const Color(0xFF1A0B70), fontWeight: FontWeight.bold)),
+                      child: Text('Cancel',
+                          style: GoogleFonts.inter(
+                              color: const Color(0xFF665FBE),
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        onSave(controller.text);
                         Navigator.pop(context);
+                        _saveUsername(controller.text); // 👈 saves to Firestore + provider
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1A0B70),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        backgroundColor: const Color(0xFF665FBE),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
                       ),
-                      child: Text('Save', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: Text('Save',
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -208,26 +263,34 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
     );
   }
 
+  Widget get _defaultAvatar => Container(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
+      ),
+    ),
+    child: const Icon(Icons.person, size: 90, color: Colors.black54),
+  );
+
   @override
   Widget build(BuildContext context) {
     final loggedUser = Provider.of<UserProvider>(context).user; 
     final photoUrl = loggedUser?.photoUrl;
 
-    // --- Binago: Header color at shadow decoration ---
-    final Color headerColor = const Color(0xFF514BB0); // Mas madilim na purple
+    final Color headerColor = const Color(0xFF514BB0); 
     final cardDecoration = BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(30),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.12), // Soft shadow
+          color: Colors.black.withValues(alpha: 0.12), 
           spreadRadius: 1,
           blurRadius: 10,
-          offset: const Offset(0, 5), // Shadow offset sa baba
+          offset: const Offset(0, 5), 
         ),
       ],
     );
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(
@@ -252,14 +315,14 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
         child: Column(
           children: [
             Container(
-              decoration: cardDecoration, // BINAGO: Shadow added
+              decoration: cardDecoration, 
               child: Column(
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
                     decoration: BoxDecoration(
-                      color: headerColor, // BINAGO: Darker header
+                      color: headerColor, 
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
@@ -271,157 +334,165 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       style: GoogleFonts.lora(
                         fontWeight: FontWeight.bold,
                         fontSize: 23,
-                        color: Colors.white, // BINAGO: Puti para mabasa sa dark header
+                        color: Colors.white, 
                       ),
                     ),
                   ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          children: [
-                            ClipOval(
-                              child: SizedBox(
-                                width: 100,
-                                height: 100,
-                                child: _selectedImage != null
-                                    ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                                    : photoUrl != null
-                                        ? Image.memory(
-                                            base64Decode(photoUrl),
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (context, error, stack) => Container(
-                                              decoration: const BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topCenter,
-                                                  colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
-                                                ),
-                                              ),
-                                              child: const Icon(Icons.person, size: 90, color: Colors.black54),
-                                            ),
-                                          )
-                                        : Container(
-                                            decoration: const BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
-                                              ),
-                                            ),
-                                            child: const Icon(Icons.person, size: 90, color: Colors.black54),
-                                          ),
-                              ),
-                            ),
-                            if (_isUploadingPhoto)
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.black.withOpacity(0.4),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Stack(
+                            children: [
+                              ClipOval(
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: _selectedImage != null
+                                      ? Image.file(_selectedImage!,
+                                          fit: BoxFit.cover)
+                                      : photoUrl != null
+                                          ? Image.memory(
+                                              base64Decode(photoUrl),
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context,
+                                                      error, stack) =>
+                                                  _defaultAvatar,
+                                            )
+                                          : _defaultAvatar,
                                 ),
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
+                              ),
+                              if (_isUploadingPhoto)
+                                Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        Colors.black.withValues(alpha: 0.4),
+                                  ),
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-
-                        GestureDetector(
-                          onTap: _isUploadingPhoto ? null : _pickAndUploadImage,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: _isUploadingPhoto ? Colors.grey : Colors.orange,
-                              borderRadius: BorderRadius.circular(20),
+                              ],
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.camera_alt, color: Colors.white, size: 23),
-                                SizedBox(width: 5),
-                                Text('Edit Photo',
-                                    style: TextStyle(
+                          GestureDetector(
+                            onTap: _isUploadingPhoto
+                                ? null
+                                : _pickAndUploadImage,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: _isUploadingPhoto
+                                    ? Colors.grey
+                                    : Colors.orange,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.camera_alt,
+                                      color: Colors.white, size: 23),
+                                  SizedBox(width: 5),
+                                  Text('Edit Photo',
+                                      style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Username
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                    decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.grey, width: 0.5))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Username', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                loggedUser?.username ?? '',
-                                style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: () => _showEditDialog('Username', loggedUser?.username ?? '', (val) => setState(() => Provider.of<UserProvider>(context, listen: false).updateUsername(val))),
-                              child: const Icon(Icons.edit, size: 18, color: Colors.blue),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-
+                  // Username
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 8),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              top: BorderSide(
+                                  color: Colors.grey, width: 0.5))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Username',
+                              style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: Colors.grey[600])),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _isSavingUsername
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
+                                      )
+                                    : Text(
+                                        loggedUser?.username ?? '',
+                                        style: GoogleFonts.lora(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: _isSavingUsername
+                                    ? null
+                                    : () => _showEditUsernameDialog(
+                                        loggedUser?.username ?? ''),
+                                child: const Icon(Icons.edit,
+                                    size: 18, color: Colors.blue),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   // Email 
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                    decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.grey, width: 0.5))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Email', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
-                        const SizedBox(height: 2),
-                        Text(
-                          loggedUser?.emailAdd ?? '',
-                          style: GoogleFonts.lora(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
-                        ),
-                      ],
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Colors.grey, width: 0.5))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Email', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
+                          const SizedBox(height: 2),
+                          Text(
+                            loggedUser?.emailAdd ?? '',
+                            style: GoogleFonts.lora(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-
-            const SizedBox(height: 25), // Spacing adjusted for shadow
-
-            // SECURITY 
+            const SizedBox(height: 25), 
+            // SECURITY
             Container(
-              decoration: cardDecoration, // BINAGO: Shadow added
+              decoration: cardDecoration, 
               child: Column(
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
                     decoration: BoxDecoration(
-                      color: headerColor, // BINAGO: Darker header
+                      color: headerColor, 
                       borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
                     ),
                     child: Text(
@@ -429,7 +500,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       style: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white, // BINAGO: White text
+                        color: Colors.white, 
                       ),
                     ),
                   ),
@@ -456,13 +527,13 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
               ),
             ),
 
-            const SizedBox(height: 25), // Spacing adjusted for shadow
+            const SizedBox(height: 25), 
 
-            // DELETE ACCOUNT SECTION 
+            // Delete Account
             GestureDetector(
               onTap: _showDeleteConfirmation, 
               child: Container(
-                decoration: cardDecoration, // BINAGO: Shadow added
+                decoration: cardDecoration, 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -470,19 +541,19 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: headerColor, // BINAGO: Darker header
+                        color: headerColor, 
                         borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 28), // BINAGO: Lighter red for visibility
+                          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 28), 
                           const SizedBox(width: 10),
                           Text(
                             'Delete Account',
                             style: GoogleFonts.inter(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 255, 255, 255), // BINAGO: Light red text
+                              color: const Color.fromARGB(255, 255, 255, 255), 
                             ),
                           ),
                         ],

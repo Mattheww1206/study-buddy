@@ -32,7 +32,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
 
   @override
   void dispose() {
-    // Linisin ang lahat ng controllers para iwas memory leak
+    // Nilinis lahat ng controllers para iwas memory leak
     _subjectController.dispose();
     _titleController.dispose();
     for (var card in cardControllers) {
@@ -42,6 +42,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     super.dispose();
   }
 
+  // Pag save ng Deck
   Future<void> _saveDeck() async {
     if(_titleController.text.trim().isEmpty){
       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,17 +87,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         subject: _subjectController.text.trim(), 
         cards: cards
         );
-
       messenger.showSnackBar(
         SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
       );
-      print('Saved naaaa');
-
       nav.pop();
-
-
     } catch (e) {
-      print('Error saving deck: $e'); 
       messenger.showSnackBar(
         SnackBar(content: Text('Failed to save deck. Please try again.', style: GoogleFonts.itim()))
       );
@@ -110,7 +105,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE), // INIBA: Dominant Color
+        backgroundColor: const Color(0xFF665FBE), 
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -132,7 +127,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- HEADER SECTION ---
+                  // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -165,7 +160,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                   const SizedBox(height: 25),
 
-                  // --- DELETE BAR ---
+                  // Delete Bar
                   if (isEditMode && selectedIndices.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
@@ -199,17 +194,17 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       ),
                     ),
 
-                  // --- SUBJECT & TITLE SECTION ---
+                  // Subject and Title
                   Row(
                     children: [
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1))), 
+                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))), 
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("SUBJECT", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withOpacity(0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
+                              Text("SUBJECT", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
                               TextFormField(
                                 controller: _subjectController,
                                 decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.zero),
@@ -223,11 +218,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1))), 
+                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))), 
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("TITLE", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withOpacity(0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
+                              Text("TITLE", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
                               TextFormField(
                                 controller: _titleController,
                                 decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.zero),
@@ -241,7 +236,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // --- FLASHCARDS LIST ---
+                  // List of Flashcards
                   ...cardControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     var controllers = entry.value;
@@ -253,7 +248,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       decoration: BoxDecoration(
                         color: isSelected ? const Color(0xFFFFF0F0) : const Color(0xFFFAEEFF), 
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isSelected ? Colors.red.shade200 : const Color(0xFF665FBE).withOpacity(0.2)), 
+                        border: Border.all(color: isSelected ? Colors.red.shade200 : const Color(0xFF665FBE).withValues(alpha: 0.2)), 
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,11 +290,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          Text("TERM", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withOpacity(0.5), fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("TERM", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1))),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))),
                             child: TextFormField(
                               controller: controllers["term"],
                               style: GoogleFonts.lora(fontSize: 18),
@@ -311,11 +306,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          Text("DEFINITION", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withOpacity(0.5), fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("DEFINITION", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1))),
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))),
                             child: TextFormField(
                               controller: controllers["def"],
                               maxLines: null,
@@ -336,7 +331,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
             ),
           ),
 
-          // --- BOTTOM BUTTONS BAR ---
+          // Bottom buttons
           if (!isEditMode)
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25, top: 10),

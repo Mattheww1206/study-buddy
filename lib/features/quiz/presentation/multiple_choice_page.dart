@@ -32,6 +32,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
   String? _selectedOption;
   Timer? _timer;
   int _secondsLeft = 0;
+  bool _geminiUnavailable = false;
   
 
   // Color Palette
@@ -54,7 +55,6 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     if (_timerMinutes != null) {
       _secondsLeft = _timerMinutes! * 60;
     }
-
     _loadQuiz();
   }
 
@@ -78,6 +78,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     if (_timerMinutes != null) _startTimer();
   } catch (e) {
     setState(() => _isLoading = false);
+    _geminiUnavailable = true;
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Failed to load quiz.')),
@@ -86,9 +87,9 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
 }
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsLeft <= 0) {
+      if (_secondsLeft <= 0) { // Ubos na yung time, finished quiz na kaagad
         timer.cancel();
-        _finishQuiz(); // time's up
+        _finishQuiz();
       } else {
         setState(() => _secondsLeft--);
       }
@@ -102,7 +103,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
   }
 
   void _onNextTapped() {
-    if (_selectedOption == null) return; // must select before proceeding
+    if (_selectedOption == null) return; 
 
     final currentData = _quizData[_currentIndex];
     final isCorrect = _selectedOption == currentData['correctAnswer'];
@@ -153,6 +154,11 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     } catch (e) {
       print('Error saving result: $e');
     }
+
+    _quizService.clearCache(
+    deckId: _deck.deckId,
+    numberOfQuestions: _numberOfQuestions,
+  );
 
     if (!mounted) return;
     Navigator.pushReplacementNamed(
@@ -207,6 +213,91 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
         ),
       );
     }
+    if (_geminiUnavailable) {
+      return Scaffold(
+        backgroundColor: secondaryColor,
+        appBar: AppBar(
+          backgroundColor: dominantColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            _deck.title,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi_off_rounded, size: 80, color: dominantColor.withValues(alpha: 0.4)),
+                const SizedBox(height: 20),
+                Text(
+                  'AI Unavailable',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: dominantColor),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'The AI service is currently unavailable or rate limited. Please try again in a moment.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600], height: 1.5),
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                        _geminiUnavailable = false;
+                      });
+                      _loadQuiz();
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Retry',
+                        style:
+                            TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: dominantColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: dominantColor, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: Text('Go Back',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: dominantColor)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     if (_flashcards.isEmpty) {
       return Scaffold(
         backgroundColor: secondaryColor,
@@ -252,7 +343,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
       body: SafeArea(
         child: Column(
           children: [
-            // --- UPDATED STATUS SECTION ---
+            // Update Status
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
               child: Column(
@@ -261,7 +352,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Dynamic Question Number & Percent
+                      // Progress
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -281,7 +372,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(color: _secondsLeft < 60
                             ? Colors.red
-                            : dominantColor.withOpacity(0.2),
+                            : dominantColor.withValues(alpha: 0.2),
                             width: 1.5),
                           ),
                           child: Row(
@@ -329,7 +420,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
               ),
               child: Text(
                 flashcard.question,
@@ -339,7 +430,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
             ),
 
             const SizedBox(height: 20),
-            // --- OPTIONS LIST ---
+            // Options
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

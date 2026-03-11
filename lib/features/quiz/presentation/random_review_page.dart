@@ -15,13 +15,13 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
   // Sample Mixed Data
   final List<Map<String, dynamic>> randomReviewData = [
     {
-      "type": "multiple", // Type indicator
+      "type": "multiple", 
       "isCorrect": false,
       "question": "Who created the World Wide Web (WWW)?",
       "userAnswer": "Steve Jobs",
-      "userAnswerIndex": 2, // Choice index (C)
+      "userAnswerIndex": 2, 
       "correctAnswer": "Tim Berners-Lee",
-      "correctAnswerIndex": 0, // Choice index (A)
+      "correctAnswerIndex": 0, 
     },
     {
       "type": "identification",
@@ -92,13 +92,13 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5)),
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5)),
                       ],
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [
-                        // --- QUESTION SECTION ---
+                        // Question
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Row(
@@ -120,7 +120,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                           ),
                         ),
 
-                        // --- ANSWER BOXES ---
+                        // Answer
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -128,7 +128,6 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                               // User's Answer
                               _buildAnswerBox(
                                 label: "Your Answer: ",
-                                // Dito ikakabit ang Letter + Text
                                 value: "${getLetter(item['userAnswerIndex'])}${item['userAnswer']}",
                                 icon: Icons.close,
                                 iconColor: Colors.red,
@@ -138,7 +137,6 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                               // Correct Answer
                               _buildAnswerBox(
                                 label: "Correct Answer: ",
-                                // Dito ikakabit ang Letter + Text
                                 value: "${getLetter(item['correctAnswerIndex'])}${item['correctAnswer']}",
                                 icon: Icons.check,
                                 iconColor: Colors.green,
@@ -149,7 +147,6 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                         ),
                         const SizedBox(height: 20),
 
-                        // --- FOOTER ---
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -188,7 +185,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 15, color: dominantColor.withOpacity(0.7)),
+                style: TextStyle(fontSize: 15, color: dominantColor.withValues(alpha: 0.7)),
                 children: [
                   TextSpan(text: label),
                   TextSpan(

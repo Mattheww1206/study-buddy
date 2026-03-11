@@ -43,7 +43,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     }
     super.dispose();
   }
-
+  
   Future<void> _loadFlashcards() async {
     try {
       final cards = await _deckService
@@ -74,7 +74,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
   }
 
   Future<void> _deleteFlashcard(String cardId) async {
-    // Confirmation Dialog injected directly
+    // Confirmation Dialog for deleting flashcard
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -86,7 +86,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent, size: 40),
@@ -148,7 +148,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
       }
     }
   }
-
+  // Save flashcard edit
   Future<void> _saveCardEdit(int index) async {
     try {
       await _flashcardService.updateFlashcard(

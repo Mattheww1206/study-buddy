@@ -263,7 +263,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                     boxShadow: [
                                       BoxShadow(
                                           color:
-                                              Colors.black.withOpacity(0.1),
+                                              Colors.black.withValues(alpha: 0.1),
                                           blurRadius: 10,
                                           offset: const Offset(0, 5)),
                                     ],
@@ -364,7 +364,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                     decoration: BoxDecoration(
                       color: i <= (_currentIndex % 5)
                           ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withOpacity(0.2),
+                          : const Color(0xFF665FBE).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

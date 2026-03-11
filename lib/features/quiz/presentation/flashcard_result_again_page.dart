@@ -81,7 +81,7 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                       horizontal: 24, vertical: 30),
                   child: Column(
                     children: [
-                      // Stats row
+                      // Stats
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [

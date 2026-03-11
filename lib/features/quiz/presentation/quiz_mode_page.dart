@@ -64,7 +64,7 @@ class _QuizModePageState extends State<QuizModePage> {
              const Text('Choose Quiz Type', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF120E32))),
              const SizedBox(height: 20),
              
-            // 1. Multiple Choice Quiz
+            // Multiple Choice Quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'Multiple Mode');
@@ -80,7 +80,7 @@ class _QuizModePageState extends State<QuizModePage> {
                     width: 2
                   ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Column(
@@ -118,7 +118,7 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
             ),
 
-            // 2. Identification Quiz
+            // Identification Quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'iden_mode');
@@ -134,7 +134,7 @@ class _QuizModePageState extends State<QuizModePage> {
                     width: 2
                   ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Column(
@@ -172,7 +172,7 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
             ),
 
-            // 3. True or False Quiz (BAGONG DAGDAG)
+            // True or False Quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'tf_mode');
@@ -188,7 +188,7 @@ class _QuizModePageState extends State<QuizModePage> {
                     width: 2
                   ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Column(
@@ -226,7 +226,7 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
             ),
 
-            // 4. Mixed quiz
+            // Mixed quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'ran_mode');
@@ -242,7 +242,7 @@ class _QuizModePageState extends State<QuizModePage> {
                     width: 2
                   ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
                 ),
                 child: Column(

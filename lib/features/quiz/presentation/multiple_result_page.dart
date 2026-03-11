@@ -102,7 +102,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Text(
@@ -114,7 +114,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                 ),
               ),
               const SizedBox(height: 25),
-
               // white card
               Expanded(
                 child: Container(
@@ -160,7 +159,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           ),
                         ),
                         const SizedBox(height: 12),
-
                         // accuracy
                         Container(
                           padding: const EdgeInsets.all(18),
@@ -209,7 +207,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           ),
                         ),
                         const SizedBox(height: 12),
-
                         // time and streak row
                         Row(
                           children: [
@@ -285,7 +282,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           ],
                         ),
                         const SizedBox(height: 25),
-
                         // review wrong answers
                         if (wrongAnswers.isNotEmpty) ...[
                           ElevatedButton(
@@ -319,7 +315,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           ),
                           const SizedBox(height: 12),
                         ],
-
                         // back to home
                         ElevatedButton(
                           onPressed: () =>

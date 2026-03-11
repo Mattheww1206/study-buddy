@@ -20,7 +20,7 @@ class UserProvider extends ChangeNotifier {
   if (_user == null) return;
   _user = AppUser(
     userId: _user!.userId,
-    username: username, // 👈 updated
+    username: username, 
     emailAdd: _user!.emailAdd,
     provider: _user!.provider,
     photoUrl: _user!.photoUrl,

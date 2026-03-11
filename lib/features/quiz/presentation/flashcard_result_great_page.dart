@@ -84,7 +84,7 @@ class _FlashcardResultGreatPageState
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Stats row
+                      // Stats 
                       Row(
                         children: [
                           Expanded(
@@ -195,7 +195,7 @@ class _FlashcardResultGreatPageState
                       ),
                       const SizedBox(height: 15),
 
-                      // Review Missed button — only show if there are missed cards
+                      // Review Missed button, showed only if may missed cards
                       if (againCount > 0)
                         SizedBox(
                           width: double.infinity,

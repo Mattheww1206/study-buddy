@@ -8,12 +8,11 @@ class TrueFalseReviewPage extends StatefulWidget {
 }
 
 class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
-  // Palette settings (Consistent sa Multiple Review Page)
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFF665FBE);
 
-  // Sample data para sa True/False
+  // Sample data
   final List<Map<String, dynamic>> tfReviewData = [
     {
       "isCorrect": false,
@@ -28,7 +27,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
       "correctAnswer": "False",
     },
     {
-      "isCorrect": true, // Hindi ito lalabas dahil naka-filter tayo sa 'false'
+      "isCorrect": true,
       "question": "Water boils at 100 degrees Celsius.",
       "userAnswer": "True",
       "correctAnswer": "True",
@@ -92,7 +91,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -101,7 +100,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [
-                        // --- QUESTION SECTION ---
+                        // Question 
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Row(
@@ -123,12 +122,12 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                           ),
                         ),
 
-                        // --- ANSWER BOXES ---
+                        // Answers
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
                             children: [
-                              // User's Choice
+                              // User choices
                               Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(15),
@@ -143,7 +142,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                                         text: TextSpan(
                                           style: TextStyle(
                                             fontSize: 15,
-                                            color: dominantColor.withOpacity(0.7),
+                                            color: dominantColor.withValues(alpha: 0.7),
                                           ),
                                           children: [
                                             const TextSpan(text: "Your Answer: "),
@@ -178,7 +177,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                                         text: TextSpan(
                                           style: TextStyle(
                                             fontSize: 15,
-                                            color: dominantColor.withOpacity(0.7),
+                                            color: dominantColor.withValues(alpha: 0.7),
                                           ),
                                           children: [
                                             const TextSpan(text: "Correct Answer: "),
@@ -202,7 +201,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                         ),
                         const SizedBox(height: 20),
 
-                        // --- FOOTER STATUS BAR ---
+                        // Status bar
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),

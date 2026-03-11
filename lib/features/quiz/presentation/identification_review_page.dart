@@ -97,7 +97,7 @@ class _IdentificationReviewPageState
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -148,7 +148,7 @@ class _IdentificationReviewPageState
                                           text: TextSpan(
                                             style: TextStyle(
                                                 fontSize: 15,
-                                                color: dominantColor.withOpacity(0.7)),
+                                                color: dominantColor.withValues(alpha: 0.7)),
                                             children: [
                                               const TextSpan(text: 'Your Answer: '),
                                               TextSpan(
@@ -181,7 +181,7 @@ class _IdentificationReviewPageState
                                           text: TextSpan(
                                             style: TextStyle(
                                                 fontSize: 15,
-                                                color: dominantColor.withOpacity(0.7)),
+                                                color: dominantColor.withValues(alpha: 0.7)),
                                             children: [
                                               const TextSpan(text: 'Correct Answer: '),
                                               TextSpan(

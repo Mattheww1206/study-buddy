@@ -9,7 +9,6 @@ class AchievementPage extends StatefulWidget {
 }
 
 class _AchievementPageState extends State<AchievementPage> {
-  // Ginamit ang List<Map<String, dynamic>> para sa flexibility ng data types
   final List<Map<String, dynamic>> achievements = [
     {"title": "Unstoppable", "desc": "Get 10 correct answers in a row", "icon": Icons.bolt},
     {"title": "Comeback Kid", "desc": "Pass a quiz after previously failing it", "icon": Icons.book},
@@ -63,7 +62,7 @@ class _AchievementPageState extends State<AchievementPage> {
           children: [
             const SizedBox(height: 30),
             
-            // STATS ROW
+            // Stats
             Row(
               children: [
                 _buildStatBox("0", "UNLOCKED", Colors.orange),
@@ -91,7 +90,7 @@ class _AchievementPageState extends State<AchievementPage> {
             
             const SizedBox(height: 15),
 
-            // GRID
+            // Grid
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -100,12 +99,12 @@ class _AchievementPageState extends State<AchievementPage> {
                 crossAxisCount: 3,
                 mainAxisSpacing: 15,
                 crossAxisSpacing: 15,
-                childAspectRatio: 0.65, // In-adjust para sa mahabang descriptions
+                childAspectRatio: 0.65, 
               ),
               itemBuilder: (context, index) {
                 final item = achievements[index];
                 
-                // SAFE ICON ACCESS: Gumagamit ng fallback na Icons.help kung null
+                // fall back icons if ever maging null
                 final IconData displayIcon = item['icon'] != null 
                     ? item['icon'] as IconData 
                     : Icons.emoji_events;
@@ -115,7 +114,7 @@ class _AchievementPageState extends State<AchievementPage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 5)
                     ],
                   ),
                   child: Stack(
@@ -183,7 +182,7 @@ class _AchievementPageState extends State<AchievementPage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
+            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)
           ],
         ),
         child: Column(

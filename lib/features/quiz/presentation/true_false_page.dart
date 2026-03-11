@@ -104,7 +104,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                   borderRadius: BorderRadius.circular(35),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -127,12 +127,12 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
 
             const SizedBox(height: 35),
 
-            // --- CHOICES SECTION ---
+            // Choice section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  // TRUE BUTTON
+                  // True button
                   GestureDetector(
                     onTap: () => setState(() => selectedAnswer = 'TRUE'),
                     child: Container(
@@ -156,7 +156,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  // FALSE BUTTON
+                  // False button
                   GestureDetector(
                     onTap: () => setState(() => selectedAnswer = 'FALSE'),
                     child: Container(
@@ -185,19 +185,18 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             
             const SizedBox(height: 50),
 
-            // --- NEXT/SUBMIT BUTTON ---
+            // Next and Submit Button
             Padding(
               padding: const EdgeInsets.all(20),
               child: GestureDetector(
                 onTap: () {
-                  // Tinanggal ang validation. Pwedeng pindutin kahit walang sagot.
+                  if (selectedAnswer == null) return;
                   if (currentQuestion < totalQuestions) {
                     setState(() {
                       currentQuestion++;
                       selectedAnswer = null; 
                     });
                   } else {
-                    // Pupunta na sa Result Screen
                     Navigator.pushNamed(context, 'tf_result');
                   }
                 },
@@ -205,11 +204,11 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                   width: double.infinity,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF7F32), // Laging orange na ang kulay
+                    color: const Color(0xFFFF7F32), 
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF7F32).withOpacity(0.3),
+                        color: const Color(0xFFFF7F32).withValues(alpha: 0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),

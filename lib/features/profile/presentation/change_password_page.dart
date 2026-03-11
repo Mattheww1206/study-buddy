@@ -126,10 +126,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF), // Background Lavender
+      backgroundColor: const Color(0xFFFAEEFF), 
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF665FBE), // Dark Purple App Bar
+        backgroundColor: const Color(0xFF665FBE), 
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -151,7 +151,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                // Gradient Card: Puti patungong Lavender
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -160,7 +159,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF665FBE).withOpacity(0.15),
+                    color: const Color(0xFF665FBE).withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   )
@@ -177,7 +176,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _currentController,
@@ -209,7 +208,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _newController,
@@ -246,7 +245,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withOpacity(0.1)),
+                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _confirmController,
@@ -279,11 +278,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 width: double.infinity,
                 height: 55,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF7A01), // Accent (Orange)
+                  color: const Color(0xFFFF7A01), 
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF7A01).withOpacity(0.4),
+                      color: const Color(0xFFFF7A01).withValues(alpha: 0.4),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     )

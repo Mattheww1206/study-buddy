@@ -31,6 +31,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
   int _correctCount = 0;
   Timer? _timer;
   int _secondsLeft = 0;
+  bool _geminiUnavailable = false;
 
   @override
   void didChangeDependencies() {
@@ -68,6 +69,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
     if (_timerMinutes != null) _startTimer();
   } catch (e) {
     setState(() => _isLoading = false);
+    _geminiUnavailable = true;
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Failed to load quiz.')),
@@ -178,7 +180,6 @@ void _startTimer() {
     super.dispose();
   }
 
-  // Color Palette
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF6D00);
@@ -209,6 +210,92 @@ void _startTimer() {
               Text('Generating questions...',
                   style: TextStyle(color: Color(0xFF665FBE), fontSize: 16)),
             ],
+          ),
+        ),
+      );
+    }
+    if (_geminiUnavailable) {
+      return Scaffold(
+        backgroundColor: secondaryColor,
+        appBar: AppBar(
+          backgroundColor: dominantColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            _deck.title,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.wifi_off_rounded, size: 80, color: dominantColor.withValues(alpha: 0.4)),
+                const SizedBox(height: 20),
+                Text(
+                  'AI Unavailable',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: dominantColor),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'The AI service is currently unavailable or rate limited. Please try again in a moment.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600], height: 1.5),
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // 👈 retry
+                      setState(() {
+                        _isLoading = true;
+                        _geminiUnavailable = false;
+                      });
+                      _loadQuiz();
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Retry',
+                        style:
+                            TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: dominantColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: dominantColor, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: Text('Go Back',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: dominantColor)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -293,7 +380,7 @@ void _startTimer() {
                               border: Border.all(
                                 color: _secondsLeft < 60
                                     ? Colors.red
-                                    : dominantColor.withOpacity(0.2),
+                                    : dominantColor.withValues(alpha: 0.2),
                                 width: 1.5,
                               ),
                             ),
@@ -345,7 +432,7 @@ void _startTimer() {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10)
                   ],
                 ),
@@ -387,7 +474,7 @@ void _startTimer() {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide(
-                              color: dominantColor.withOpacity(0.1)),
+                              color: dominantColor.withValues(alpha: 0.1)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),

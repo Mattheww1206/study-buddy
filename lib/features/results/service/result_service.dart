@@ -33,8 +33,53 @@ class ResultService {
         .toList();
   }
 
+  int calculateStreak(List<StudyResult> results) {
+    if (results.isEmpty) return 0;
+
+    final dates = results
+        .map((r) => DateTime(
+            r.completedAt.year, r.completedAt.month, r.completedAt.day))
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+
+      print('Unique study dates: $dates');
+
+    int streak = 0;
+    DateTime expected = DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    for (final date in dates) {
+      print('Checking date: $date vs expected: $expected');
+      if (date == expected) {
+        streak++;
+        expected = expected.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  int todayQuizCount(List<StudyResult> results) {
+    final today = DateTime.now();
+    return results
+        .where((r) =>
+            r.completedAt.year == today.year &&
+            r.completedAt.month == today.month &&
+            r.completedAt.day == today.day)
+            .length;
+  }
+
+  int weekQuizCount(List<StudyResult> results) {
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final start = DateTime(
+        startOfWeek.year, startOfWeek.month, startOfWeek.day);
+    return results.where((r) => r.completedAt.isAfter(start)).length;
+  }
+
 
 }
-//Future<void> saveResult(StudyResult result){}
-//Future<List<StudyResult>> getUserResults(String userId){}
+
 

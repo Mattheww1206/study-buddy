@@ -74,7 +74,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            // Mode Banner
+            // Mode
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -95,7 +95,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12)),
                         child: const Icon(Icons.fact_check,
                             color: Colors.white, size: 26),
@@ -207,7 +207,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         value: isTimerEnabled,
                         onChanged: (val) =>
                             setState(() => isTimerEnabled = val),
-                        activeColor: dominantColor,
+                        activeThumbColor: dominantColor,
                       ),
                     ],
                   ),

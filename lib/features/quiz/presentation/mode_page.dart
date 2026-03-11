@@ -66,14 +66,13 @@ class _ModePageState extends State<ModePage> {
                     borderRadius: BorderRadius.circular(35),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 5)),
                     ],
                   ),
                   child: Column(
                     children: [
-                      // 👇 real card count
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -89,14 +88,12 @@ class _ModePageState extends State<ModePage> {
                             width: 60,
                             height: 5,
                             decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(10)),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-
-                      // 👇 real deck title
                       Text(
                         deck.title,
                         textAlign: TextAlign.center,
@@ -106,20 +103,17 @@ class _ModePageState extends State<ModePage> {
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
-
-                      // 👇 real subject
                       Text(
                         deck.subject,
                         style: const TextStyle(
                             color: Colors.white70, fontSize: 16),
                       ),
                       const SizedBox(height: 15),
-
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20)),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -136,7 +130,6 @@ class _ModePageState extends State<ModePage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
               const Text('Choose Study Mode',
                   style: TextStyle(
@@ -144,7 +137,6 @@ class _ModePageState extends State<ModePage> {
                       fontSize: 22,
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-
               // flashcard mode button
               Padding(
                 padding:
@@ -153,7 +145,7 @@ class _ModePageState extends State<ModePage> {
                   onPressed: () => Navigator.pushNamed(
                     context,
                     'flashcard_mode',
-                    arguments: deck, // 👈 pass real deck
+                    arguments: deck, 
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -216,7 +208,6 @@ class _ModePageState extends State<ModePage> {
                   ),
                 ),
               ),
-
               // quiz mode button
               Padding(
                 padding:
@@ -225,7 +216,7 @@ class _ModePageState extends State<ModePage> {
                   onPressed: () => Navigator.pushNamed(
                     context,
                     'quiz_mode',
-                    arguments: deck, // 👈 pass real deck
+                    arguments: deck, 
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -263,7 +254,6 @@ class _ModePageState extends State<ModePage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
             ],
           ),

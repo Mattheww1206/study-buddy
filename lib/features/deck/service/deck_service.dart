@@ -55,21 +55,18 @@ class DeckService {
   }
   // para makuha yung mga flashcards na nasa isang deck
   Future<List<Flashcard>> getDeckFlashcards(String deckId) async {
-    print('Fetching from path: decks/$deckId/flashcards');
     try {
     final snapshot = await _firestore 
                      .collection('decks')
                      .doc(deckId)
                      .collection('flashcards')
-                     .get(const GetOptions(source: Source.server));
-    print('Snapshot docs count: ${snapshot.docs.length}');
+                     .get();
+    
     return snapshot.docs.map((doc) {
-      print('Doc data: ${doc.data()}'); 
           return Flashcard.fromMap(doc.id, doc.data());
     })
     .toList();
     } catch (e) {
-      print('getDeckFlashcards error: $e');
     rethrow;
     }
 

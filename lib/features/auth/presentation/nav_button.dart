@@ -5,9 +5,6 @@ import 'package:studybuddy/features/profile/presentation/profile_page.dart';
 import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 
 
-
-
-
 class NavButton extends StatefulWidget {
   const NavButton({super.key});
 

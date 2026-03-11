@@ -8,12 +8,11 @@ class TrueFalseResultPage extends StatefulWidget {
 }
 
 class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
-  // Define colors from your palette
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF7D00);
 
-  // Sample data (Palitan ito ng actual variables mo)
+  // Sample data 
   final int _correctCount = 0;
   final int _totalCards = 17;
   final double accuracy = 0.0;
@@ -71,7 +70,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
@@ -84,7 +83,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
             ),
           ),
           
-          // Ang hiningi mong Main Container Code
+          
           Expanded(
             child: Container(
               width: double.infinity,
@@ -174,7 +173,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Time and Streak Row
+                    // Time and streak
                     Row(
                       children: [
                         Expanded(
@@ -262,7 +261,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Back to Home Button (White style from screenshot)
+                    // Back to Home Button 
                      ElevatedButton(
                           onPressed: () =>
                               Navigator.pushNamedAndRemoveUntil(

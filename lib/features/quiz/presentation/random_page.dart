@@ -20,13 +20,11 @@ class _RandomPageState extends State<RandomPage> {
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF6D00);
 
-  // State Variables
   int currentIndex = 0; 
   final TextEditingController _answerController = TextEditingController();
   String? selectedOption;
 
-  // --- SAMPLE DATA STRUCTURE ---
-  // Dito natin ilalagay ang mga tanong. Pwedeng halo ang type.
+  // Sample Data
   final List<Map<String, dynamic>> quizData = [
     {
       "type": "multiple",
@@ -87,8 +85,6 @@ class _RandomPageState extends State<RandomPage> {
               const SizedBox(height: 10),
               _buildQuestionCard(currentData["question"]),
               const SizedBox(height: 25),
-              
-              // Dynamic Body base sa type ng tanong
               if (isMultipleChoice) 
                 _buildMultipleChoiceOptions(currentData["options"]) 
               else 
@@ -102,8 +98,6 @@ class _RandomPageState extends State<RandomPage> {
       ),
     );
   }
-
-  // --- UI BUILDER METHODS ---
 
   Widget _buildStatusSection() {
     double progress = (currentIndex + 1) / quizData.length;
@@ -147,7 +141,7 @@ class _RandomPageState extends State<RandomPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: dominantColor.withOpacity(0.2), width: 1.5),
+        border: Border.all(color: dominantColor.withValues(alpha: 0.2), width: 1.5),
       ),
       child: Row(
         children: [
@@ -166,7 +160,7 @@ class _RandomPageState extends State<RandomPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
       ),
       child: Text(
         question,
@@ -226,7 +220,7 @@ class _RandomPageState extends State<RandomPage> {
               contentPadding: const EdgeInsets.all(20),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: dominantColor.withOpacity(0.1)),
+                borderSide: BorderSide(color: dominantColor.withValues(alpha: 0.1)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -256,12 +250,10 @@ class _RandomPageState extends State<RandomPage> {
             if (!isLastQuestion) {
               setState(() {
                 currentIndex++;
-                // Reset fields para sa next question
                 selectedOption = null;
                 _answerController.clear();
               });
             } else {
-              // Submit Logic
               Navigator.pushNamed(context, 'ran_result');
             }
           },

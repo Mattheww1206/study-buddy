@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 
 class FlashcardService {

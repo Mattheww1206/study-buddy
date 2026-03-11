@@ -282,4 +282,30 @@ class AuthService {
     } 
      }
 
+
+    Future<void> deleteAccount(String userId) async {
+      final results = await _firestore
+      .collection('results')
+      .where('userId', isEqualTo: userId)
+      .get();
+      for(final doc in results.docs){
+        await doc.reference.delete();
+      }
+
+      final decks = await _firestore
+      .collection('decks')
+      .where('userId', isEqualTo: userId)
+      .get();
+      for (final deck in decks.docs) {
+        final flashcards = await deck.reference.collection('flashcards').get();
+        for (final card in flashcards.docs) {
+          await card.reference.delete();
+        }
+        await deck.reference.delete();
+      }
+
+      await _firestore.collection('users').doc(userId).delete();
+      await _auth.currentUser?.delete();
+    }
+
 }

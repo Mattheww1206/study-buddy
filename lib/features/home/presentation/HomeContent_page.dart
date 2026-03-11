@@ -28,8 +28,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_initialized) return;
-    _initialized = true;
-    _userId = Provider.of<UserProvider>(context, listen: false).user!.userId;
+     final user = Provider.of<UserProvider>(context, listen: false).user;
+      if (user == null) return; 
+       _initialized = true;
+    _userId = user.userId;
     _decksStream = _deckService.getUserDecks(_userId!);
     _loadResults();
   }
@@ -49,7 +51,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
     final lastResult = _results.isNotEmpty ? _results.first : null;
 
 
@@ -62,7 +63,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
               builder: (context, snapshot) {
                 final decks = snapshot.data ?? [];
 
-                // 👇 same filter as CreatePage
+                
                 final pinnedDecks =
                     decks.where((d) => d.isPinned).toList();
                 final recentDecks = decks.take(5).toList();
@@ -75,7 +76,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     children: [
                       const SizedBox(height: 60),
 
-                      // --- 1. PINNED DECKS ---
+                      // Pinned decks
                       if (pinnedDecks.isNotEmpty)
                         Container(
                           margin:
@@ -140,7 +141,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                                   size: 20),
                                             ),
                                             Text(
-                                              deck.title, // 👈 real title
+                                              deck.title, 
                                               maxLines: 1,
                                               overflow:
                                                   TextOverflow.ellipsis,
@@ -152,7 +153,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
-                                              '${deck.totalCards} Flashcards', // 👈 real count
+                                              '${deck.totalCards} Flashcards', 
                                               style: GoogleFonts.lora(
                                                   color: Colors.white70,
                                                   fontSize: 14),
@@ -170,7 +171,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 25),
 
-                      // --- 2. STATS ---
+                      // Stats
                       Container(
                         margin:
                             const EdgeInsets.symmetric(horizontal: 20),
@@ -184,7 +185,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           children: [
                             Column(
                               children: [
-                                Text('${decks.length}', // 👈 real count
+                                Text('${decks.length}', 
                                     style: GoogleFonts.lora(
                                         fontSize: 38,
                                         fontWeight: FontWeight.bold,
@@ -202,7 +203,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                 color: Colors.grey[100]),
                             Column(
                               children: [
-                                Text('${_results.length}', // 👈 real count
+                                Text('${_results.length}', 
                                     style: GoogleFonts.lora(
                                         fontSize: 38,
                                         fontWeight: FontWeight.bold,
@@ -220,7 +221,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 25),
 
-                      // --- 3. CONTINUE LAST SESSION ---
+                      // Continue Last Session
                       if (!_isLoading && lastResult != null)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -274,7 +275,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 25),
 
-                      // --- 4. RECENT DECKS ---
+                      // Recent Decks
                       Padding(
                         padding: const EdgeInsets.only(left: 25),
                         child: Text('Recent Decks',
@@ -348,7 +349,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 35),
 
-                      // --- 5. NEWLY ADDED ---
+                      // New Added Decks
                       Padding(
                         padding: const EdgeInsets.only(left: 25),
                         child: Text('Newly added decks',
@@ -391,7 +392,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                           border: Border.all(
                                               color: const Color(
                                                       0xFF665FBE)
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               width: 1.5)),
                                       padding: const EdgeInsets.all(20),
                                       child: Column(

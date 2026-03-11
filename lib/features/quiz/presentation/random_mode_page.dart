@@ -42,7 +42,7 @@ class _RandomModePageState extends State<RandomModePage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            // --- SELECTED MODE SECTION (Random Mode Design) ---
+            // Mode
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -60,7 +60,7 @@ class _RandomModePageState extends State<RandomModePage> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12)),
                         child: const Icon(Icons.shuffle, color: Colors.white, size: 26), // Shuffle icon for Random
                       ),
@@ -83,7 +83,7 @@ class _RandomModePageState extends State<RandomModePage> {
             ),
             const SizedBox(height: 16),
 
-            // --- NUMBER OF QUESTIONS SECTION ---
+            // Number of Questions
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -127,7 +127,7 @@ class _RandomModePageState extends State<RandomModePage> {
             ),
             const SizedBox(height: 16),
 
-            // --- QUIZ TIMER SECTION ---
+            // Timer
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -187,7 +187,7 @@ class _RandomModePageState extends State<RandomModePage> {
             ),
             const SizedBox(height: 16),
 
-            // --- QUIZ SUMMARY SECTION ---
+            // Summary
             Container(
               padding: const EdgeInsets.all(20),
               width: double.infinity,
@@ -230,13 +230,12 @@ class _RandomModePageState extends State<RandomModePage> {
             ),
             const SizedBox(height: 23),
 
-            // --- START BUTTON ---
+            // Start Button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
-                  // Siguraduhin na may route ka na 'random_quiz' sa iyong main.dart
                   Navigator.pushNamed(context, 'random'); 
                 },
                 style: ElevatedButton.styleFrom(

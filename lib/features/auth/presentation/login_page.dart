@@ -220,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     )
@@ -245,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
               Text(
                 'Login to continue your study journey',
                 style: GoogleFonts.itim(
-                  color: Colors.black.withOpacity(0.8),
+                  color: Colors.black.withValues(alpha: 0.8),
                   fontSize: 16,
                 ),
               ),
@@ -262,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                     // Idinagdag ang shadow para magmukhang nakalutang
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 20,
                         spreadRadius: 2,
                         offset: const Offset(0, 10),

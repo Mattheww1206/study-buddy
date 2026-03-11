@@ -76,11 +76,11 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                       Container(
                         padding: const EdgeInsets.all(10), 
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12)), 
                         child: const Icon(Icons.edit_document, color: Colors.white, size: 26), 
                       ),
-                      const SizedBox(width: 16), // 18 -> 16
+                      const SizedBox(width: 16), 
                       const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,8 +98,6 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
               ),
             ),
             const SizedBox(height: 16), 
-
-            
             Container(
               padding: const EdgeInsets.all(18), 
               decoration: BoxDecoration(
@@ -148,7 +146,6 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
               ),
             ),
             const SizedBox(height: 16), 
-
             // Timer
             Container(
               padding: const EdgeInsets.all(18), 
@@ -171,7 +168,7 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                       Switch(
                         value: isTimerEnabled,
                         onChanged: (val) => setState(() => isTimerEnabled = val),
-                        activeColor: const Color(0xFF665FBE),
+                        activeThumbColor: const Color(0xFF665FBE),
                         materialTapTargetSize: MaterialTapTargetSize.padded,
                       ),
                     ],

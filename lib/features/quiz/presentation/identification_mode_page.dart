@@ -85,7 +85,7 @@ import 'package:studybuddy/features/deck/model/deck_model.dart';
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12)),
                         child: const Icon(Icons.keyboard,
                             color: Colors.white, size: 26),

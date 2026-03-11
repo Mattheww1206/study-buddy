@@ -94,7 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.yellow.withOpacity(0.3), // Glow effect
+                    color: Colors.yellow.withValues(alpha: 0.3), // Glow effect
                   ),
                   child: Image.asset(
                     'assets/studybuddy-logo.png',
@@ -120,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 'Create your free account today',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: Colors.black.withOpacity(0.8),
+                  color: Colors.black.withValues(alpha: 0.8),
                 ),
               ),
       
@@ -137,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderRadius: BorderRadius.circular(40),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),

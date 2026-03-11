@@ -10,7 +10,6 @@ import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_view_page.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/flashcards/provider/flashcard_provider.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
@@ -39,11 +38,9 @@ import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_result_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_review_page.dart';
-import 'package:studybuddy/features/quiz/provider/quiz_provider.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_ai/firebase_ai.dart';
 import 'firebase_options.dart';
 
 

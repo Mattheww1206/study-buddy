@@ -122,26 +122,26 @@ class _SettingsPageState extends State<SettingsPage> {
           'Settings',
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
-            fontSize: 25, // Pinaliit mula 30
+            fontSize: 25, 
             color: Colors.white,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
-              size: 25, color: Colors.white), // Pinaliit mula 30
+              size: 25, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0), // Bahagyang pinaliit ang padding
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0), 
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(30), // Pinaliit mula 40
+              padding: const EdgeInsets.all(30), 
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 255, 255, 255), // Secondary Color
-                borderRadius: BorderRadius.circular(25), // Pinaliit mula 30
+                borderRadius: BorderRadius.circular(25),
               ),
               child: Column(
                 children: [
@@ -156,29 +156,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       children: [
                         Container(
-                          height: 50, // Pinaliit mula 60
-                          width: 50,  // Pinaliit mula 60
+                          height: 50, 
+                          width: 50,  
                           decoration: const BoxDecoration(
                             color: Color(0xFF665FBE), // Dominant Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.person,
-                              size: 25, color: Colors.white), // Pinaliit mula 30
+                              size: 25, color: Colors.white), 
                         ),
                         const SizedBox(width: 15),
                         Text(
                           'Account',
                           style: GoogleFonts.lora(
-                            fontSize: 20, // Pinaliit mula 25
+                            fontSize: 20, 
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 20), // Pinaliit mula 25
+                        const Icon(Icons.arrow_forward_ios, size: 20), 
                       ],
                     ),
                   ),
-                  const Divider(height: 25), // Pinaliit mula 30
+                  const Divider(height: 25), 
                   TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -190,29 +190,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Row(
                       children: [
                         Container(
-                          height: 50, // Pinaliit mula 60
-                          width: 50,  // Pinaliit mula 60
+                          height: 50, 
+                          width: 50,  
                           decoration: const BoxDecoration(
                             color: Color(0xFFFF810E), // Accent Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.notifications,
-                              size: 25, color: Colors.white), // Pinaliit mula 30
+                              size: 25, color: Colors.white), 
                         ),
                         const SizedBox(width: 15),
                         Text(
                           'Achievement',
                           style: GoogleFonts.lora(
-                            fontSize: 20, // Pinaliit mula 25
+                            fontSize: 20, 
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 20), // Pinaliit mula 25
+                        const Icon(Icons.arrow_forward_ios, size: 20), 
                       ],
                     ),
                   ),
-                  const Divider(height: 25), // Pinaliit mula 30
+                  const Divider(height: 25), 
                   TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -225,19 +225,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         Container(
                           height: 50, 
-                          width: 50,  // Pinaliit mula 60
+                          width: 50,  
                           decoration: const BoxDecoration(
                             color: Color(0xFF665FBE), // Dominant Color
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.lock,
-                              size: 25, color: Colors.white), // Pinaliit mula 30
+                              size: 25, color: Colors.white), 
                         ),
-                        const SizedBox(width: 20), // Pinaliit mula 25
+                        const SizedBox(width: 20), 
                         Text(
                           'Logout',
                           style: GoogleFonts.lora(
-                              fontSize: 20, fontWeight: FontWeight.bold), // Pinaliit mula 25
+                              fontSize: 20, fontWeight: FontWeight.bold), 
                         ),
                       ],
                     ),

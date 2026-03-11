@@ -1,4 +1,3 @@
-import "package:flutter/material.dart";
 import "package:studybuddy/features/flashcards/model/flashcard_model.dart";
 
 class QuizQuestion {

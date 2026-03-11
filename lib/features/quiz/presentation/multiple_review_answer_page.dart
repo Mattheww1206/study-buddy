@@ -29,8 +29,6 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
         List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = args['deck'] as Deck;
   }
-
-  
   
   @override
   Widget build(BuildContext context) {
@@ -97,7 +95,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -150,12 +148,11 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                               style: TextStyle(
                                                   fontSize: 15,
                                                   color: dominantColor
-                                                      .withOpacity(0.7)),
+                                                      .withValues(alpha: 0.7)),
                                               children: [
                                                 const TextSpan(
                                                     text: 'Your Answer: '),
                                                 TextSpan(
-                                                  // 👈 real selected answer
                                                   text: item['selectedAnswer'] ?? '',
                                                   style: TextStyle(
                                                       color: dominantColor,
@@ -189,12 +186,11 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                               style: TextStyle(
                                                   fontSize: 15,
                                                   color: dominantColor
-                                                      .withOpacity(0.7)),
+                                                      .withValues(alpha: 0.7)),
                                               children: [
                                                 const TextSpan(
                                                     text: 'Correct Answer: '),
                                                 TextSpan(
-                                                  // 👈 real correct answer
                                                   text: item['correctAnswer'] ?? '',
                                                   style: TextStyle(
                                                       color: accentColor,
