@@ -8,6 +8,7 @@ import 'package:studybuddy/features/auth/presentation/register_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/presentation/create_deck_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_page.dart';
+import 'package:studybuddy/features/deck/presentation/create_upload_page.dart';
 import 'package:studybuddy/features/deck/presentation/create_view_page.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/profile/presentation/account_information_page.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
        'achievement': (context) => const AchievementPage(),
        'change_password':(context) => const ChangePasswordPage(),
        'create_deck':(context) => const CreateDeckPage(),
+       'upload':(context) => const CreateUploadPage(),
        'create_view':(context) => const CreateViewPage(),
        'mode':(context) => const ModePage(),
        'flashcard_mode':(context) => const FlashcardModePage(),
@@ -110,6 +112,7 @@ class MyApp extends StatelessWidget {
        'tf':(context) => const TrueFalsePage(),
        'tf_result':(context) => const TrueFalseResultPage(),
        'tf_review':(context) => const TrueFalseReviewPage()
+
 
      
 

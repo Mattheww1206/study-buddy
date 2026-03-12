@@ -35,7 +35,7 @@ class _LandingPageState extends State<LandingPage> {
             children: [
               const  SizedBox(height: 100),
               Image(
-              image: const AssetImage('assets/studybuddy.png'),
+              image: const AssetImage('assets/study.png'),
               width: 400,
               height: 360,
               fit: BoxFit.cover,
