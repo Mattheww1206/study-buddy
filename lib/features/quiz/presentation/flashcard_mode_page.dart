@@ -74,7 +74,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
         _currentIndex++;
       });
     } else {
-      _isFinished = true;
+      setState(() => _isFinished = true);
       _saveResultAndNavigate();
     }
   }
@@ -89,7 +89,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     final percentage = _easyCount / totalCards;
 
     try {
-      final resultId = await _resultService.saveResult(StudyResult(
+      await _resultService.saveResult(StudyResult(
         resultId: '',
         userId: userId,
         deckId: _deck.deckId,
@@ -101,9 +101,8 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
         againCount: _againCount,
         completedAt: DateTime.now(),
       ));
-      print('Saved result: $resultId');
     } catch (e) {
-      print('Error saving result: $e');
+      debugPrint('Error saving result: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -142,8 +141,6 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text('STUDY BUDDY',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
         body: const Center(child: Text('No flashcards in this deck.')),
       );
@@ -163,9 +160,10 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'STUDY BUDDY',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95,
+          fit: BoxFit.contain,
         ),
       ),
       body: SafeArea(
@@ -239,11 +237,9 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                               color: Colors.red, size: 50),
                         ),
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _isFlipped = !_isFlipped),
+                          onTap: () => setState(() => _isFlipped = !_isFlipped),
                           child: TweenAnimationBuilder(
-                            tween: Tween<double>(
-                                begin: 0, end: _isFlipped ? pi : 0),
+                            tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
                             duration: const Duration(milliseconds: 500),
                             builder: (context, double val, __) {
                               final isBackSide = val > (pi / 2);
@@ -262,8 +258,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color:
-                                              Colors.black.withValues(alpha: 0.1),
+                                          color: Colors.black.withOpacity(0.1),
                                           blurRadius: 10,
                                           offset: const Offset(0, 5)),
                                     ],
@@ -271,21 +266,19 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                   child: isBackSide
                                       ? Transform(
                                           alignment: Alignment.center,
-                                          transform: Matrix4.identity()
-                                            ..rotateY(pi),
+                                          transform: Matrix4.identity()..rotateY(pi),
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(30),
+                                                child: SingleChildScrollView(
+                                                  padding: const EdgeInsets.all(40), // Mas malaking padding sa back
                                                   child: Text(
                                                     card.answer,
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
                                                         fontSize: 18,
                                                         color: Colors.black87,
-                                                        height: 1.5),
+                                                        height: 1.6), // Better line spacing
                                                   ),
                                                 ),
                                               ),
@@ -303,27 +296,28 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                         )
                                       : Stack(
                                           children: [
-                                            Center(
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    card.question,
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 32,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  const Text(
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 40), // Padding para sa front text
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      card.question,
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 32,
+                                                          fontWeight: FontWeight.bold),
+                                                    ),
+                                                    const SizedBox(height: 12),
+                                                    const Text(
                                                       'Tap to see definition',
                                                       style: TextStyle(
                                                           color: Colors.white70,
                                                           fontSize: 14)),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             const Positioned(
@@ -364,7 +358,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                     decoration: BoxDecoration(
                       color: i <= (_currentIndex % 5)
                           ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withValues(alpha: 0.2),
+                          : const Color(0xFF665FBE).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

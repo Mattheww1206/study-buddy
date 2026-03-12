@@ -30,10 +30,10 @@ class _ProfilePageState extends State<ProfilePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_initialized) return;
-     final user = Provider.of<UserProvider>(context, listen: false).user;
-     if (user == null) return;
-     _initialized = true;
-     _userId = user.userId;
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+    if (user == null) return;
+    _initialized = true;
+    _userId = user.userId;
     _decksStream = _deckService.getUserDecks(_userId!);
     _loadResults();
   }
@@ -63,12 +63,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final loggedUser = Provider.of<UserProvider>(context).user; 
+    final loggedUser = Provider.of<UserProvider>(context).user;
     final photoUrl = loggedUser?.photoUrl;
-    
-    final streak     = _resultService.calculateStreak(_results);
+
+    final streak = _resultService.calculateStreak(_results);
     final todayCount = _resultService.todayQuizCount(_results);
-    final weekCount  = _resultService.weekQuizCount(_results);
+    final weekCount = _resultService.weekQuizCount(_results);
 
     const dailyGoal = 6;
     const weeklyGoal = 15;
@@ -77,6 +77,19 @@ class _ProfilePageState extends State<ProfilePage> {
     final dailyPercent = (dailyProgress * 100).toInt();
     final weeklyPercent = (weeklyProgress * 100).toInt();
 
+    // Achievement Data (Temporary/Mock)
+    final List<Map<String, dynamic>> achievements = [
+      {'title': 'First Deck', 'icon': Icons.style, 'progress': 1.0},
+      {'title': 'Quiz Master', 'icon': Icons.psychology, 'progress': 0.6},
+      {'title': '7-Day Streak', 'icon': Icons.local_fire_department, 'progress': 0.3},
+      {'title': 'Early Bird', 'icon': Icons.wb_sunny, 'progress': 1.0},
+    ];
+
+    // --- IDINAGDAG: CALCULATION PARA SA OVERALL PROGRESS ---
+    final int totalAchievements = achievements.length;
+    final int unlockedCount = achievements.where((a) => a['progress'] == 1.0).length;
+    final double overallProgress = totalAchievements > 0 ? unlockedCount / totalAchievements : 0.0;
+    final int overallPercent = (overallProgress * 100).toInt();
 
     return SafeArea(
       child: Container(
@@ -170,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         base64Decode(photoUrl),
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
-                                                            (_,_,_) =>
+                                                            (_, _, _) =>
                                                                 _defaultAvatar,
                                                       )
                                                     : _defaultAvatar,
@@ -250,7 +263,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   Column(
                                     children: [
-                                      Text('$totalDecks', 
+                                      Text('$totalDecks',
                                           style: GoogleFonts.lora(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 25,
@@ -271,7 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.grey.withValues(alpha: 0.3)),
                                   Column(
                                     children: [
-                                      Text('$totalQuizTaken', 
+                                      Text('$totalQuizTaken',
                                           style: GoogleFonts.lora(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 25,
@@ -351,7 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           child: LinearProgressIndicator(
-                                            value: dailyProgress, 
+                                            value: dailyProgress,
                                             backgroundColor: const Color(0xFFFAEEFF),
                                             color: const Color(0xFF665FBE),
                                             minHeight: 15,
@@ -391,7 +404,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           child: LinearProgressIndicator(
-                                            value: weeklyProgress, 
+                                            value: weeklyProgress,
                                             backgroundColor: const Color(0xFFFAEEFF),
                                             color: const Color(0xFF665FBE),
                                             minHeight: 15,
@@ -410,7 +423,146 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+
+                          // Achievements Section
+                          Transform.translate(
+                            offset: const Offset(0, -20),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Achievements',
+                                          style: GoogleFonts.lora(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 22,
+                                            color: const Color(0xFF665FBE),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          // --- PINABAGO 2: NAVIGATE SA ACHIEVEMENT PAGE ---
+                                          onPressed: () => Navigator.pushNamed(context, 'achievement'),
+                                          child: Text(
+                                            'See All',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    height: 140,
+                                    child: ListView.builder(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: achievements.length,
+                                      itemBuilder: (context, index) {
+                                        final achievement = achievements[index];
+                                        final isDone = achievement['progress'] == 1.0;
+                                        return Container(
+                                          width: 120,
+                                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFAEEFF).withValues(alpha: 0.5),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                achievement['icon'],
+                                                size: 40,
+                                                color: isDone 
+                                                    ? const Color(0xFFFD9519) 
+                                                    : Colors.grey[300],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                achievement['title'],
+                                                textAlign: TextAlign.center,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.lora(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  
+                                  // --- PINABAGO 1: OVERALL PROGRESS UI SA ILALIM NG ICONS ---
+                                  const SizedBox(height: 15),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '$unlockedCount of $totalAchievements unlocked',
+                                              style: GoogleFonts.lora(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFF665FBE).withValues(alpha: 0.7),
+                                              ),
+                                            ),
+                                            Text(
+                                              '$overallPercent%',
+                                              style: GoogleFonts.lora(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFFFD9519),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: LinearProgressIndicator(
+                                            value: overallProgress,
+                                            backgroundColor: const Color(0xFFFAEEFF),
+                                            color: const Color(0xFFFD9519),
+                                            minHeight: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 40),
                         ],
                       ),
                     );

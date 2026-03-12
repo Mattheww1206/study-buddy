@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
@@ -15,10 +14,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   final DeckService _deckService = DeckService();
   final _titleController = TextEditingController();
   final _subjectController = TextEditingController();
-  bool isEditMode = false;
   bool _isLoading = false;
-
-
 
   // List of card data
   List<Map<String, TextEditingController>> cardControllers = [
@@ -28,11 +24,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     }
   ];
 
-  List<int> selectedIndices = [];
-
   @override
   void dispose() {
-    // Nilinis lahat ng controllers para iwas memory leak
     _subjectController.dispose();
     _titleController.dispose();
     for (var card in cardControllers) {
@@ -42,18 +35,114 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     super.dispose();
   }
 
+  // --- DINAGDAG NA DELETE DIALOG (image_0fda5d.png design) ---
+  void _confirmDelete(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF7B67).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.delete_sweep_rounded,
+                    color: Color(0xFFFF7B67),
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "Delete this card?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF665FBE),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Are you sure you want to delete this card?\nThis action cannot be undone.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: Colors.black12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: const Text(
+                          "CANCEL",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            cardControllers[index]["term"]?.dispose();
+                            cardControllers[index]["def"]?.dispose();
+                            cardControllers.removeAt(index);
+                          });
+                          Navigator.pop(dialogContext);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF7B67),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: const Text(
+                          "DELETE",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // Pag save ng Deck
   Future<void> _saveDeck() async {
-    if(_titleController.text.trim().isEmpty){
+    if (_titleController.text.trim().isEmpty || _subjectController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Title is required.", style: GoogleFonts.itim())),
-      );
-      return;
-    }
-
-    if (_subjectController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Subject is required.", style: GoogleFonts.lora())),
+        const SnackBar(content: Text("Title and Subject are required.")),
       );
       return;
     }
@@ -62,7 +151,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       if (cardControllers[i]['term']!.text.trim().isEmpty ||
           cardControllers[i]['def']!.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Card ${i + 1} is missing a term or definition.", style: GoogleFonts.lora())),
+          SnackBar(content: Text("Card ${i + 1} is missing a term or definition.")),
         );
         return;
       }
@@ -77,35 +166,30 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
 
     try {
       final cards = cardControllers.map((card) => {
-        'term': card['term']!.text.trim(),
-        'def': card['def']!.text.trim(),
-      }).toList();
+            'term': card['term']!.text.trim(),
+            'def': card['def']!.text.trim(),
+          }).toList();
 
       await _deckService.createDeck(
-        userId: userProvider.user!.userId, 
-        title: _titleController.text.trim(), 
-        subject: _subjectController.text.trim(), 
-        cards: cards
-        );
-      messenger.showSnackBar(
-        SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
-      );
+          userId: userProvider.user!.userId,
+          title: _titleController.text.trim(),
+          subject: _subjectController.text.trim(),
+          cards: cards);
+      messenger.showSnackBar(const SnackBar(content: Text('Deck Saved!')));
       nav.pop();
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Failed to save deck. Please try again.', style: GoogleFonts.itim()))
-      );
+      messenger.showSnackBar(const SnackBar(content: Text('Failed to save deck.')));
     } finally {
-      if(mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE), 
+        backgroundColor: const Color(0xFF665FBE),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -116,117 +200,96 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
           'assets/studybuddy-logo.png',
           height: 95,
           fit: BoxFit.contain,
-          
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Create Deck", 
-                            style: GoogleFonts.lora(fontSize: 30, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A1A))),
-                          Text("${cardControllers.length} cards total", 
-                            style: GoogleFonts.lora(color: const Color(0xFF665FBE), fontSize: 16)), 
-                        ],
-                      ),
-                      // Edit/Close Button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isEditMode ? const Color(0xFF421C21) : const Color(0xFFFAEEFF), 
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              isEditMode = !isEditMode;
-                              selectedIndices.clear();
-                            });
-                          },
-                          icon: Icon(isEditMode ? Icons.close : Icons.edit, size: 20, color: isEditMode ? Colors.white : const Color(0xFF665FBE)),
-                        ),
-                      ),
+                      const Text("Create Deck",
+                          style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A1A1A))),
+                      Text("${cardControllers.length} cards total",
+                          style: const TextStyle(
+                              color: Color(0xFF665FBE), fontSize: 14)),
                     ],
                   ),
-                  const SizedBox(height: 25),
-
-                  // Delete Bar
-                  if (isEditMode && selectedIndices.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: const Color(0xFF2D1616), borderRadius: BorderRadius.circular(12)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text("Selected ${selectedIndices.length}", 
-                              style: GoogleFonts.lora(color: Colors.white)),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6B1111)),
-                            onPressed: () {
-                              setState(() {
-                                selectedIndices.sort((a, b) => b.compareTo(a));
-                                for (var index in selectedIndices) {
-                                  cardControllers[index]["term"]?.dispose();
-                                  cardControllers[index]["def"]?.dispose();
-                                  cardControllers.removeAt(index);
-                                }
-                                selectedIndices.clear();
-                                isEditMode = false;
-                              });
-                            },
-                            child: Text("Delete", style: GoogleFonts.lora(color: Colors.white)),
-                          )
-                        ],
-                      ),
-                    ),
+                  const SizedBox(height: 20),
 
                   // Subject and Title
                   Row(
                     children: [
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))), 
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: const Color(0xFF665FBE)
+                                      .withOpacity(0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("SUBJECT", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
+                              Text("SUBJECT",
+                                  style: TextStyle(
+                                      color: const Color(0xFF665FBE)
+                                          .withOpacity(0.5),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
                               TextFormField(
                                 controller: _subjectController,
-                                decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.zero),
-                                style: GoogleFonts.lora(fontWeight: FontWeight.w600, fontSize: 20),
+                                decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 16),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))), 
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: const Color(0xFF665FBE)
+                                      .withOpacity(0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("TITLE", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 15, fontWeight: FontWeight.bold)), 
+                              Text("TITLE",
+                                  style: TextStyle(
+                                      color: const Color(0xFF665FBE)
+                                          .withOpacity(0.5),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold)),
                               TextFormField(
                                 controller: _titleController,
-                                decoration: const InputDecoration(isDense: true, border: InputBorder.none, contentPadding: EdgeInsets.zero),
-                                style: GoogleFonts.lora(color: const Color(0xFFFF7B67), fontWeight: FontWeight.w600, fontSize: 20), 
+                                decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero),
+                                style: const TextStyle(
+                                    color: Color(0xFFFF7B67),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16),
                               ),
                             ],
                           ),
@@ -234,92 +297,115 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
                   // List of Flashcards
                   ...cardControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     var controllers = entry.value;
-                    bool isSelected = selectedIndices.contains(index);
 
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.only(bottom: 15),
+                      padding: const EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFFFF0F0) : const Color(0xFFFAEEFF), 
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isSelected ? Colors.red.shade200 : const Color(0xFF665FBE).withValues(alpha: 0.2)), 
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                            color: const Color(0xFF665FBE).withOpacity(0.1)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              if (isEditMode)
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: () {
-                                    setState(() {
-                                      isSelected ? selectedIndices.remove(index) : selectedIndices.add(index);
-                                    });
-                                  },
-                                  icon: Container(
-                                    width: 22, height: 22,
-                                    margin: const EdgeInsets.only(right: 10),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFF665FBE) : Colors.white, 
+                                      color: index % 2 == 0
+                                          ? const Color(0xFFFF7B67)
+                                          : const Color(0xFF665FBE),
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: const Color(0xFF665FBE), width: 2), 
                                     ),
-                                    child: isSelected ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
+                                    child: Text("${index + 1}",
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14)),
                                   ),
-                                ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: index % 2 == 0 ? const Color(0xFFFF7B67) : const Color(0xFF665FBE), 
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text("${index + 1}", 
-                                  style: GoogleFonts.lora(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                                  const SizedBox(width: 10),
+                                  const Text("Card",
+                                      style: TextStyle(
+                                          color: Color(0xFF665FBE),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                ],
                               ),
-                              const SizedBox(width: 12),
-                              Text("Card", 
-                                style: GoogleFonts.lora(color: const Color(0xFF665FBE), fontWeight: FontWeight.bold, fontSize: 20)), 
+                              // --- DINAGDAG NA DELETE ICON ---
+                              if (cardControllers.length > 1)
+                                IconButton(
+                                  onPressed: () => _confirmDelete(index),
+                                  icon: const Icon(Icons.delete_outline_rounded,
+                                      color: Color(0xFFFF7B67), size: 24),
+                                ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                          Text("TERM", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 18, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 15),
+                          Text("TERM",
+                              style: TextStyle(
+                                  color: const Color(0xFF665FBE)
+                                      .withOpacity(0.5),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 5),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFFAEEFF),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    color: const Color(0xFF665FBE)
+                                        .withOpacity(0.05))),
                             child: TextFormField(
                               controller: controllers["term"],
-                              style: GoogleFonts.lora(fontSize: 18),
-                              decoration: InputDecoration(
-                                hintText: "Enter term...", 
-                                border: InputBorder.none, 
-                                hintStyle: GoogleFonts.lora(fontSize: 18, color: Colors.grey)
-                              ),
+                              style: const TextStyle(fontSize: 15),
+                              decoration: const InputDecoration(
+                                  hintText: "Enter term...",
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(
+                                      fontSize: 14, color: Colors.grey)),
                             ),
                           ),
-                          const SizedBox(height: 15),
-                          Text("DEFINITION", style: GoogleFonts.lora(color: const Color(0xFF665FBE).withValues(alpha: 0.5), fontSize: 18, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
+                          Text("DEFINITION",
+                              style: TextStyle(
+                                  color: const Color(0xFF665FBE)
+                                      .withOpacity(0.5),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 5),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1))),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFFAEEFF),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    color: const Color(0xFF665FBE)
+                                        .withOpacity(0.05))),
                             child: TextFormField(
                               controller: controllers["def"],
                               maxLines: null,
-                              style: GoogleFonts.lora(fontSize: 18),
-                              decoration: InputDecoration(
-                                hintText: "Enter definition...", 
-                                border: InputBorder.none, 
-                                hintStyle: GoogleFonts.lora(fontSize: 18, color: Colors.grey)
-                              ),
+                              style: const TextStyle(fontSize: 15),
+                              decoration: const InputDecoration(
+                                  hintText: "Enter definition...",
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(
+                                      fontSize: 14, color: Colors.grey)),
                             ),
                           ),
                         ],
@@ -332,63 +418,56 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
           ),
 
           // Bottom buttons
-          if (!isEditMode)
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 25, top: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 55,
-                      child: ElevatedButton(
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
                         onPressed: _isLoading ? null : _saveDeck,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF7B67), 
+                          backgroundColor: const Color(0xFFED9E4F),
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         child: _isLoading
-                        ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                        : Text('Save Deck',
-                        style: GoogleFonts.lora(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold
-                        ),
-                        )
-                      ),
-                    ),
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 2))
+                            : const Text('Save Deck',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold))),
                   ),
-                  const SizedBox(width: 15),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        cardControllers.add({
-                          "term": TextEditingController(),
-                          "def": TextEditingController(),
-                        });
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      cardControllers.add({
+                        "term": TextEditingController(),
+                        "def": TextEditingController(),
                       });
-                    },
-                    child: Container(
-                      height: 55,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF665FBE), 
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(Icons.add, size: 30, color: Colors.white),
-                    ),
+                    });
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 55,
+                    decoration: BoxDecoration(
+                        color: const Color(0xFF665FBE),
+                        borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.add, size: 28, color: Colors.white),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );

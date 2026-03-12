@@ -408,21 +408,30 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
             const SizedBox(height: 5),
 
             // Question Card
+           // Question Card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 35),
+              width: double.infinity, // Sinisigurado na laging sagad ang lapad
+              constraints: const BoxConstraints(
+                minHeight: 160, // Eto ang magpapanatili na malaki ang card kahit maikli ang text
+                maxHeight: 220, // Limit para hindi kainin ang buong screen kung sobrang haba
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
               ),
-              child: Text(
-                flashcard.question,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: dominantColor, fontSize: 20, fontWeight: FontWeight.bold),
+              child: Center( // Para manatiling nasa gitna ang text kahit malaki ang card
+                child: SingleChildScrollView( // Para hindi mag-overflow kung sobrang haba ng tanong
+                  child: Text(
+                    flashcard.question,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: dominantColor, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ),
-
             const SizedBox(height: 20),
             // Options
             Expanded(

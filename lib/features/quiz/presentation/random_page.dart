@@ -491,27 +491,39 @@ class _RandomPageState extends State<RandomPage> {
                 ],
               ),
             ),
-            // Question 
+            
+           // Question 
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 25, vertical: 35),
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                minHeight: 160, // Pareho sa ibang pages para consistent ang "Study Buddy" app mo
+                maxHeight: 220, // Sakto lang para hindi ma-overlap ang input fields
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10)
+                      blurRadius: 10,
+                      offset: const Offset(0, 4), // Para mas mukhang "lifted" ang card
+                  )
                 ],
               ),
-              child: Text(
-                questionText,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: dominantColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
+              child: Center(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Text(
+                    questionText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: dominantColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ),
 

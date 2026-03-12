@@ -52,9 +52,10 @@ class _RandomModePageState extends State<RandomModePage> {
             Navigator.of(context).pop();
           },
         ),
-        title: const Text(
-          'Quiz Settings',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+         title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
       ),

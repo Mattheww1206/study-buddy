@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// Tinanggal ang google_fonts import
 
 class AchievementPage extends StatefulWidget {
   const AchievementPage({super.key});
@@ -42,9 +42,9 @@ class _AchievementPageState extends State<AchievementPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF665FBE),
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Achievements',
-          style: GoogleFonts.lora(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25,
             color: Colors.white,
@@ -52,7 +52,7 @@ class _AchievementPageState extends State<AchievementPage> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 25, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, size: 25, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -79,7 +79,7 @@ class _AchievementPageState extends State<AchievementPage> {
                 const SizedBox(width: 8),
                 Text(
                   "ALL ACHIEVEMENTS",
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -104,7 +104,6 @@ class _AchievementPageState extends State<AchievementPage> {
               itemBuilder: (context, index) {
                 final item = achievements[index];
                 
-                // fall back icons if ever maging null
                 final IconData displayIcon = item['icon'] != null 
                     ? item['icon'] as IconData 
                     : Icons.emoji_events;
@@ -141,7 +140,7 @@ class _AchievementPageState extends State<AchievementPage> {
                             Text(
                               item['title'] ?? 'No Title',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: TextStyle(
                                 fontSize: 10, 
                                 fontWeight: FontWeight.bold, 
                                 color: Colors.grey[600]
@@ -153,7 +152,7 @@ class _AchievementPageState extends State<AchievementPage> {
                               textAlign: TextAlign.center,
                               maxLines: 4,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
+                              style: TextStyle(
                                 fontSize: 8, 
                                 color: Colors.grey[400],
                                 height: 1.1,
@@ -187,8 +186,8 @@ class _AchievementPageState extends State<AchievementPage> {
         ),
         child: Column(
           children: [
-            Text(count, style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
-            Text(label, style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+            Text(count, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
           ],
         ),
       ),

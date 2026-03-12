@@ -424,29 +424,40 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
 
             const SizedBox(height: 5),
 
-            // Question card
+           // Question card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 35),
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                minHeight: 160, 
+                maxHeight: 220, 
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10)
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                  )
                 ],
               ),
-              child: Text(
-                statement,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: dominantColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
+              child: Center(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Text(
+                    statement,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: dominantColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ),
-
             const SizedBox(height: 30),
 
             // True / False buttons
