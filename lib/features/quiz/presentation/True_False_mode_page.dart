@@ -105,12 +105,12 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('True or False',
+                             Text('True or False',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18)),
-                            const Text('Verify if the statement is correct',
+                             Text('Verify if the statement is correct',
                                 style: TextStyle(
                                     color: Colors.white70, fontSize: 12)),
                           ],

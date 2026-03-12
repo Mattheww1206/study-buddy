@@ -74,8 +74,7 @@ class GeminiService {
         - The distractors should be similar in length and complexity to the correct answer.
         - The distractors should be unique and not repetitive.
         Return ONLY a JSON array of arrays, one inner array per flashcard, nothing else.
-        - Example Output: [["D1","D2","D3"],["D1","D2","D3"]]
-        ''';
+        - Example Output: [["D1","D2","D3"],["D1","D2","D3"]]''';
 
       final content = [Content.text(prompt)];
       final response = await _model.generateContent(content);
@@ -174,4 +173,73 @@ class GeminiService {
 
     return result ?? flashcards;
   }
+
+  Future<List<Map<String, dynamic>>> generateTrueFalseQuestions({
+  required List<Map<String, String>> flashcards,
+}) async {
+  print('Gemini generateTrueFalse called for ${flashcards.length} cards');
+
+  final result = await _callWithRetry(() async {
+    print('calling gemini for true/false questions');
+    final flashcardsJson = jsonEncode(flashcards);
+
+    final prompt = '''You are a quiz generator. Convert these flashcards into true or false questions.
+    Flashcards: $flashcardsJson
+
+    Rules:
+    - For each flashcard, create a statement that is either TRUE or FALSE.
+    - Mix the results like half should be true, half should be false or true is more than false and vice-versa.
+    - For FALSE statements, make it seem like you are changing the answer to be incorrect but still plausible.
+    - The statement should be clear and concise.
+    - Make the question factual.
+    - Return ONLY a JSON array where each object has exactly three keys: "statement", "answer".
+      - "statement": the true or false question
+      - "answer": either "True" or "False"
+    - The order must match the input order exactly.
+    - Example Output: [{"statement": "Manila is the capital of Philippines.", "answer": "True"}, {"statement": "The mitochondria is the nucleus of the cell.", "answer": "False"}]''';
+
+        final content = [Content.text(prompt)];
+        final response = await _model.generateContent(content);
+        final text = response.text!;
+        print('Gemini Raw response: $text');
+
+        final cleaned = text
+            .replaceAll('```json', '')
+            .replaceAll('```', '')
+            .replaceAll('\n', '')
+            .replaceAll('\r', '')
+            .trim();
+
+        final List<dynamic> parsed = jsonDecode(cleaned);
+        final questions = List.generate(
+          parsed.length,
+          (i) => {
+            'statement': parsed[i]['statement']?.toString() ?? flashcards[i]['question']!,
+            'answer': parsed[i]['answer']?.toString() ?? 'True',
+          },
+        );
+
+        for (int i = 0; i < questions.length; i++) {
+          print('  Card ${i + 1}:');
+          print('  Original:    "${flashcards[i]["question"]}"');
+          print('  Statement:   "${questions[i]["statement"]}"');
+          print('  Answer:      "${questions[i]["answer"]}"');
+        }
+
+        return questions;
+      });
+
+      if (result == null) {
+        print('Gemini failed — returning fallback T/F questions');
+        // fallback use flashcards question and answer, so answer is always true na
+        return flashcards.map((f) => {
+          'statement': f['question']!,
+          'answer': 'True',
+        }).toList();
+      } else {
+        print('Gemini success — ${result.length} questions generated');
+      }
+
+      return result;
+    }
 }

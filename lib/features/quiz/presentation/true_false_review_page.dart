@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class TrueFalseReviewPage extends StatefulWidget {
   const TrueFalseReviewPage({super.key});
@@ -8,36 +9,29 @@ class TrueFalseReviewPage extends StatefulWidget {
 }
 
 class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
+  List<Map<String, String>> wrongAnswers = [];
+  late Deck deck;
+  bool _initialized = false;
+
+
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFF665FBE);
 
-  // Sample data
-  final List<Map<String, dynamic>> tfReviewData = [
-    {
-      "isCorrect": false,
-      "question": "The sun rises in the West.",
-      "userAnswer": "True",
-      "correctAnswer": "False",
-    },
-    {
-      "isCorrect": false,
-      "question": "Flutter is developed by Facebook.",
-      "userAnswer": "True",
-      "correctAnswer": "False",
-    },
-    {
-      "isCorrect": true,
-      "question": "Water boils at 100 degrees Celsius.",
-      "userAnswer": "True",
-      "correctAnswer": "True",
-    },
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    deck = args['deck'] as Deck;
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // Filter para 'false' (mali) lang ang makuha
-    final incorrectAnswers = tfReviewData.where((item) => item['isCorrect'] == false).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAEEFF),
@@ -49,7 +43,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'T/F Review Results',
+          'Review Results - ${deck.title}',
           style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -80,9 +74,9 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: incorrectAnswers.length,
+                itemCount: wrongAnswers.length,
                 itemBuilder: (context, index) {
-                  final item = incorrectAnswers[index];
+                  final item = wrongAnswers[index];
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 20),
@@ -110,7 +104,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Text(
-                                  item['question'],
+                                  item['statement'] ?? '',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -147,7 +141,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
                                           children: [
                                             const TextSpan(text: "Your Answer: "),
                                             TextSpan(
-                                              text: item['userAnswer'],
+                                              text: item['selectedAnswer'],
                                               style: TextStyle(
                                                 color: dominantColor,
                                                 fontWeight: FontWeight.bold,

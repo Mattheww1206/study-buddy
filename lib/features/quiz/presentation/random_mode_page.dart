@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class RandomModePage extends StatefulWidget {
   const RandomModePage({super.key});
@@ -10,14 +11,33 @@ class RandomModePage extends StatefulWidget {
 class _RandomModePageState extends State<RandomModePage> {
   bool isTimerEnabled = true;
   int selectedTime = 20;
-  int numberOfQuestions = 100;
-  final TextEditingController _questionsController = TextEditingController(text: "100");
+  int numberOfQuestions = 10;
+  bool _initialized = false;
+  late Deck _deck;
+
+  final TextEditingController _questionsController = TextEditingController();
+ 
+ @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _deck = args['deck'] as Deck;
+
+    // cap numberOfQuestions to totalCards
+    numberOfQuestions = _deck.totalCards.clamp(1, 100);
+    _questionsController.text = numberOfQuestions.toString();
+  }
 
   @override
   void dispose() {
     _questionsController.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +126,8 @@ class _RandomModePageState extends State<RandomModePage> {
                     keyboardType: TextInputType.number,
                     onChanged: (val) {
                       setState(() {
-                        numberOfQuestions = int.tryParse(val) ?? 0;
+                        numberOfQuestions = (int.tryParse(val) ?? 1)
+                            .clamp(1, _deck.totalCards);
                       });
                     },
                     decoration: InputDecoration(
@@ -149,7 +170,7 @@ class _RandomModePageState extends State<RandomModePage> {
                       Switch(
                         value: isTimerEnabled,
                         onChanged: (val) => setState(() => isTimerEnabled = val),
-                        activeColor: const Color(0xFF665FBE),
+                        activeThumbColor: const Color(0xFF665FBE),
                       ),
                     ],
                   ),
@@ -236,7 +257,13 @@ class _RandomModePageState extends State<RandomModePage> {
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'random'); 
+                  Navigator.pushNamed(context, 'random', 
+                  arguments: {
+                    'deck': _deck, 
+                    'numberOfQuestions': numberOfQuestions,
+                    'timerMinutes': isTimerEnabled ? selectedTime : null,
+                   },
+                  ); 
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF7F32),

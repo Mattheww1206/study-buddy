@@ -5,13 +5,31 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/model/user_model.dart';
 import 'package:studybuddy/features/auth/presentation/landing_page.dart';
 import 'package:studybuddy/features/auth/presentation/nav_button.dart';
+import 'package:studybuddy/features/auth/presentation/opening_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _showSplash = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if(_showSplash) return const OpeningPage();
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {

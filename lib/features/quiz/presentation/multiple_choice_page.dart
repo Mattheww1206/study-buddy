@@ -46,8 +46,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     if (_initialized) return;
     _initialized = true;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _deck = args['deck'] as Deck;
     _numberOfQuestions = args['numberOfQuestions'] as int;
     _timerMinutes = args['timerMinutes'] as int?;

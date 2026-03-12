@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class RandomResultPage extends StatefulWidget {
   const RandomResultPage({super.key});
@@ -8,16 +9,43 @@ class RandomResultPage extends StatefulWidget {
 }
 
 class _RandomResultPageState extends State<RandomResultPage> {
+  int _correctCount = 0;
+  int _totalCards = 0;
+  List<Map<String, String>> wrongAnswers = [];
+  late Deck deck;
+  bool _initialized = false;
+  String timeUsed = '';
+
+  final Color dominantColor = Color(0xFF665FBE);
+  final Color secondaryColor = Color(0xFFFAEEFF);
+  final Color accentColor = Color(0xFFFF7900);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _correctCount = args['correctCount'] as int;
+    _totalCards = args['totalCards'] as int;
+    wrongAnswers =
+        List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    deck = args['deck'] as Deck;
+    timeUsed = args['timeUsed'] as String;
+  }
+  
   @override
   Widget build(BuildContext context) {
-    const Color dominantColor = Color(0xFF665FBE);
-    const Color secondaryColor = Color(0xFFFAEEFF);
-    const Color accentColor = Color(0xFFFF7900);
+    final double accuracy = _totalCards > 0 ? _correctCount / _totalCards : 0.0;
+    final int accuracyPercent = (accuracy * 100).toInt();
+    final bool isExcellent = accuracy >= 0.75;
+
 
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -28,7 +56,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
           bottom: false,
           child: Column(
             children: [
-              const SizedBox(height: 10),
+               SizedBox(height: 10),
               const Text(
                 "QUIZ COMPLETE!",
                 style: TextStyle(
@@ -38,26 +66,30 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   fontSize: 15,
                 ),
               ),
-              const SizedBox(height: 15),
+               SizedBox(height: 15),
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white24, width: 2),
                 ),
-                child: const Icon(Icons.emoji_events, size: 45, color: Colors.white),
+                child: Icon( isExcellent ?
+                  Icons.emoji_events : Icons.sentiment_satisfied,
+                  size: 45, 
+                  color: Colors.white),
               ),
-              const SizedBox(height: 5),
-              const Text(
-                "85%", // Halimbawang score
+              SizedBox(height: 5),
+               Text(
+                '$accuracyPercent%', // Halimbawang score
                 style: TextStyle(
                   fontSize: 50,
                   fontWeight: FontWeight.bold,
                   color: accentColor,
                 ),
               ),
-              const Text(
-                "Great Effort! 🧠",
+               Text(
+                isExcellent ? 'Excellent Work! 🎉' :
+                "Keep Practicing! 💪",
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
@@ -71,8 +103,8 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: const Text(
-                  "📝 Random • 20 Questions • Science", 
+                child: Text(
+                  " Random Quiz • $_totalCards Questions • ${deck.subject}", 
                   style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -100,10 +132,10 @@ class _RandomResultPageState extends State<RandomResultPage> {
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: const Color(0xFFE8E5FF)),
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
                             Text(
-                              "17/20",
+                              "$_correctCount/$_totalCards",
                               style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: dominantColor),
                             ),
                             Text(
@@ -113,7 +145,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       // Progress Card
                       Container(
                         padding: const EdgeInsets.all(18),
@@ -124,7 +156,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                         ),
                         child: Column(
                           children: [
-                            const Row(
+                                Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -134,13 +166,13 @@ class _RandomResultPageState extends State<RandomResultPage> {
                                     Text("Accuracy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                   ],
                                 ),
-                                Text("85%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
+                                Text("$accuracyPercent%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                             SizedBox(height: 12),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: const LinearProgressIndicator(
+                              child:  LinearProgressIndicator(
                                 value: 0.85,
                                 minHeight: 10,
                                 backgroundColor: Color(0xFFE0E0E0),
@@ -162,14 +194,14 @@ class _RandomResultPageState extends State<RandomResultPage> {
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(color: const Color(0xFFE8E5FF)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.timer_outlined, color: Colors.black26, size: 22),
                                   SizedBox(width: 8),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("10m 05s", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                      Text(timeUsed, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                       Text("TIME USED", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
@@ -186,7 +218,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(color: const Color(0xFFE8E5FF)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.local_fire_department, color: accentColor, size: 22),
                                   SizedBox(width: 8),
@@ -203,56 +235,65 @@ class _RandomResultPageState extends State<RandomResultPage> {
                           ),
                         ],
                       ),
-                      
                       const SizedBox(height: 25), 
-                      
                       // Review Answers Button
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'ran_review');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor, 
-                          foregroundColor: secondaryColor, 
-                          minimumSize: const Size(double.infinity, 58),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: 0,
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.fact_check, size: 20),
-                            SizedBox(width: 10),
-                            Text("Review Answers", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Back to Deck Button
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'study');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white, 
-                          foregroundColor: dominantColor, 
-                          minimumSize: const Size(double.infinity, 58),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: const BorderSide(color: Color(0xFFE8E5FF)),
+                      if (wrongAnswers.isNotEmpty) ...[
+                          ElevatedButton(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              'ran_review',
+                              arguments: {
+                                'wrongAnswers': wrongAnswers,
+                                'deck': deck,
+                              },
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentColor,
+                              foregroundColor: secondaryColor,
+                              minimumSize: const Size(double.infinity, 58),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fact_check, size: 20),
+                                SizedBox(width: 10),
+                                Text('Review Wrong Answers',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                              ],
+                            ),
                           ),
-                          elevation: 0,
+                          const SizedBox(height: 12),
+                        ],
+                      // Back to Home Button
+                      ElevatedButton(
+                          onPressed: () =>
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/', (route) => false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: dominantColor,
+                            minimumSize: const Size(double.infinity, 58),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            elevation: 0,
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.home_rounded, size: 20),
+                              SizedBox(width: 10),
+                              Text('Back to Home',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                            ],
+                          ),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.home_rounded, size: 20),
-                            SizedBox(width: 10),
-                            Text("Back to Deck", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
                       const SizedBox(height: 20),
                     ],
                   ),

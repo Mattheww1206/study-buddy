@@ -21,12 +21,12 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
-    deck = ModalRoute.of(context)!.settings.arguments as Deck;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+     deck = args['deck'] as Deck;
+
     // converts num of questions to the total cards of the selected deck
-    if (deck.totalCards < numberOfQuestions) {
       numberOfQuestions = deck.totalCards;
       _questionsController.text = '$numberOfQuestions';
-    }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studybuddy/features/deck/model/deck_model.dart';
 
 class TrueFalseResultPage extends StatefulWidget {
   const TrueFalseResultPage({super.key});
@@ -8,19 +9,38 @@ class TrueFalseResultPage extends StatefulWidget {
 }
 
 class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
+  int _correctCount = 0;
+  int _totalCards = 17;
+  List<Map<String, String>> wrongAnswers = [];
+  late Deck deck;
+  bool _initialized = false;
+  String timeUsed = '';
+
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFFFF7D00);
 
-  // Sample data 
-  final int _correctCount = 0;
-  final int _totalCards = 17;
-  final double accuracy = 0.0;
-  final String accuracyPercent = "0";
-  final String timeUsed = "0m 11s";
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _correctCount = args['correctCount'] as int;
+    _totalCards = args['totalCards'] as int;
+    wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    deck = args['deck'] as Deck;
+    timeUsed = args['timeUsed'] as String;
+  }
+  
 
   @override
   Widget build(BuildContext context) {
+    final double accuracy = _totalCards > 0 ? _correctCount / _totalCards : 0.0;
+    final int accuracyPercent = (accuracy * 100).toInt();
+    final bool isExcellent = accuracy >= 0.75;
+
     return Scaffold(
       backgroundColor: dominantColor,
       body: Column(
@@ -46,7 +66,8 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     border: Border.all(color: Colors.white24, width: 2),
                     color: const Color(0xFF867FE0),
                   ),
-                  child: const Icon(Icons.sentiment_satisfied_alt,
+                  child:  Icon( isExcellent ?
+                    Icons.emoji_events : Icons.sentiment_satisfied_alt,
                       size: 50, color: Colors.white),
                 ),
                 Text(
@@ -57,8 +78,8 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Text(
-                  "Keep Practicing! 💪",
+                 Text( isExcellent ?
+                  'Excellent Work! 🎉' : "Keep Practicing! 💪",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -73,8 +94,8 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    "📝 Identification • 17 Questions • STS",
+                  child: Text(
+                    "📝 Identification • $_totalCards Questions • ${deck.subject}",
                     style: TextStyle(color: Colors.white, fontSize: 11),
                   ),
                 ),
@@ -82,8 +103,6 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
               ],
             ),
           ),
-          
-          
           Expanded(
             child: Container(
               width: double.infinity,
@@ -242,25 +261,39 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                       ],
                     ),
                     const SizedBox(height: 30),
-
                     // Review Answers Button
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, 'tf_review');
-                      },
-                      icon: const Icon(Icons.fact_check),
-                      label: const Text("Review Answers",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 60),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                        elevation: 0,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
+                    if (wrongAnswers.isNotEmpty) ...[
+                          ElevatedButton(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              'tf_review',
+                              arguments: {
+                                'wrongAnswers': wrongAnswers,
+                                'deck': deck,
+                              },
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentColor,
+                              foregroundColor: secondaryColor,
+                              minimumSize: const Size(double.infinity, 58),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fact_check, size: 20),
+                                SizedBox(width: 10),
+                                Text('Review Wrong Answers',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
                     // Back to Home Button 
                      ElevatedButton(
                           onPressed: () =>

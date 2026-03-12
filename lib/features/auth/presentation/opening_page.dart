@@ -20,11 +20,6 @@ class _OpeningPageState extends State<OpeningPage> {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, 'landing');
-      }
-    });
   }
 
   @override

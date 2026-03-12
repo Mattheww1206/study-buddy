@@ -196,7 +196,7 @@ import 'package:studybuddy/features/deck/model/deck_model.dart';
                         value: isTimerEnabled,
                         onChanged: (val) =>
                             setState(() => isTimerEnabled = val),
-                        activeColor: dominantColor,
+                        activeThumbColor: dominantColor,
                       ),
                     ],
                   ),

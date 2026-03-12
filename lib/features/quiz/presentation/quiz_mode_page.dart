@@ -226,7 +226,7 @@ class _QuizModePageState extends State<QuizModePage> {
               ),
             ),
 
-            // Mixed quiz
+            // Random quiz
             GestureDetector(
               onTap: () {
                 setState(() => selectedType = 'ran_mode');
@@ -286,13 +286,13 @@ class _QuizModePageState extends State<QuizModePage> {
             ElevatedButton(
               onPressed: () {
                 if (selectedType == 'Multiple Mode') {
-                  Navigator.pushNamed(context, 'multiple_mode', arguments: deck);
+                  Navigator.pushNamed(context, 'multiple_mode', arguments: {'deck': deck});
                 } else if (selectedType == 'iden_mode') {
                    Navigator.pushNamed(context, 'iden_mode', arguments: {'deck': deck});
                 } else if (selectedType == 'tf_mode') {
-                   Navigator.pushNamed(context, 'tf_mode', arguments: deck); // BAGONG DAGDAG NA ROUTE
+                   Navigator.pushNamed(context, 'tf_mode', arguments: {'deck': deck}); 
                 } else if (selectedType == 'ran_mode') {
-                   Navigator.pushNamed(context, 'ran_mode', arguments: deck);
+                   Navigator.pushNamed(context, 'ran_mode', arguments: {'deck': deck});
                 }
               },
               style: ElevatedButton.styleFrom(
