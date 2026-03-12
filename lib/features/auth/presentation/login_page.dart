@@ -23,7 +23,6 @@ class _LoginPageState extends State<LoginPage> {
   String? _emailError;
   String? _passwordError;
 
-  // Define the background color as a constant for easy reuse
   final Color _themeBackgroundColor = const Color(0xFFFAEEFF);
 
   @override
@@ -39,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
@@ -207,41 +206,30 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 40),
-              // Circular Logo Wrapper
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFE082), Color(0xFFFFB74D)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
-                    )
-                  ],
-                ),
+              // Inalis ang malaking top padding para tumaas ang layout
+              const SizedBox(height: 10),
+              
+              Center(
                 child: Image.asset(
-                  'assets/studybuddy-logo.png',
-                  width: 70,
-                  height: 70,
+                  'assets/study.png',
+                  width: 180, // Bahagyang linuitan para mas compact
+                  height: 180,
+                  fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 8),
+              
+              // Inalis ang SizedBox dito para magkalapit ang Logo at Welcome
               Text(
-                'Welcome! ',
+                'Welcome!',
                 style: GoogleFonts.fredoka(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 8),
+              
+              const SizedBox(height: 4), // Maliit na space para sa subtitle
+              
               Text(
                 'Login to continue your study journey',
                 style: GoogleFonts.itim(
@@ -249,20 +237,21 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 20),
+              
+              const SizedBox(height: 15), // Space bago ang card
+              
               // The White Card Container
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 25, vertical: 35),
+                      horizontal: 25, vertical: 30),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(40),
-                    // Idinagdag ang shadow para magmukhang nakalutang
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         spreadRadius: 2,
                         offset: const Offset(0, 10),
@@ -273,13 +262,12 @@ class _LoginPageState extends State<LoginPage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Email/Username TextField with custom fillColor
                         CustomTextfield(
                           controller: _emailController,
                           hintText: 'Email or Username',
                           errorText: _emailError,
                           keyboardType: TextInputType.emailAddress,
-                          fillColor: _themeBackgroundColor, // Color applied here
+                          fillColor: _themeBackgroundColor,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Email or Username is required';
@@ -288,13 +276,12 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                         const SizedBox(height: 20),
-                        // Password TextField with custom fillColor
                         CustomTextfield(
                           controller: _passwordController,
                           hintText: 'Password',
                           errorText: _passwordError,
                           isPassword: true,
-                          fillColor: _themeBackgroundColor, // Color applied here
+                          fillColor: _themeBackgroundColor,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Password is required';
@@ -320,14 +307,13 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        // Login Button
                         CustomButton(
                           text: 'Login',
                           backgroundColor: const Color(0xFF5D54D0),
                           textColor: Colors.white,
                           fontSize: 22,
                           width: 160,
-                          height: 60,
+                          height: 55,
                           isLoading: _isLoading,
                           onTap: () async {
                             await signIn();
@@ -350,10 +336,9 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        // Google Login Button
                         CustomButton(
                           text: 'Sign in with Google',
-                          height: 60,
+                          height: 55,
                           width: double.infinity,
                           backgroundColor: Colors.white,
                           textColor: Colors.black87,
@@ -362,13 +347,13 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 18,
                           icon: Image.asset(
                             'assets/google-icon.png',
-                            height: 30,
+                            height: 24,
                           ),
                           onTap: () {
                             signInWithGoogle();
                           },
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 25),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -395,7 +380,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
             ],
           ),
         ),
