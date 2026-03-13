@@ -38,24 +38,33 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
         totalCards > 0 ? gotItCount / totalCards : 0.0;
     final int accuracyPercentage = (accuracyRatio * 100).toInt();
 
+    // Accuracy Color Logic (Same as Great Page)
+    Color accuracyColor = Colors.red; 
+    if (accuracyPercentage >= 80) {
+      accuracyColor = Colors.green;
+    } else if (accuracyPercentage >= 50) {
+      accuracyColor =  Colors.red;
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFF43409B),
+      backgroundColor: const Color(0xFF665FBE), // Same Lavender Background
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             const SizedBox(height: 20),
 
-            // Header
-            const Text('Flashcard Mode',
-                style: TextStyle(
+            // Header: Topic and Subject
+            Text(deck.title, 
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
-            Text('${deck.subject} • ${deck.title}',
-                style:
-                    const TextStyle(color: Colors.white70, fontSize: 14)),
+            Text(deck.subject, 
+                style: const TextStyle(color: Colors.white70, fontSize: 14)),
+            
             const SizedBox(height: 30),
-            const Text('💡', style: TextStyle(fontSize: 50)),
+            const Text('💡', style: TextStyle(fontSize: 60)),
             const SizedBox(height: 10),
             const Text('Keep Practicing!',
                 style: TextStyle(
@@ -66,167 +75,137 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                 style: TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 30),
 
+            // Main White/Lavender Container
             Expanded(
               child: Container(
                 width: double.infinity,
+                padding: const EdgeInsets.all(25),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xFFFAEEFF), 
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
                   ),
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 30),
                   child: Column(
                     children: [
-                      // Stats
+                      // Stats Row (Got It and Again)
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Expanded(
                             child: Container(
                               margin: const EdgeInsets.only(right: 8),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 15),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                               decoration: BoxDecoration(
-                                  color: const Color(0xFFE8F5E9),
-                                  borderRadius: BorderRadius.circular(15)),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20)),
                               child: Column(children: [
                                 Text('$gotItCount',
                                     style: const TextStyle(
+                                        color: Colors.green,
                                         fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green)),
+                                        fontWeight: FontWeight.bold)),
                                 const Text('GOT IT!',
                                     style: TextStyle(
+                                        color: Colors.green,
                                         fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green)),
+                                        fontWeight: FontWeight.bold)),
                               ]),
                             ),
                           ),
                           Expanded(
                             child: Container(
                               margin: const EdgeInsets.only(left: 8),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 15),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                               decoration: BoxDecoration(
-                                  color: const Color(0xFFFFEBEE),
-                                  borderRadius: BorderRadius.circular(15)),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20)),
                               child: Column(children: [
                                 Text('$againCount',
                                     style: const TextStyle(
+                                        color: Colors.red,
                                         fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red)),
+                                        fontWeight: FontWeight.bold)),
                                 const Text('AGAIN',
                                     style: TextStyle(
+                                        color: Colors.red,
                                         fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red)),
+                                        fontWeight: FontWeight.bold)),
                               ]),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 25),
 
-                      // Accuracy
+                      // Accuracy Chart Section
                       Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFF7F6FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20)),
                         child: Column(
                           children: [
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
                               children: [
+                                const Icon(Icons.bar_chart, color: Color(0xFF665FBE)),
+                                const SizedBox(width: 10),
                                 const Text('Accuracy',
                                     style: TextStyle(
-                                        fontWeight: FontWeight.bold,
                                         fontSize: 18,
-                                        color: Color(0xFF43409B))),
+                                        fontWeight: FontWeight.bold)),
+                                const Spacer(),
                                 Text('$accuracyPercentage%',
-                                    style: const TextStyle(
+                                    style: TextStyle(
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 22,
-                                        color: Colors.orange)),
+                                        color: accuracyColor)), // Dynamic color text
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            ClipRRect(
+                            const SizedBox(height: 15),
+                            LinearProgressIndicator(
+                              value: accuracyRatio,
+                              backgroundColor: Colors.grey[200],
+                              color: accuracyColor,
+                              minHeight: 10,
                               borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: accuracyRatio,
-                                minHeight: 12,
-                                backgroundColor: const Color(0xFFE0E0E0),
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-
-                      // Tip
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFF7F6FF),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('💡 Tip',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF43409B))),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Focus on reviewing the $againCount cards you missed. Try writing the definitions out loud!',
-                              style: const TextStyle(
-                                  color: Colors.black54, fontSize: 13),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 30),
 
-                      // Study Again button
+                      // Study Again Button
                       SizedBox(
                         width: double.infinity,
-                        height: 55,
-                        child: ElevatedButton(
+                        height: 60,
+                        child: ElevatedButton.icon(
                           onPressed: () => Navigator.pushReplacementNamed(
                             context,
                             'flashcard_mode',
                             arguments: deck,
                           ),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF8A3D),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30))),
-                          child: const Text('🔄 Study Again',
+                          icon: const Icon(Icons.refresh, color: Colors.white),
+                          label: const Text('Study Again',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF27F21), 
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 15),
 
-                      // Focus on Missed button
+                      // Focus on Missed Button (Conditional)
                       if (againCount > 0)
                         SizedBox(
                           width: double.infinity,
-                          height: 55,
-                          child: ElevatedButton(
+                          height: 60,
+                          child: ElevatedButton.icon(
                             onPressed: () async {
                               final result = await Navigator.pushNamed(
                                 context,
@@ -237,49 +216,55 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                                 },
                               );
                               if (result != null && mounted) {
-                                final map =
-                                    result as Map<String, dynamic>;
+                                final map = result as Map<String, dynamic>;
                                 setState(() {
-                                  final newGotIt =
-                                      map['gotItCount'] as int;
+                                  final newGotIt = map['gotItCount'] as int;
                                   gotItCount = gotItCount + newGotIt;
                                   againCount = againCount - newGotIt;
                                 });
                               }
                             },
+                            icon: const Icon(Icons.push_pin,
+                                color: Color(0xFF665FBE)),
+                            label: Text('Focus on Missed ($againCount)',
+                                style: const TextStyle(
+                                    color: Color(0xFF665FBE),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF706FD3),
+                                backgroundColor: Colors.white,
+                                elevation: 0,
+                                side: const BorderSide(color: Color(0xFF665FBE)),
                                 shape: RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.circular(30))),
-                            child: Text(
-                                '📌 Focus on Missed ($againCount)',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
                           ),
                         ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 15),
 
-                      // Back to Home button
+                      // BACK TO STUDY BUTTON
                       SizedBox(
                         width: double.infinity,
-                        height: 55,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                              context, '/', (route) => false),
-                          style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                  color: Color(0xFFD1C4E9)),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(30))),
-                          child: const Text('← Back to Home',
+                        height: 60,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context, 
+                              'home', 
+                              (route) => false,
+                              arguments: 2, 
+                            );
+                          },
+                          icon: const Icon(Icons.menu_book, color: Colors.white),
+                          label: const Text('Back to Study',
                               style: TextStyle(
-                                  color: Color(0xFF706FD3),
+                                  color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF665FBE),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30))),
                         ),
                       ),
                     ],

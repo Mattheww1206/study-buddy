@@ -16,6 +16,9 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
   late Deck deck;
   bool _initialized = false;
   String timeUsed = '';
+  
+  // BAGONG VARIABLE: Para sa streak visibility
+  bool _isFirstQuizToday = false;
 
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
@@ -35,6 +38,9 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
         List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = args['deck'] as Deck;
     timeUsed = args['timeUsed'] as String;
+    
+    // Kunin ang streak flag mula sa IdentificationPage
+    _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
   }
 
   @override
@@ -227,29 +233,34 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                                     const Icon(Icons.timer_outlined,
                                         color: Colors.black26, size: 22),
                                     const SizedBox(width: 8),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(timeUsed,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14)),
-                                        const Text('TIME USED',
-                                            style: TextStyle(
-                                                fontSize: 9,
-                                                color: Colors.black38,
-                                                fontWeight:
-                                                    FontWeight.bold)),
-                                      ],
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(timeUsed,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14)),
+                                          const Text('TIME USED',
+                                              style: TextStyle(
+                                                  fontSize: 9,
+                                                  color: Colors.black38,
+                                                  fontWeight:
+                                                      FontWeight.bold)),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                             const SizedBox(width: 12),
+                            
+                            // CONDITIONAL RENDERING: Ipakita lang ang streak kung ito ang unang quiz today
                             Expanded(
-                              child: Container(
+                              child: _isFirstQuizToday 
+                              ? Container(
                                 padding: const EdgeInsets.all(18),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF8F7FF),
@@ -280,7 +291,27 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                                     ),
                                   ],
                                 ),
-                              ),
+                              )
+                              : Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.02),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                        color: const Color(0xFFE8E5FF)),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Daily Streak\nClaimed",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 10, 
+                                        color: Colors.black26, 
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ),
                           ],
                         ),
@@ -322,18 +353,22 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
 
                         // back to home
                         ElevatedButton(
-                          onPressed: () =>
+                          onPressed: (){
                               Navigator.pushNamedAndRemoveUntil(
-                                  context, '/', (route) => false),
+                              context, 
+                              'home', 
+                              (route) => false,
+                              arguments: 2, 
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: dominantColor,
                             minimumSize: const Size(double.infinity, 58),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: const BorderSide(
-                                  color: Color(0xFFE8E5FF)),
-                            ),
+                                borderRadius: BorderRadius.circular(20)),
+                            side: const BorderSide(
+                                color: Color(0xFFE8E5FF)),
                             elevation: 0,
                           ),
                           child: const Row(
@@ -341,7 +376,7 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                             children: [
                               Icon(Icons.home_rounded, size: 20),
                               SizedBox(width: 10),
-                              Text('Back to Home',
+                              Text('Back to Study',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),

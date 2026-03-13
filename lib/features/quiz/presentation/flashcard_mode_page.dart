@@ -56,6 +56,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     }
   }
 
+  // FIXED: Inayos ang flow ng swipe para maiwasan ang Dismissible error
   void _onSwipe(DismissDirection direction) {
     if (_isFinished) return;
 
@@ -74,8 +75,12 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
         _currentIndex++;
       });
     } else {
-      setState(() => _isFinished = true);
-      _saveResultAndNavigate();
+      // Set finished state agad para mawala ang Dismissible sa UI
+      setState(() {
+        _isFinished = true;
+      });
+      // Tawagin ang save and navigate pagkatapos ng frame update
+      Future.microtask(() => _saveResultAndNavigate());
     }
   }
 
@@ -217,9 +222,13 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
               ),
               const SizedBox(height: 30),
 
-              // Flashcard
+              // Flashcard Section
               Expanded(
-                child: Dismissible(
+                // FIXED: Idinagdag ang _isFinished check para mawala ang Dismissible 
+                // bago mag-navigate, maiwasan ang "Dismissible widget is still part of the tree" error.
+                child: _isFinished || _isSaving
+                    ? const Center(child: CircularProgressIndicator())
+                    : Dismissible(
                         key: ValueKey(_currentIndex),
                         onDismissed: _onSwipe,
                         background: Container(
@@ -269,14 +278,14 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                             children: [
                                               Center(
                                                 child: SingleChildScrollView(
-                                                  padding: const EdgeInsets.all(40), // Mas malaking padding sa back
+                                                  padding: const EdgeInsets.all(40),
                                                   child: Text(
                                                     card.answer,
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
                                                         fontSize: 18,
                                                         color: Colors.black87,
-                                                        height: 1.6), // Better line spacing
+                                                        height: 1.6),
                                                   ),
                                                 ),
                                               ),
@@ -295,7 +304,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                       : Stack(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 40), // Padding para sa front text
+                                              padding: const EdgeInsets.symmetric(horizontal: 40),
                                               child: Center(
                                                 child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.center,

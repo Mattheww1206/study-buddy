@@ -12,7 +12,7 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  // Color Palette Application
+  // Color Palette
   final Color colorDominant = const Color(0xFF665FBE);
   final Color colorSecondary = const Color(0xFFFAEEFF);
   final Color colorAccent = const Color(0xFFFF7A00);
@@ -48,7 +48,6 @@ class _CreatePageState extends State<CreatePage> {
     });
   }
 
-  // --- MODAL PARA SA ADD BUTTON ---
   void _showAddOptions() {
     showModalBottomSheet(
       context: context,
@@ -73,11 +72,7 @@ class _CreatePageState extends State<CreatePage> {
               const SizedBox(height: 25),
               Text(
                 "Manage New Deck",
-                style: TextStyle(
-                  fontSize: 22, 
-                  fontWeight: FontWeight.bold, 
-                  color: colorDominant
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colorDominant),
               ),
               const SizedBox(height: 25),
               _buildModalOption(
@@ -133,7 +128,6 @@ class _CreatePageState extends State<CreatePage> {
     );
   }
 
-  // --- MODAL PARA SA ACTION OPTIONS ---
   void _showActionOptions(List<Deck> allDecks) {
     final selectedDecks = allDecks.where((d) => selectedDecksIds.contains(d.deckId));
     bool isAllPinned = selectedDecks.every((d) => d.isPinned);
@@ -205,25 +199,76 @@ class _CreatePageState extends State<CreatePage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: colorWhite,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
         title: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(color: Color(0xFFFFEFEF), shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFEFEF), 
+                shape: BoxShape.circle
+              ),
               child: const Icon(Icons.delete_sweep_rounded, color: Colors.red, size: 50),
             ),
             const SizedBox(height: 20),
-            Text("Confirm Delete", style: TextStyle(fontWeight: FontWeight.bold, color: colorDominant)),
+            Text(
+              "Confirm Delete", 
+              style: TextStyle(fontWeight: FontWeight.bold, color: colorDominant, fontSize: 24)
+            ),
           ],
         ),
-        content: Text("Are you sure you want to delete ${selectedDecksIds.length} deck(s)?", textAlign: TextAlign.center),
+        content: Text(
+          "Are you sure you want to delete ${selectedDecksIds.length} deck(s)?", 
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(25, 0, 25, 25), // Nilagyan ng sapat na space sa ilalim
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("CANCEL")),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: StadiumBorder()),
-            child: const Text("DELETE"),
+          Row(
+            children: [
+              // --- CANCEL BUTTON (WITH BLACK BORDER) ---
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.black, width: 1.2), // Explicit black border
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18), // Match sa screenshot mo
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  child: const Text(
+                    "CANCEL", 
+                    style: TextStyle(
+                      color: Colors.grey, // Grey text based on image
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    )
+                  ),
+                ),
+              ),
+              const SizedBox(width: 15),
+              // --- DELETE BUTTON (SOLID RED) ---
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF5252), // Vibrant Red
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  child: const Text(
+                    "DELETE", 
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -298,24 +343,20 @@ class _CreatePageState extends State<CreatePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: Column(
                           children: [
-                            // --- SEARCH BAR DESIGN ---
+                            // Search Bar
                             Container(
                               decoration: BoxDecoration(
                                 color: colorWhite,
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
-                                  BoxShadow(
-                                    color: colorDominant.withOpacity(0.08), 
-                                    blurRadius: 20, 
-                                    offset: const Offset(0, 10)
-                                  )
+                                  BoxShadow(color: colorDominant.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10))
                                 ],
                               ),
                               child: TextField(
                                 controller: _searchController,
                                 onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
                                 decoration: InputDecoration(
-                                  hintText: 'Search your study deck...',
+                                  hintText: 'Search deck',
                                   hintStyle: TextStyle(color: colorDominant.withOpacity(0.4)),
                                   prefixIcon: Icon(Icons.search_rounded, color: colorDominant),
                                   border: InputBorder.none,
@@ -325,44 +366,54 @@ class _CreatePageState extends State<CreatePage> {
                             ),
                             const SizedBox(height: 35),
                             
-                            // --- HEADER DESIGN ---
+                            // Header Section
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Text('Library', style: TextStyle(color: colorDominant.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600)),
-                                    Text('My Decks', style: TextStyle(color: colorDominant, fontSize: 32, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 5),
+                                    Text(
+                                      'Library', 
+                                      style: TextStyle(color: colorDominant.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600)
+                                    ),
+                                    Text(
+                                      'My Decks', 
+                                      style: TextStyle(color: colorDominant, fontSize: 32, fontWeight: FontWeight.bold, height: 1.0)
+                                    ),
+                                    const SizedBox(height: 4),
                                     GestureDetector(
                                       onTap: () => setState(() {
                                         isEditMode = !isEditMode;
                                         selectedDecksIds.clear();
                                       }),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: isEditMode ? Colors.red.withOpacity(0.1) : colorDominant.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(20)
+                                      child: Text(
+                                        isEditMode ? 'Cancel' : 'Edit Library',
+                                        style: TextStyle(
+                                          color: isEditMode ? Colors.red : colorDominant.withOpacity(0.4), 
+                                          fontSize: 18, 
+                                          fontWeight: FontWeight.w500
                                         ),
-                                        child: Text(isEditMode ? 'Cancel Edit' : 'Edit Library',
-                                          style: TextStyle(color: isEditMode ? Colors.red : colorDominant, fontSize: 14, fontWeight: FontWeight.bold)),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    color: colorWhite,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: colorDominant.withOpacity(0.1))
-                                  ),
-                                  child: Column(
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 25),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text('${filteredDecks.length}', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: colorAccent)),
-                                      Text('DECKS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: colorDominant.withOpacity(0.5))),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 5),
+                                        child: Icon(Icons.style_outlined, color: colorDominant.withOpacity(0.8), size: 36),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${filteredDecks.length}', 
+                                        style: TextStyle(fontSize: 55, fontWeight: FontWeight.w900, color: colorAccent, height: 0.8),
+                                      ),
                                     ],
                                   ),
                                 )
@@ -370,7 +421,7 @@ class _CreatePageState extends State<CreatePage> {
                             ),
                             const SizedBox(height: 25),
                             
-                            // --- DECK LIST DESIGN ---
+                            // Deck List
                             ...filteredDecks.map((deck) {
                               bool isSelected = selectedDecksIds.contains(deck.deckId);
                               return Padding(
@@ -383,10 +434,7 @@ class _CreatePageState extends State<CreatePage> {
                                     decoration: BoxDecoration(
                                       color: colorWhite,
                                       borderRadius: BorderRadius.circular(24),
-                                      border: Border.all(
-                                        color: isSelected ? colorDominant : Colors.transparent, 
-                                        width: 2
-                                      ),
+                                      border: Border.all(color: isSelected ? colorDominant : Colors.transparent, width: 2),
                                       boxShadow: [
                                         BoxShadow(
                                           color: isSelected ? colorDominant.withOpacity(0.1) : Colors.black.withOpacity(0.03), 
@@ -407,10 +455,7 @@ class _CreatePageState extends State<CreatePage> {
                                           ),
                                         Container(
                                           padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: colorSecondary,
-                                            borderRadius: BorderRadius.circular(15)
-                                          ),
+                                          decoration: BoxDecoration(color: colorSecondary, borderRadius: BorderRadius.circular(15)),
                                           child: Icon(Icons.collections_bookmark_rounded, color: colorDominant, size: 30),
                                         ),
                                         const SizedBox(width: 18),
@@ -434,8 +479,7 @@ class _CreatePageState extends State<CreatePage> {
                                             ],
                                           ),
                                         ),
-                                        if (deck.isPinned)
-                                          Icon(Icons.push_pin_rounded, color: colorAccent, size: 20),
+                                        if (deck.isPinned) Icon(Icons.push_pin_rounded, color: colorAccent, size: 20),
                                       ],
                                     ),
                                   ),

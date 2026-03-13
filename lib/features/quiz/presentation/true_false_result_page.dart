@@ -10,11 +10,14 @@ class TrueFalseResultPage extends StatefulWidget {
 
 class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
   int _correctCount = 0;
-  int _totalCards = 17;
+  int _totalCards = 0;
   List<Map<String, String>> wrongAnswers = [];
   late Deck deck;
   bool _initialized = false;
   String timeUsed = '';
+  
+  // BAGONG VARIABLE: Flag para sa streak logic
+  bool _isFirstQuizToday = false;
 
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
@@ -32,8 +35,10 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = args['deck'] as Deck;
     timeUsed = args['timeUsed'] as String;
+    
+    // Kunin ang streak flag mula sa quiz page arguments
+    _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +71,9 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     border: Border.all(color: Colors.white24, width: 2),
                     color: const Color(0xFF867FE0),
                   ),
-                  child:  Icon( isExcellent ?
+                  child: Icon(isExcellent ? 
                     Icons.emoji_events : Icons.sentiment_satisfied_alt,
-                      size: 50, color: Colors.white),
+                    size: 50, color: Colors.white),
                 ),
                 Text(
                   "$accuracyPercent%",
@@ -78,9 +83,9 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                 Text( isExcellent ?
-                  'Excellent Work! 🎉' : "Keep Practicing! 💪",
-                  style: TextStyle(
+                Text(
+                  isExcellent ? 'Excellent Work! 🎉' : "Keep Practicing! 💪",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -95,8 +100,8 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "📝 Identification • $_totalCards Questions • ${deck.subject}",
-                    style: TextStyle(color: Colors.white, fontSize: 11),
+                    "📊 True or False • $_totalCards Questions • ${deck.subject}",
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -208,117 +213,148 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                                 const Icon(Icons.timer_outlined,
                                     color: Colors.black26, size: 22),
                                 const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(timeUsed,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14)),
-                                    const Text('TIME USED',
-                                        style: TextStyle(
-                                            fontSize: 9,
-                                            color: Colors.black38,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(timeUsed,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14)),
+                                      const Text('TIME USED',
+                                          style: TextStyle(
+                                              fontSize: 9,
+                                              color: Colors.black38,
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
+                        
+                        // CONDITIONAL RENDERING: Streak Logic
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8F7FF),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFE8E5FF)),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.local_fire_department,
-                                    color: accentColor, size: 22),
-                                const SizedBox(width: 8),
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("+1 day",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14)),
-                                    Text('STREAK',
-                                        style: TextStyle(
-                                            fontSize: 9,
-                                            color: Colors.black38,
-                                            fontWeight: FontWeight.bold)),
-                                  ],
+                          child: _isFirstQuizToday
+                          ? Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F7FF),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: const Color(0xFFE8E5FF)),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.local_fire_department,
+                                      color: accentColor, size: 22),
+                                  const SizedBox(width: 8),
+                                  const Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("+1 day",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14)),
+                                      Text('STREAK',
+                                          style: TextStyle(
+                                              fontSize: 9,
+                                              color: Colors.black38,
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.02),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: const Color(0xFFE8E5FF)),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Daily Streak\nFinished",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10, 
+                                    color: Colors.black26, 
+                                    fontWeight: FontWeight.bold
+                                  ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 30),
+                    
                     // Review Answers Button
                     if (wrongAnswers.isNotEmpty) ...[
-                          ElevatedButton(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              'tf_review',
-                              arguments: {
-                                'wrongAnswers': wrongAnswers,
-                                'deck': deck,
-                              },
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                              foregroundColor: secondaryColor,
-                              minimumSize: const Size(double.infinity, 58),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              elevation: 0,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.fact_check, size: 20),
-                                SizedBox(width: 10),
-                                Text('Review Wrong Answers',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                    // Back to Home Button 
-                     ElevatedButton(
-                          onPressed: () =>
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, '/', (route) => false),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: dominantColor,
-                            minimumSize: const Size(double.infinity, 58),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            elevation: 0,
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.home_rounded, size: 20),
-                              SizedBox(width: 10),
-                              Text('Back to Home',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                            ],
-                          ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(
+                          context,
+                          'tf_review',
+                          arguments: {
+                            'wrongAnswers': wrongAnswers,
+                            'deck': deck,
+                          },
                         ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentColor,
+                          foregroundColor: secondaryColor,
+                          minimumSize: const Size(double.infinity, 58),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.fact_check, size: 20),
+                            SizedBox(width: 10),
+                            Text('Review Wrong Answers',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    
+                    // Back to Home Button 
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          'home',
+                          (route) => false,
+                          arguments: 2,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: dominantColor,
+                        minimumSize: const Size(double.infinity, 58),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.home_rounded, size: 20),
+                          SizedBox(width: 10),
+                          Text('Back to Study',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16)),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 20),
                   ],
                 ),

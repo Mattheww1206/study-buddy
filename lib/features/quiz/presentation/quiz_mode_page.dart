@@ -137,7 +137,7 @@ class _QuizModePageState extends State<QuizModePage> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 30),
               decoration: BoxDecoration(
-                color: const Color(0xFF4C49A7),
+                color: const Color(0xFF665FBE),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Column(

@@ -15,10 +15,13 @@ class _RandomResultPageState extends State<RandomResultPage> {
   late Deck deck;
   bool _initialized = false;
   String timeUsed = '';
+  
+  // BAGONG VARIABLE: Flag para sa streak logic
+  bool _isFirstQuizToday = false;
 
-  final Color dominantColor = Color(0xFF665FBE);
-  final Color secondaryColor = Color(0xFFFAEEFF);
-  final Color accentColor = Color(0xFFFF7900);
+  final Color dominantColor = const Color(0xFF665FBE);
+  final Color secondaryColor = const Color(0xFFFAEEFF);
+  final Color accentColor = const Color(0xFFFF7900);
 
   @override
   void didChangeDependencies() {
@@ -29,10 +32,12 @@ class _RandomResultPageState extends State<RandomResultPage> {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _correctCount = args['correctCount'] as int;
     _totalCards = args['totalCards'] as int;
-    wrongAnswers =
-        List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = args['deck'] as Deck;
     timeUsed = args['timeUsed'] as String;
+    
+    // Kunin ang streak flag mula sa quiz page arguments
+    _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
   }
   
   @override
@@ -41,7 +46,6 @@ class _RandomResultPageState extends State<RandomResultPage> {
     final int accuracyPercent = (accuracy * 100).toInt();
     final bool isExcellent = accuracy >= 0.75;
 
-
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -49,14 +53,14 @@ class _RandomResultPageState extends State<RandomResultPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [dominantColor, Color(0xFF7A73D1)],
+            colors: [dominantColor, const Color(0xFF7A73D1)],
           ),
         ),
         child: SafeArea(
           bottom: false,
           child: Column(
             children: [
-               SizedBox(height: 10),
+              const SizedBox(height: 10),
               const Text(
                 "QUIZ COMPLETE!",
                 style: TextStyle(
@@ -66,7 +70,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   fontSize: 15,
                 ),
               ),
-               SizedBox(height: 15),
+              const SizedBox(height: 15),
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -78,19 +82,18 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   size: 45, 
                   color: Colors.white),
               ),
-              SizedBox(height: 5),
-               Text(
-                '$accuracyPercent%', // Halimbawang score
+              const SizedBox(height: 5),
+              Text(
+                '$accuracyPercent%',
                 style: TextStyle(
                   fontSize: 50,
                   fontWeight: FontWeight.bold,
                   color: accentColor,
                 ),
               ),
-               Text(
-                isExcellent ? 'Excellent Work! 🎉' :
-                "Keep Practicing! 💪",
-                style: TextStyle(
+              Text(
+                isExcellent ? 'Excellent Work! 🎉' : "Keep Practicing! 💪",
+                style: const TextStyle(
                   fontSize: 18,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -104,8 +107,8 @@ class _RandomResultPageState extends State<RandomResultPage> {
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Text(
-                  " Random Quiz • $_totalCards Questions • ${deck.subject}", 
-                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                  "🔀 Random Quiz • $_totalCards Questions • ${deck.subject}", 
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
               const SizedBox(height: 25), 
@@ -120,124 +123,144 @@ class _RandomResultPageState extends State<RandomResultPage> {
                       topRight: Radius.circular(40),
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start, 
-                    children: [
-                      // Score card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 22),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F7FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE8E5FF)),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start, 
+                      children: [
+                        // Score card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 22),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F7FF),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE8E5FF)),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                "$_correctCount/$_totalCards",
+                                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: dominantColor),
+                              ),
+                              const Text(
+                                "TOTAL SCORE",
+                                style: TextStyle(fontSize: 11, color: Colors.black38, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Column(
+                        const SizedBox(height: 12),
+                        // Accuracy Card
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F7FF),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE8E5FF)),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.insights, color: dominantColor, size: 20),
+                                      const SizedBox(width: 8),
+                                      const Text("Accuracy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                    ],
+                                  ),
+                                  Text("$accuracyPercent%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: LinearProgressIndicator(
+                                  value: accuracy,
+                                  minHeight: 10,
+                                  backgroundColor: const Color(0xFFE0E0E0),
+                                  valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Time and streak
+                        Row(
                           children: [
-                            Text(
-                              "$_correctCount/$_totalCards",
-                              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: dominantColor),
-                            ),
-                            Text(
-                              "TOTAL SCORE",
-                              style: TextStyle(fontSize: 11, color: Colors.black38, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      // Progress Card
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F7FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE8E5FF)),
-                        ),
-                        child: Column(
-                          children: [
-                                Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F7FF),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: const Color(0xFFE8E5FF)),
+                                ),
+                                child: Row(
                                   children: [
-                                    Icon(Icons.insights, color: dominantColor, size: 20),
-                                    SizedBox(width: 8),
-                                    Text("Accuracy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                    const Icon(Icons.timer_outlined, color: Colors.black26, size: 22),
+                                    const SizedBox(width: 8),
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(timeUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                          const Text("TIME USED", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                Text("$accuracyPercent%", style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor)),
-                              ],
-                            ),
-                             SizedBox(height: 12),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child:  LinearProgressIndicator(
-                                value: 0.85,
-                                minHeight: 10,
-                                backgroundColor: Color(0xFFE0E0E0),
-                                valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                               ),
+                            ),
+                            const SizedBox(width: 12),
+                            // CONDITIONAL RENDERING: Streak Logic
+                            Expanded(
+                              child: _isFirstQuizToday 
+                              ? Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF8F7FF),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: const Color(0xFFE8E5FF)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.local_fire_department, color: accentColor, size: 22),
+                                      const SizedBox(width: 8),
+                                      const Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("+1 day", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                          Text("STREAK", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.02),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: const Color(0xFFE8E5FF)),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Daily Streak\nClaimed",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 10, color: Colors.black26, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Time and streak
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.timer_outlined, color: Colors.black26, size: 22),
-                                  SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(timeUsed, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      Text("TIME USED", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.local_fire_department, color: accentColor, size: 22),
-                                  SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("+1 day", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      Text("STREAK", style: TextStyle(fontSize: 9, color: Colors.black38, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 25), 
-                      // Review Answers Button
-                      if (wrongAnswers.isNotEmpty) ...[
+                        const SizedBox(height: 25), 
+                        // Review Answers Button
+                        if (wrongAnswers.isNotEmpty) ...[
                           ElevatedButton(
                             onPressed: () => Navigator.pushNamed(
                               context,
@@ -269,11 +292,16 @@ class _RandomResultPageState extends State<RandomResultPage> {
                           ),
                           const SizedBox(height: 12),
                         ],
-                      // Back to Home Button
-                      ElevatedButton(
-                          onPressed: () =>
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, '/', (route) => false),
+                        // Back to Home Button
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context, 
+                              'home', 
+                              (route) => false,
+                              arguments: 2, 
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: dominantColor,
@@ -287,15 +315,16 @@ class _RandomResultPageState extends State<RandomResultPage> {
                             children: [
                               Icon(Icons.home_rounded, size: 20),
                               SizedBox(width: 10),
-                              Text('Back to Home',
+                              Text('Back to Study',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
                             ],
                           ),
                         ),
-                      const SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ),
