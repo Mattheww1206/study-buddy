@@ -63,10 +63,10 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          _deck.title,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
       ),

@@ -31,9 +31,9 @@ class _OpeningPageState extends State<OpeningPage> {
           maxWidth: double.infinity,
           maxHeight: double.infinity,
           child: Image(
-            image: const AssetImage('assets/studybuddy.png'),
-            width: 500,
-            height: 500,
+            image: const AssetImage('assets/study.png'),
+            width: 400,
+            height: 400,
             fit: BoxFit.fill,
           ),
         ),

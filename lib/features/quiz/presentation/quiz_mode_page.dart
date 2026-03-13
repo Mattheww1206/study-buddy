@@ -121,9 +121,10 @@ class _QuizModePageState extends State<QuizModePage> {
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Quiz Mode',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+         title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
       ),

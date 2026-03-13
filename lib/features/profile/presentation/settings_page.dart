@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// Tinanggal ang google_fonts import
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
@@ -37,9 +37,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   size: 60,
                 ),
                 const SizedBox(height: 20),
-                Text(
+                const Text(
                   'Oh no! Leaving?',
-                  style: GoogleFonts.lora(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -49,7 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   'Are you sure you want to log out of your StudyBuddy account?',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],
                   ),
@@ -67,10 +67,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Stay',
-                          style: GoogleFonts.lora(
-                            color: const Color(0xFF665FBE), // Dominant Color
+                          style: TextStyle(
+                            color: Color(0xFF665FBE), // Dominant Color
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -93,9 +93,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Logout',
-                          style: GoogleFonts.lora(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -118,9 +118,9 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: const Color(0xFFFAEEFF), // Dominant Color
       appBar: AppBar(
         backgroundColor: const Color(0xFF665FBE),
-        title: Text(
+        title: const Text(
           'Settings',
-          style: GoogleFonts.lora(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25, 
             color: Colors.white,
@@ -166,9 +166,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               size: 25, color: Colors.white), 
                         ),
                         const SizedBox(width: 15),
-                        Text(
+                        const Text(
                           'Account',
-                          style: GoogleFonts.lora(
+                          style: TextStyle(
                             fontSize: 20, 
                             fontWeight: FontWeight.bold,
                           ),
@@ -200,9 +200,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               size: 25, color: Colors.white), 
                         ),
                         const SizedBox(width: 15),
-                        Text(
+                        const Text(
                           'Achievement',
-                          style: GoogleFonts.lora(
+                          style: TextStyle(
                             fontSize: 20, 
                             fontWeight: FontWeight.bold,
                           ),
@@ -234,9 +234,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               size: 25, color: Colors.white), 
                         ),
                         const SizedBox(width: 20), 
-                        Text(
+                        const Text(
                           'Logout',
-                          style: GoogleFonts.lora(
+                          style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold), 
                         ),
                       ],

@@ -230,8 +230,11 @@ class _CreateViewPageState extends State<CreateViewPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text("StudyBuddy",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Image.asset(
+          'assets/studybuddy-logo.png',
+          height: 95,
+          fit: BoxFit.contain,
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
