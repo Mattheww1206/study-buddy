@@ -190,7 +190,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     final nav = Navigator.of(context);
 
     try {
-      await _deckService.updateDeck(
+       _deckService.updateDeck(
         _deck.deckId,
         {
           'title': _deck.title,

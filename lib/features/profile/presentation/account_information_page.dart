@@ -72,7 +72,6 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                         side: BorderSide(color: Colors.grey.shade400),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       ),
-                      // Pinalitan ng default TextStyle
                       child: Text('Cancel', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     ),
                   ),

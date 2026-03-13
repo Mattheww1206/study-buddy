@@ -24,7 +24,7 @@ class FlashcardService {
 
     await cardDoc.set(flashcard.toMap());
 
-    await _firestore.collection('decks').doc(deckId).update({'totalCards': FieldValue.increment(1)});
+     _firestore.collection('decks').doc(deckId).update({'totalCards': FieldValue.increment(1)});
 
     return flashcard;
 }
@@ -37,7 +37,7 @@ Future<void> updateFlashcard({
   required String answer,
 }) async {  
 
-   await _firestore
+         _firestore
          .collection('decks')
          .doc(deckId)
          .collection('flashcards')
@@ -54,14 +54,14 @@ Future<void> deleteFlashcard({
   required String deckId,
   required String cardId,
 }) async {
-  await _firestore
+        _firestore
         .collection('decks')
         .doc(deckId)
         .collection('flashcards')
         .doc(cardId)
         .delete();
 
-      await _firestore.collection('decks').doc(deckId).update({
+       _firestore.collection('decks').doc(deckId).update({
         'totalCards': FieldValue.increment(-1),
       });
 }

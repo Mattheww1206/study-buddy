@@ -81,12 +81,12 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         'def': card['def']!.text.trim(),
       }).toList();
 
-      await _deckService.createDeck(
+       _deckService.createDeck(
         userId: userProvider.user!.userId, 
         title: _titleController.text.trim(), 
         subject: _subjectController.text.trim(), 
         cards: cards
-        );
+        ).catchError((e) => print('Error saving decks: $e'));
       messenger.showSnackBar(
         SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
       );

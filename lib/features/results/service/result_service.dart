@@ -6,7 +6,7 @@ class ResultService {
 
   Future<String> saveResult(StudyResult result) async {
     final resultDoc = _firestore.collection('results').doc();
-    await resultDoc.set(StudyResult(
+       resultDoc.set(StudyResult(
       resultId: resultDoc.id,
       userId: result.userId,
       deckId: result.deckId,
@@ -17,11 +17,12 @@ class ResultService {
       easyCount: result.easyCount,
       againCount: result.againCount,
       completedAt: result.completedAt,
-    ).toMap());
+    ).toMap()).catchError((e) => print('ResultService save error: $e'));
     return resultDoc.id;
   }
 
   Future<List<StudyResult>> getUserResults(String userId) async {
+    try {
     final snapshot = await _firestore
         .collection('results')
         .where('userId', isEqualTo: userId)
@@ -31,7 +32,24 @@ class ResultService {
     return snapshot.docs
         .map((doc) => StudyResult.fromMap(doc.id, doc.data()))
         .toList();
+
+    } catch (e) {
+      try {
+      final snapshot = await _firestore
+          .collection('results')
+          .where('userId', isEqualTo: userId)
+          .orderBy('completedAt', descending: true)
+          .get(const GetOptions(source: Source.cache));
+
+      return snapshot.docs
+          .map((doc) => StudyResult.fromMap(doc.id, doc.data()))
+          .toList();
+    } catch (cacheError) {
+      print('ResultService cache error: $cacheError');
+      return []; // return empty list if both fail
+    }
   }
+}
 
   int calculateStreak(List<StudyResult> results) {
     if (results.isEmpty) return 0;

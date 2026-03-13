@@ -198,7 +198,7 @@ class _RandomPageState extends State<RandomPage> {
     }
 
     try {
-      await _resultService.saveResult(StudyResult(
+       _resultService.saveResult(StudyResult(
         resultId: '',
         userId: userId,
         deckId: _deck.deckId,

@@ -315,4 +315,38 @@ class QuizService {
     }
     return wrongAnswers;
   }
+  
+  Future<bool> isQuizCached(String deckId, String quizType) async {
+  try {
+    final doc = await _firestore
+        .collection('decks')
+        .doc(deckId)
+        .collection('generatedQuiz')
+        .doc(quizType)
+        .get(const GetOptions(source: Source.cache));
+    return doc.exists;
+  } catch (e) {
+    return false;
+  }
+}
+
+Future<bool> isRandomQuizCached(String deckId) async {
+  try {
+    final types = ['multiple_choice', 'identification', 'true_false'];
+    for (final type in types) {
+      final doc = await _firestore
+          .collection('decks')
+          .doc(deckId)
+          .collection('generatedQuiz')
+          .doc(type)
+          .get(const GetOptions(source: Source.cache));
+      if (!doc.exists) return false; 
+    }
+    return true; 
+  } catch (e) {
+    return false;
+  }
+}
+
+
 }

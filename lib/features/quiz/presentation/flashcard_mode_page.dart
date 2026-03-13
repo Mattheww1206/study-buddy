@@ -89,7 +89,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     final percentage = _easyCount / totalCards;
 
     try {
-      final resultId = await _resultService.saveResult(StudyResult(
+      final resultId = _resultService.saveResult(StudyResult(
         resultId: '',
         userId: userId,
         deckId: _deck.deckId,
@@ -221,9 +221,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
 
               // Flashcard
               Expanded(
-                child: _isFinished
-                    ? const Center(child: CircularProgressIndicator())
-                    : Dismissible(
+                child: Dismissible(
                         key: ValueKey(_currentIndex),
                         onDismissed: _onSwipe,
                         background: Container(

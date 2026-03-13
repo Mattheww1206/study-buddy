@@ -148,7 +148,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
     }
 
     try {
-      await _resultService.saveResult(StudyResult(
+       _resultService.saveResult(StudyResult(
         resultId: '',
         userId: userId,
         deckId: _deck.deckId,

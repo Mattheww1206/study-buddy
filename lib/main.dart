@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/core/auth_wrapper.dart';
 import 'package:studybuddy/features/auth/presentation/landing_page.dart';
 import 'package:studybuddy/features/auth/presentation/login_page.dart';
@@ -44,8 +45,6 @@ import 'package:studybuddy/services/firebase_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     await FirebaseService.initializeFirebase();
@@ -58,6 +57,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DeckProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
       ],
       child: MyApp(),
     )
@@ -112,11 +112,6 @@ class MyApp extends StatelessWidget {
        'tf':(context) => const TrueFalsePage(),
        'tf_result':(context) => const TrueFalseResultPage(),
        'tf_review':(context) => const TrueFalseReviewPage()
-
-
-     
-
-
       },
     );
   }

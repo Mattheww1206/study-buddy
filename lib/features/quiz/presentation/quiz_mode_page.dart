@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 
 class QuizModePage extends StatefulWidget {
   const QuizModePage({super.key});
@@ -9,9 +12,12 @@ class QuizModePage extends StatefulWidget {
 }
 
 class _QuizModePageState extends State<QuizModePage> {
-  String selectedType = 'Multiple Mode';
+  final QuizService _quizService = QuizService();
+  late ConnectivityProvider _connectivityProvider;
+  String selectedType = '';
   late Deck deck;
   bool _initialized = false;
+  bool _isChecking = false;
 
   @override
   void didChangeDependencies() {
@@ -19,6 +25,89 @@ class _QuizModePageState extends State<QuizModePage> {
     if (_initialized) return;
     _initialized = true;
     deck = ModalRoute.of(context)!.settings.arguments as Deck; 
+    _connectivityProvider = Provider.of<ConnectivityProvider>(context, listen: false);
+  }
+
+  void _navigate() {
+    if (selectedType == 'Multiple Mode') {
+      Navigator.pushNamed(context, 'multiple_mode', arguments: {'deck': deck});
+    } else if (selectedType == 'iden_mode') {
+      Navigator.pushNamed(context, 'iden_mode', arguments: {'deck': deck});
+    } else if (selectedType == 'tf_mode') {
+      Navigator.pushNamed(context, 'tf_mode', arguments: {'deck': deck});
+    } else if (selectedType == 'ran_mode') {
+      Navigator.pushNamed(context, 'ran_mode', arguments: {'deck': deck});
+    }
+  }
+
+  void _showNoInternetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.wifi_off, color: Colors.red),
+            SizedBox(width: 10),
+            Text('No Internet'),
+          ],
+        ),
+        content: const Text(
+          'This quiz has not been generated yet and it requires an internet '
+          'connection for the first time.\n\nPlease connect to the '
+          'internet to generate the quiz.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFF665FBE))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startQuiz() async {
+    if(_isChecking) return;
+    setState(() => _isChecking = true);
+
+    
+    final isOnline = await _connectivityProvider.checkRealInternet();
+
+    if (!mounted) return;
+    setState(() => _isChecking = false);
+        
+    // online — proceed normally
+    if (isOnline) {
+      _navigate();
+      return;
+    }
+
+    // offline — random needs all 3 cached
+    if (selectedType == 'ran_mode') {
+      final isCached = await _quizService.isRandomQuizCached(deck.deckId);
+      if (!mounted) return;
+      isCached ? _navigate() : _showNoInternetDialog();
+      return;
+    }
+
+    // offline — check specific quiz type cache
+    final quizType = switch (selectedType) {
+      'Multiple Mode' => 'multiple_choice',
+      'iden_mode' => 'identification',
+      'tf_mode' => 'true_false',
+      _ => 'multiple_choice',
+    };
+
+    final isCached = await _quizService.isQuizCached(deck.deckId, quizType);
+    if (!mounted) return;
+    if (isCached) {
+      _navigate();
+    } else {
+      _showNoInternetDialog();
+    }
   }
   
   @override
@@ -284,23 +373,29 @@ class _QuizModePageState extends State<QuizModePage> {
 
             // Start Button
             ElevatedButton(
-              onPressed: () {
-                if (selectedType == 'Multiple Mode') {
-                  Navigator.pushNamed(context, 'multiple_mode', arguments: {'deck': deck});
-                } else if (selectedType == 'iden_mode') {
-                   Navigator.pushNamed(context, 'iden_mode', arguments: {'deck': deck});
-                } else if (selectedType == 'tf_mode') {
-                   Navigator.pushNamed(context, 'tf_mode', arguments: {'deck': deck}); 
-                } else if (selectedType == 'ran_mode') {
-                   Navigator.pushNamed(context, 'ran_mode', arguments: {'deck': deck});
-                }
-              },
+              onPressed: _isChecking ? null : _startQuiz,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF8137),
                 minimumSize: const Size(double.infinity, 60),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
-              child: const Text('Start Quiz', style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
+              child: _isChecking
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Start Quiz',
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
             const SizedBox(height: 30),
           ],
