@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
@@ -111,11 +112,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                   itemBuilder: (context, index) {
                                     final deck = pinnedDecks[index];
                                     return GestureDetector(
-                                      onTap: () => Navigator.pushNamed(
-                                        context,
-                                        'mode',
-                                        arguments: deck,
-                                      ),
+                                      onTap: () {
+                                        Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                        Navigator.pushNamed(context, 'mode');
+                                      },
                                       child: Container(
                                         width: 250,
                                         margin: const EdgeInsets.only(right: 12),
@@ -194,7 +194,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                 color: Colors.grey[100]),
                             Column(
                               children: [
-                                Text('${_results.length}',
+                                Text('${_results.where((r) => r.mode != 'flashcard').length}',
                                     style: const TextStyle( // Changed
                                         fontSize: 38,
                                         fontWeight: FontWeight.bold,
@@ -291,11 +291,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                 itemBuilder: (context, index) {
                                   final deck = recentDecks[index];
                                   return GestureDetector(
-                                    onTap: () => Navigator.pushNamed(
-                                      context,
-                                      'mode',
-                                      arguments: deck,
-                                    ),
+                                   onTap: () {
+                                      Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                      Navigator.pushNamed(context, 'mode');
+                                    },
                                     child: Container(
                                       width: 200,
                                       margin: const EdgeInsets.only(right: 15),
@@ -357,11 +356,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                 itemBuilder: (context, index) {
                                   final deck = newlyAdded[index];
                                   return GestureDetector(
-                                    onTap: () => Navigator.pushNamed(
-                                      context,
-                                      'mode',
-                                      arguments: deck,
-                                    ),
+                                   onTap: () {
+                                      Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                      Navigator.pushNamed(context, 'mode');
+                                    },
                                     child: Container(
                                       width: 200,
                                       margin: const EdgeInsets.only(right: 15),

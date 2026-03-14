@@ -13,51 +13,50 @@ class QuizService {
 
   // Multiple Choice Distractors
   Future<List<Map<String, dynamic>>> generateMultipleChoiceQuiz({
-    required String deckId,
-    required int numberOfQuestions,
-  }) async {
-    final cards = await _deckService.getDeckFlashcards(deckId);
-    cards.shuffle();
-    final selected = cards.take(numberOfQuestions).toList();
-
-
-    final saved = await _getFromFirestore(deckId, 'multiple_choice');
-    if (saved != null) {
-      print('Firestore — MC quiz for $deckId');
-      return _buildMCQuizData(selected, saved);
-    }
-
-    print('Gemini generating distractors - MC quiz for $deckId');
-    final flashcardMaps = selected
-        .map((c) => {'question': c.question, 'answer': c.answer})
-        .toList();
-
-    final allDistractors = await _geminiService.generateDistractors(flashcards: flashcardMaps);
-
-
-    await _saveMCToFirestore(deckId, selected, allDistractors);
-    print('Firestore saved MC quiz for $deckId');
-
-  
-    final freshSaved = await _getFromFirestore(deckId, 'multiple_choice');
-    return _buildMCQuizData(selected, freshSaved!);
+  required String deckId,
+  required int numberOfQuestions,
+}) async {
+  // ✅ Check cache FIRST before loading cards
+  final saved = await _getFromFirestore(deckId, 'multiple_choice');
+  if (saved != null) {
+    print('Firestore — MC quiz for $deckId');
+    // ✅ Build directly from saved, no need for selected cards
+    return _buildMCFromSaved(saved, numberOfQuestions);
   }
+
+  // Cache miss — generate fresh
+  final cards = await _deckService.getDeckFlashcards(deckId);
+  cards.shuffle();
+  final selected = cards.take(numberOfQuestions).toList();
+
+  final flashcardMaps = selected
+      .map((c) => {'question': c.question, 'answer': c.answer})
+      .toList();
+
+  final allDistractors =
+      await _geminiService.generateDistractors(flashcards: flashcardMaps);
+
+  await _saveMCToFirestore(deckId, selected, allDistractors);
+
+  final freshSaved = await _getFromFirestore(deckId, 'multiple_choice');
+  return _buildMCFromSaved(freshSaved!, numberOfQuestions);
+}
   
   // Identification questions
   Future<List<Map<String, dynamic>>> generateIdentificationQuiz({
     required String deckId,
     required int numberOfQuestions,
   }) async {
+    final saved = await _getFromFirestore(deckId, 'identification');
+    if (saved != null) {
+    print('Firestore — identification quiz for $deckId');
+    return _buildIdenQuizData(saved.take(numberOfQuestions).toList()); // ✅
+  }
+
     final cards = await _deckService.getDeckFlashcards(deckId);
     cards.shuffle();
     final selected = cards.take(numberOfQuestions).toList();
-
-    final saved = await _getFromFirestore(deckId, 'identification');
-    if (saved != null) {
-      print('Firestore — identification quiz for $deckId');
-      return _buildIdenQuizData(saved);
-    }
-
+    
     print('Gemini generating modified questions - identification quiz for $deckId');
     final flashcardMaps = selected
         .map((c) => {'question': c.question, 'answer': c.answer})
@@ -79,15 +78,15 @@ class QuizService {
     required String deckId,
     required int numberOfQuestions,
   }) async {
-    final cards = await _deckService.getDeckFlashcards(deckId);
-    cards.shuffle();
-    final selected = cards.take(numberOfQuestions).toList();
-
     final saved = await _getFromFirestore(deckId, 'true_false');
     if (saved != null) {
       print('Firestore — T/F quiz for $deckId');
-      return _buildTFQuizData(selected, saved);
+      return _buildTFQuizData(saved, numberOfQuestions);
     }
+
+    final cards = await _deckService.getDeckFlashcards(deckId);
+    cards.shuffle();
+    final selected = cards.take(numberOfQuestions).toList();
 
     print('Gemini Generating T/F quiz for $deckId');
     final flashcardMaps = selected
@@ -102,7 +101,7 @@ class QuizService {
     print('Firestore Saved T/F quiz for $deckId');
 
     final freshSaved = await _getFromFirestore(deckId, 'true_false');
-    return _buildTFQuizData(selected, freshSaved!);
+    return _buildTFQuizData(freshSaved!, numberOfQuestions);
   }
 
   Future<List<Map<String, dynamic>>> generateRandomQuiz({
@@ -233,27 +232,29 @@ class QuizService {
   //QUIZ DATA
 
   
-  List<Map<String, dynamic>> _buildMCQuizData(
-    List<Flashcard> flashcards,
-    List<Map<String, dynamic>> saved,
-  ) {
-    return List.generate(flashcards.length, (i) {
-      final match = saved.firstWhere(
-        (s) => s['flashcardId'] == flashcards[i].cardId,
-        orElse: () => saved[i],
-      );
-      final choices = [
-        match['correctAnswer'].toString(),
-        ...List<String>.from(match['distractors']),
-      ]..shuffle();
-      return {
-        'flashcard': flashcards[i],
-        'choices': choices,
-        'correctAnswer': match['correctAnswer'],
-        'selectedAnswer': null,
-      };
-    });
-  }
+  List<Map<String, dynamic>> _buildMCFromSaved(
+  List<Map<String, dynamic>> saved,
+  int numberOfQuestions,
+) {
+  final questions = saved.take(numberOfQuestions).toList();
+  return questions.map((q) {
+    final choices = [
+      q['correctAnswer'].toString(),
+      ...List<String>.from(q['distractors']),
+    ]..shuffle();
+    return {
+      'flashcard': Flashcard(
+        cardId: q['flashcardId'],
+        deckId: '',
+        question: q['question'],
+        answer: q['correctAnswer'],
+      ),
+      'choices': choices,
+      'correctAnswer': q['correctAnswer'],
+      'selectedAnswer': null,
+    };
+  }).toList();
+}
 
   List<Map<String, dynamic>> _buildIdenQuizData(
     List<Map<String, dynamic>> saved,
@@ -267,22 +268,21 @@ class QuizService {
   }
 
   List<Map<String, dynamic>> _buildTFQuizData(
-    List<Flashcard> flashcards,
     List<Map<String, dynamic>> saved,
+    int numberOfQuestions
   ) {
-    return List.generate(flashcards.length, (i) {
-      final match = saved.firstWhere(
-        (s) => s['flashcardId'] == flashcards[i].cardId,
-        orElse: () => saved[i],
-      );
-      return {
-        'flashcard': flashcards[i],
-        'statement': match['statement'],
-        'correctAnswer': match['answer'],   // true or false
-        'selectedAnswer': null,
-      };
-    });
-  }
+    return saved.take(numberOfQuestions).map((q) => {
+    'flashcard': Flashcard(
+      cardId: q['flashcardId'],
+      deckId: '',
+      question: q['statement'],
+      answer: q['answer'],
+    ),
+    'statement': q['statement'],
+    'correctAnswer': q['answer'],
+    'selectedAnswer': null,
+  }).toList();
+}
 
   // Delete if deck is edited
   Future<void> deleteGeneratedQuiz(String deckId) async {

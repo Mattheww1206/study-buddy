@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 
 class StudyPage extends StatefulWidget {
@@ -157,11 +158,10 @@ class _StudyPageState extends State<StudyPage> {
                               itemBuilder: (context, index) {
                                 final deck = filteredDecks[index];
                                 return GestureDetector(
-                                  onTap: () => Navigator.pushNamed(
-                                    context,
-                                    'mode',
-                                    arguments: deck, 
-                                  ),
+                                 onTap: () {
+                                    Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                    Navigator.pushNamed(context, 'mode');
+                                  },
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 16),
                                     padding: const EdgeInsets.all(18),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/flashcards/service/flashcard_service.dart';
@@ -28,7 +30,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _deck = ModalRoute.of(context)!.settings.arguments as Deck;
+      _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
       _loadFlashcards();
     });
   }
@@ -46,9 +48,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
   
   Future<void> _loadFlashcards() async {
     try {
-      final cards = await _deckService
-          .getDeckFlashcards(_deck.deckId)
-          .timeout(const Duration(seconds: 10));
+      final cards = await _deckService.getDeckFlashcards(_deck.deckId);
       if (mounted) {
         setState(() {
           _flashcards = cards;

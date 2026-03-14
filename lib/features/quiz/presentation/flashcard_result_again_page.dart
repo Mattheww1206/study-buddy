@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 
 class FlashcardResultAgainPage extends StatefulWidget {
@@ -23,12 +25,11 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
     if (_initialized) return;
     _initialized = true;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     gotItCount = args['easyCount'] as int;
     againCount = args['againCount'] as int;
     missedCards = args['missedCards'] as List<Flashcard>;
-    deck = args['deck'] as Deck;
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
   }
 
   @override
@@ -184,7 +185,6 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                           onPressed: () => Navigator.pushReplacementNamed(
                             context,
                             'flashcard_mode',
-                            arguments: deck,
                           ),
                           icon: const Icon(Icons.refresh, color: Colors.white),
                           label: const Text('Study Again',
@@ -212,7 +212,6 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                                 'flashcard_missed',
                                 arguments: {
                                   'missedCards': missedCards,
-                                  'deck': deck,
                                 },
                               );
                               if (result != null && mounted) {

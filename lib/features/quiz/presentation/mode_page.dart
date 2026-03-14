@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -16,19 +17,11 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
-  late Deck deck;
-  bool _initialized = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_initialized) return;
-    _initialized = true;
-    deck = ModalRoute.of(context)!.settings.arguments as Deck;
-  } 
 
   @override
   Widget build(BuildContext context) {
+     final deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(
@@ -146,7 +139,6 @@ class _ModePageState extends State<ModePage> {
                   onPressed: () => Navigator.pushNamed(
                     context,
                     'flashcard_mode',
-                    arguments: deck, 
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -217,7 +209,6 @@ class _ModePageState extends State<ModePage> {
                   onPressed: () => Navigator.pushNamed(
                     context,
                     'quiz_mode',
-                    arguments: deck, 
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,

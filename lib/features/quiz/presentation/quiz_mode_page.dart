@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/core/ConnectivityProvider.dart';
-import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 
 class QuizModePage extends StatefulWidget {
@@ -15,28 +15,24 @@ class _QuizModePageState extends State<QuizModePage> {
   final QuizService _quizService = QuizService();
   late ConnectivityProvider _connectivityProvider;
   String selectedType = '';
-  late Deck deck;
-  bool _initialized = false;
+
   bool _isChecking = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_initialized) return;
-    _initialized = true;
-    deck = ModalRoute.of(context)!.settings.arguments as Deck; 
     _connectivityProvider = Provider.of<ConnectivityProvider>(context, listen: false);
   }
 
   void _navigate() {
     if (selectedType == 'Multiple Mode') {
-      Navigator.pushNamed(context, 'multiple_mode', arguments: {'deck': deck});
+      Navigator.pushNamed(context, 'multiple_mode');
     } else if (selectedType == 'iden_mode') {
-      Navigator.pushNamed(context, 'iden_mode', arguments: {'deck': deck});
+      Navigator.pushNamed(context, 'iden_mode');
     } else if (selectedType == 'tf_mode') {
-      Navigator.pushNamed(context, 'tf_mode', arguments: {'deck': deck});
+      Navigator.pushNamed(context, 'tf_mode');
     } else if (selectedType == 'ran_mode') {
-      Navigator.pushNamed(context, 'ran_mode', arguments: {'deck': deck});
+      Navigator.pushNamed(context, 'ran_mode');
     }
   }
 
@@ -73,8 +69,9 @@ class _QuizModePageState extends State<QuizModePage> {
     if(_isChecking) return;
     setState(() => _isChecking = true);
 
-    
+    final deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     final isOnline = await _connectivityProvider.checkRealInternet();
+
 
     if (!mounted) return;
     setState(() => _isChecking = false);
@@ -112,6 +109,8 @@ class _QuizModePageState extends State<QuizModePage> {
   
   @override
   Widget build(BuildContext context) {
+    final deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFFAEEFF),
       appBar: AppBar(

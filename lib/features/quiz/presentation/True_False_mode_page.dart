@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class TrueFalseModePage extends StatefulWidget {
   const TrueFalseModePage({super.key});
@@ -24,17 +26,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_initialized) return;
-
-    final args = ModalRoute.of(context)!.settings.arguments;
-
-    if (args is Map<String, dynamic>) {
-      _deck = args['deck'] as Deck;
-    } else if (args is Deck) {
-      _deck = args;
-    } else {
-      return; 
-    }
-
+    _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     numberOfQuestions = _deck.totalCards.clamp(1, _deck.totalCards);
     _questionsController =
         TextEditingController(text: numberOfQuestions.toString());
@@ -310,7 +302,6 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                     context,
                     'tf', 
                     arguments: {
-                      'deck': _deck,
                       'numberOfQuestions': numberOfQuestions,
                       'timerMinutes': isTimerEnabled ? selectedTime : null,
                     },

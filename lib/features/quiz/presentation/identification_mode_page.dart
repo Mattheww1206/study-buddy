@@ -1,5 +1,7 @@
   import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
   class IdentificationModePage extends StatefulWidget {
     const IdentificationModePage({super.key});
@@ -25,10 +27,7 @@ import 'package:studybuddy/features/deck/model/deck_model.dart';
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
-
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-        _deck = args['deck'] as Deck;
-
+    _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     // cap default to deck total
     numberOfQuestions = _deck.totalCards.clamp(1, _deck.totalCards);
     _questionsController =
@@ -312,7 +311,6 @@ import 'package:studybuddy/features/deck/model/deck_model.dart';
                     context,
                     'identification',
                     arguments: {
-                      'deck': _deck,
                       'numberOfQuestions': numberOfQuestions,
                       'timerMinutes':
                           isTimerEnabled ? selectedTime : null, 

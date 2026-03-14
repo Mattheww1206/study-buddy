@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class TrueFalseResultPage extends StatefulWidget {
   const TrueFalseResultPage({super.key});
@@ -33,7 +35,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
     _correctCount = args['correctCount'] as int;
     _totalCards = args['totalCards'] as int;
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
-    deck = args['deck'] as Deck;
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     timeUsed = args['timeUsed'] as String;
     
     // Kunin ang streak flag mula sa quiz page arguments
@@ -299,7 +301,6 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                           'tf_review',
                           arguments: {
                             'wrongAnswers': wrongAnswers,
-                            'deck': deck,
                           },
                         ),
                         style: ElevatedButton.styleFrom(

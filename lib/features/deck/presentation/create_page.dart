@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 
 class CreatePage extends StatefulWidget {
@@ -407,7 +408,7 @@ class _CreatePageState extends State<CreatePage> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(bottom: 5),
-                                        child: Icon(Icons.style_outlined, color: colorDominant.withOpacity(0.8), size: 36),
+                                        child: Icon(Icons.style_outlined, color: colorDominant.withValues(alpha: 0.8), size: 36),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -427,7 +428,10 @@ class _CreatePageState extends State<CreatePage> {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
                                 child: GestureDetector(
-                                  onTap: isEditMode ? () => _toggleSelection(deck.deckId) : () => Navigator.pushNamed(context, 'create_view', arguments: deck),
+                                  onTap: isEditMode ? () => _toggleSelection(deck.deckId) : () {
+                                    Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                    Navigator.pushNamed(context, 'create_view');
+                                  },
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     padding: const EdgeInsets.all(18),
@@ -437,7 +441,7 @@ class _CreatePageState extends State<CreatePage> {
                                       border: Border.all(color: isSelected ? colorDominant : Colors.transparent, width: 2),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: isSelected ? colorDominant.withOpacity(0.1) : Colors.black.withOpacity(0.03), 
+                                          color: isSelected ? colorDominant.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.03), 
                                           blurRadius: 15, 
                                           offset: const Offset(0, 8)
                                         )

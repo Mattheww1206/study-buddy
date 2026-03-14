@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 
 class FlashcardMissedPage extends StatefulWidget {
@@ -30,7 +32,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
 
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     missedCards = args['missedCards'] as List<Flashcard>;
-    deck = args['deck'] as Deck;
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
   }
 
   void _onSwipe(DismissDirection direction) {

@@ -107,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   builder: (context, snapshot) {
                     final decks = snapshot.data ?? [];
                     final totalDecks = decks.length;
-                    final totalQuizTaken = _results.length;
+                    final totalQuizTaken = _results.where((r) => r.mode != 'flashcard').length;
 
                     return SingleChildScrollView(
                       child: Column(

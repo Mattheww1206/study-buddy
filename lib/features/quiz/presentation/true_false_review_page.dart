@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class TrueFalseReviewPage extends StatefulWidget {
   const TrueFalseReviewPage({super.key});
@@ -26,7 +28,7 @@ class _TrueFalseReviewPageState extends State<TrueFalseReviewPage> {
 
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
-    deck = args['deck'] as Deck;
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
   }
 
 

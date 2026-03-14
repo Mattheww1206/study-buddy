@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class MultipleResultPage extends StatefulWidget {
   const MultipleResultPage({super.key});
@@ -33,7 +35,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
     _correctCount = args['correctCount'] as int;
     _totalCards = args['totalCards'] as int;
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
-    deck = args['deck'] as Deck;
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     timeUsed = args['timeUsed'] as String;
     
     // Tinatanggap ang value mula sa navigation logic
@@ -301,7 +303,6 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                               'multiple_review',
                               arguments: {
                                 'wrongAnswers': wrongAnswers,
-                                'deck': deck,
                               },
                             ),
                             style: ElevatedButton.styleFrom(

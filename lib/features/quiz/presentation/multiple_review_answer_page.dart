@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class MultipleReviewAnswerPage extends StatefulWidget {
   const MultipleReviewAnswerPage({super.key});
@@ -23,11 +25,9 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
     if (_initialized) return;
     _initialized = true;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    wrongAnswers =
-        List<Map<String, String>>.from(args['wrongAnswers'] as List);
-    deck = args['deck'] as Deck;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
   }
   
   @override

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
@@ -47,7 +48,7 @@ class _RandomPageState extends State<RandomPage> {
     _initialized = true;
 
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    _deck = args['deck'] as Deck;
+    _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     _numberOfQuestions = args['numberOfQuestions'] as int;
     _timerMinutes = args['timerMinutes'] as int?;
 
@@ -317,7 +318,6 @@ class _RandomPageState extends State<RandomPage> {
         'correctCount': _correctCount,
         'totalCards': totalCards,
         'wrongAnswers': wrongAnswers,
-        'deck': _deck,
         'timeUsed': timeUsed,
       },
     );

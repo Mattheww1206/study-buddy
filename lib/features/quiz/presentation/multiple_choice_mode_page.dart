@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class MultipleChoiceModePage extends StatefulWidget {
   const MultipleChoiceModePage({super.key});
@@ -21,8 +23,7 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-     deck = args['deck'] as Deck;
+     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
 
     // converts num of questions to the total cards of the selected deck
       numberOfQuestions = deck.totalCards;
@@ -256,7 +257,6 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, 'multiple_choice', arguments:  {
-                    'deck': deck, 
                     'numberOfQuestions': numberOfQuestions,
                     'timerMinutes': isTimerEnabled ? selectedTime : null
                   });

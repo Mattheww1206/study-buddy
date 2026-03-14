@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
@@ -34,7 +35,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _deck = ModalRoute.of(context)!.settings.arguments as Deck;
+      _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
       _loadFlashcards();
     });
   }
@@ -56,7 +57,6 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     }
   }
 
-  // FIXED: Inayos ang flow ng swipe para maiwasan ang Dismissible error
   void _onSwipe(DismissDirection direction) {
     if (_isFinished) return;
 
@@ -68,18 +68,15 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     }
 
     final isLastCard = _currentIndex >= _flashcards.length - 1;
-
     if (!isLastCard) {
       setState(() {
         _isFlipped = false;
         _currentIndex++;
       });
     } else {
-      // Set finished state agad para mawala ang Dismissible sa UI
       setState(() {
         _isFinished = true;
       });
-      // Tawagin ang save and navigate pagkatapos ng frame update
       Future.microtask(() => _saveResultAndNavigate());
     }
   }
@@ -118,7 +115,6 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
       'easyCount': _easyCount,
       'againCount': _againCount,
       'missedCards': _missedCards,
-      'deck': _deck,
     };
 
     if (percentage >= 0.75) {
@@ -248,7 +244,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                           child: TweenAnimationBuilder(
                             tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
                             duration: const Duration(milliseconds: 500),
-                            builder: (context, double val, __) {
+                            builder: (context, double val, _) {
                               final isBackSide = val > (pi / 2);
                               return Transform(
                                 alignment: Alignment.center,
@@ -265,7 +261,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withValues(alpha: 0.1),
                                           blurRadius: 10,
                                           offset: const Offset(0, 5)),
                                     ],
@@ -365,7 +361,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                     decoration: BoxDecoration(
                       color: i <= (_currentIndex % 5)
                           ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withOpacity(0.2),
+                          : const Color(0xFF665FBE).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

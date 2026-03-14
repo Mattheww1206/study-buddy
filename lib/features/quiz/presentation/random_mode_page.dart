@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
 class RandomModePage extends StatefulWidget {
   const RandomModePage({super.key});
@@ -22,10 +24,7 @@ class _RandomModePageState extends State<RandomModePage> {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
-
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    _deck = args['deck'] as Deck;
+    _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!; 
 
     // cap numberOfQuestions to totalCards
     numberOfQuestions = _deck.totalCards.clamp(1, 100);
@@ -260,7 +259,6 @@ class _RandomModePageState extends State<RandomModePage> {
                 onPressed: () {
                   Navigator.pushNamed(context, 'random', 
                   arguments: {
-                    'deck': _deck, 
                     'numberOfQuestions': numberOfQuestions,
                     'timerMinutes': isTimerEnabled ? selectedTime : null,
                    },
