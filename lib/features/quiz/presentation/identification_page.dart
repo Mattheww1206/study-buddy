@@ -145,7 +145,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: dominantColor.withOpacity(0.1),
+                color: dominantColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.exit_to_app_rounded, color: dominantColor, size: 44),
@@ -408,7 +408,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(15),
                                 border: Border.all(
-                                  color: _secondsLeft < 60 ? Colors.red : dominantColor.withOpacity(0.2),
+                                  color: _secondsLeft < 60 ? Colors.red : dominantColor.withValues(alpha: 0.2),
                                   width: 1.5,
                                 ),
                               ),
@@ -454,7 +454,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
                     ],
                   ),
                   child: Center(
@@ -492,7 +492,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: dominantColor.withOpacity(0.1)),
+                            borderSide: BorderSide(color: dominantColor.withValues(alpha: 0.1)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -537,7 +537,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
-                              BoxShadow(color: accentColor.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                              BoxShadow(color: accentColor.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4)),
                             ],
                           ),
                           child: ElevatedButton(

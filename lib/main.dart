@@ -43,10 +43,14 @@ import 'package:studybuddy/features/quiz/presentation/true_false_review_page.dar
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:studybuddy/services/notification_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    await StreakNotificationService.instance.initNotification();
+    await StreakNotificationService.instance.requestPermission();
+    await StreakNotificationService.instance.scheduleStreakReminders();
     await FirebaseService.initializeFirebase();
     await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,

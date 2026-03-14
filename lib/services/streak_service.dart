@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
+import 'package:studybuddy/services/notification_service.dart';
 
 class StreakService {
 
-  
   Future<int> updateUserStreak(String userId, List<StudyResult> results) async {
     int streak = 0;
     if (results.isNotEmpty) {
@@ -29,6 +29,9 @@ class StreakService {
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
       'streak': streak,
     });
+    if (streak > 0) {
+      await StreakNotificationService.instance.cancelEveningReminder();
+    }
 
     return streak;
   }

@@ -144,7 +144,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: dominantColor.withOpacity(0.1),
+                color: dominantColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.exit_to_app_rounded, color: dominantColor, size: 44),
@@ -357,7 +357,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.wifi_off_rounded,
-                    size: 80, color: dominantColor.withOpacity(0.4)),
+                    size: 80, color: dominantColor.withValues(alpha: 0.4)),
                 const SizedBox(height: 20),
                 Text('AI Unavailable',
                     style: TextStyle(
@@ -443,7 +443,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                               border: Border.all(
                                   color: _secondsLeft < 60
                                       ? Colors.red
-                                      : dominantColor.withOpacity(0.2),
+                                      : dominantColor.withValues(alpha: 0.2),
                                   width: 1.5),
                             ),
                             child: Row(
@@ -487,7 +487,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4))
                   ],
@@ -587,7 +587,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                           boxShadow: [
                             if (_selectedOption != null)
                               BoxShadow(
-                                  color: accentColor.withOpacity(0.3),
+                                  color: accentColor.withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4)),
                           ],

@@ -12,7 +12,6 @@ class ConnectivityProvider extends ChangeNotifier {
   }
 
   void _init() {
-    // check every 10 seconds
     checkRealInternet();
     _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       checkRealInternet();

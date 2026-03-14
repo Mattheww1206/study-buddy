@@ -66,7 +66,7 @@ class _CreatePageState extends State<CreatePage> {
                 width: 50,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: colorDominant.withOpacity(0.2),
+                  color: colorDominant.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -350,7 +350,7 @@ class _CreatePageState extends State<CreatePage> {
                                 color: colorWhite,
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
-                                  BoxShadow(color: colorDominant.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10))
+                                  BoxShadow(color: colorDominant.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 10))
                                 ],
                               ),
                               child: TextField(
@@ -358,7 +358,7 @@ class _CreatePageState extends State<CreatePage> {
                                 onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
                                 decoration: InputDecoration(
                                   hintText: 'Search deck',
-                                  hintStyle: TextStyle(color: colorDominant.withOpacity(0.4)),
+                                  hintStyle: TextStyle(color: colorDominant.withValues(alpha: 0.4)),
                                   prefixIcon: Icon(Icons.search_rounded, color: colorDominant),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 15),
@@ -378,7 +378,7 @@ class _CreatePageState extends State<CreatePage> {
                                   children: [
                                     Text(
                                       'Library', 
-                                      style: TextStyle(color: colorDominant.withOpacity(0.6), fontSize: 16, fontWeight: FontWeight.w600)
+                                      style: TextStyle(color: colorDominant.withValues(alpha: 0.6), fontSize: 16, fontWeight: FontWeight.w600)
                                     ),
                                     Text(
                                       'My Decks', 
@@ -393,7 +393,7 @@ class _CreatePageState extends State<CreatePage> {
                                       child: Text(
                                         isEditMode ? 'Cancel' : 'Edit Library',
                                         style: TextStyle(
-                                          color: isEditMode ? Colors.red : colorDominant.withOpacity(0.4), 
+                                          color: isEditMode ? Colors.red : colorDominant.withValues(alpha: 0.4), 
                                           fontSize: 18, 
                                           fontWeight: FontWeight.w500
                                         ),
@@ -473,7 +473,7 @@ class _CreatePageState extends State<CreatePage> {
                                                 children: [
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                    decoration: BoxDecoration(color: colorAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(5)),
+                                                    decoration: BoxDecoration(color: colorAccent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(5)),
                                                     child: Text(deck.subject, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorAccent)),
                                                   ),
                                                   const SizedBox(width: 8),

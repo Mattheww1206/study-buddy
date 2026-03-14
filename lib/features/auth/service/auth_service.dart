@@ -315,4 +315,37 @@ class AuthService {
       await _auth.currentUser?.delete();
     }
 
+    Future<void> changePassword({
+      required String currentPassword,
+      required String newPassword
+    }) async {
+      try {
+        final user = _auth.currentUser;
+        if(user == null) throw Exception('No user logged in');
+
+        final credential = EmailAuthProvider.credential(
+          email: user.email!, 
+          password: currentPassword
+          );
+
+          await user.reauthenticateWithCredential(credential);
+
+          await user.updatePassword(newPassword);
+      } catch (e) {
+           if (e is FirebaseAuthException) {
+          switch (e.code) {
+            case 'wrong-password':
+            case 'invalid-credential':
+              throw Exception('Current password is incorrect.');
+            case 'weak-password':
+              throw Exception('New password is too weak.');
+            case 'requires-recent-login':
+              throw Exception('Please log out and log back in before changing your password.');
+            default:
+              throw Exception('Failed to change password. Please try again.');
+          }
+        }
+      }
+      }
+
 }

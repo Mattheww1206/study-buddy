@@ -254,14 +254,14 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                   color: const Color(0xFF665FBE)
-                                      .withOpacity(0.05))),
+                                      .withValues(alpha: 0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("SUBJECT",
                                   style: TextStyle(
                                       color: const Color(0xFF665FBE)
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold)),
                               TextFormField(
@@ -287,14 +287,14 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                   color: const Color(0xFF665FBE)
-                                      .withOpacity(0.05))),
+                                      .withValues(alpha: 0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("TITLE",
                                   style: TextStyle(
                                       color: const Color(0xFF665FBE)
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold)),
                               TextFormField(
@@ -328,7 +328,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                            color: const Color(0xFF665FBE).withOpacity(0.1)),
+                            color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,7 +374,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                           Text("TERM",
                               style: TextStyle(
                                   color: const Color(0xFF665FBE)
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
@@ -386,7 +386,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                     color: const Color(0xFF665FBE)
-                                        .withOpacity(0.05))),
+                                        .withValues(alpha: 0.05))),
                             child: TextFormField(
                               controller: controllers["term"],
                               style: const TextStyle(fontSize: 15),
@@ -401,7 +401,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                           Text("DEFINITION",
                               style: TextStyle(
                                   color: const Color(0xFF665FBE)
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(height: 5),
@@ -413,7 +413,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                     color: const Color(0xFF665FBE)
-                                        .withOpacity(0.05))),
+                                        .withValues(alpha: 0.05))),
                             child: TextFormField(
                               controller: controllers["def"],
                               maxLines: null,

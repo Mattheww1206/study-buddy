@@ -142,7 +142,7 @@ Future<bool> _handleExitConfirmation() async {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: dominantColor.withOpacity(0.1),
+              color: dominantColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

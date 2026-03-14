@@ -245,7 +245,7 @@ class _RandomResultPageState extends State<RandomResultPage> {
                               : Container(
                                   padding: const EdgeInsets.all(18),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.02),
+                                    color: Colors.black.withValues(alpha: 0.02),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(color: const Color(0xFFE8E5FF)),
                                   ),

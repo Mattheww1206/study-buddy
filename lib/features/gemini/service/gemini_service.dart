@@ -242,4 +242,57 @@ class GeminiService {
 
       return result;
     }
+
+    Future<Map<String, dynamic>?> generateFlashcardsFromText({
+      required String extractedText
+    }) async {
+      print('Gemini generating flashcards from uploaded file text');
+
+      final result = await _callWithRetry(() async {
+
+        final prompt = '''You are a flashcard generator. Given the following text extracted from the document, generate
+        a set of flashcards Q&A pairs that covers the key concepts, facts, and important information.
+
+        Text:
+        """
+        $extractedText 
+        """
+
+        Rules:
+        - Generate as many flashcards pairs as the content warrants (minimum 5, maximum 20).
+        - Each question should test understanding of a key concept from the text.
+        - Each answer should be concise and clear.
+        - Also determine a suitable deck title and subject based on the content.
+        - return ONLY a JSON object with this exact structure, nothing else:
+        {
+         "title": "deck title in here",
+         "subject": "subject in here",
+         "flashcards": [
+                      {"question": "question text", "answer": "answer text"},
+                      {"question": "question text", "answer": "answer text"}      
+                      ]
+        }''';
+
+
+        final content = [Content.text(prompt)];
+        final response = await _model.generateContent(content);
+        final text = response.text!;
+        print('Gemini raw response (file): $text');
+
+        final cleaned = text.replaceAll('```json', '')
+                            .replaceAll('```', '')
+                            .replaceAll('\n', ' ')
+                            .replaceAll('\r', '')
+                            .trim();
+
+        final parsed = jsonDecode(cleaned) as Map<String, dynamic>;
+        print('Gemini generated ${(parsed['flashcards'] as List).length} flashcards from file');
+        return parsed;
+      });
+      return result;
+    }
+
+
+
+
 }

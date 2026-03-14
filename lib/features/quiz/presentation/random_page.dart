@@ -118,7 +118,7 @@ class _RandomPageState extends State<RandomPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: dominantColor.withOpacity(0.1),
+                color: dominantColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.exit_to_app_rounded, color: dominantColor, size: 44),
@@ -420,7 +420,7 @@ class _RandomPageState extends State<RandomPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.wifi_off_rounded, size: 80, color: dominantColor.withOpacity(0.4)),
+                Icon(Icons.wifi_off_rounded, size: 80, color: dominantColor.withValues(alpha: 0.4)),
                 const SizedBox(height: 20),
                 Text('Gemini Unavailable',
                     style: TextStyle(
@@ -518,7 +518,7 @@ class _RandomPageState extends State<RandomPage> {
                               border: Border.all(
                                   color: _secondsLeft < 60
                                       ? Colors.red
-                                      : dominantColor.withOpacity(0.2),
+                                      : dominantColor.withValues(alpha: 0.2),
                                   width: 1.5),
                             ),
                             child: Row(
@@ -560,7 +560,7 @@ class _RandomPageState extends State<RandomPage> {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4))
                   ],
@@ -627,7 +627,7 @@ class _RandomPageState extends State<RandomPage> {
                           boxShadow: [
                             if (_canProceed)
                               BoxShadow(
-                                  color: accentColor.withOpacity(0.3),
+                                  color: accentColor.withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4)),
                           ],
@@ -720,7 +720,7 @@ class _RandomPageState extends State<RandomPage> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: dominantColor.withOpacity(0.1))),
+                borderSide: BorderSide(color: dominantColor.withValues(alpha: 0.1))),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
                 borderSide: BorderSide(color: dominantColor, width: 2)),

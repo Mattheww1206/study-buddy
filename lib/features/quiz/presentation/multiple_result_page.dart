@@ -279,7 +279,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                 child: Container(
                                   padding: const EdgeInsets.all(18),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.03),
+                                    color: Colors.black.withValues(alpha: 0.03),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(color: const Color(0xFFE8E5FF)),
                                   ),

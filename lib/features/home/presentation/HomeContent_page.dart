@@ -369,7 +369,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                               BorderRadius.circular(30),
                                           border: Border.all(
                                               color: const Color(0xFF665FBE)
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               width: 1.5)),
                                       padding: const EdgeInsets.all(20),
                                       child: Column(
