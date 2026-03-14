@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/deck/service/deck_service.dart';
+import 'package:studybuddy/features/results/service/result_service.dart';
 
 class MultipleReviewAnswerPage extends StatefulWidget {
   const MultipleReviewAnswerPage({super.key});
@@ -11,6 +15,9 @@ class MultipleReviewAnswerPage extends StatefulWidget {
 }
 
 class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
+  final DeckService _deckService = DeckService();
+  final ResultService _resultService = ResultService();
+  final AchievementService _achievementService = AchievementService();
   List<Map<String, String>> wrongAnswers = [];
   late Deck deck;
   bool _initialized = false;
@@ -18,6 +25,28 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
   final Color dominantColor = const Color(0xFF665FBE);
   final Color secondaryColor = const Color(0xFFFAEEFF);
   final Color accentColor = const Color(0xFF665FBE);
+
+
+  Future<void> _evaluateAchievements() async {
+  try {
+    final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
+    if (userId == null) return;
+
+    final results = await _resultService.getUserResults(userId);
+    final decks = await _deckService.getUserDecks(userId).first;
+    final streak = _resultService.calculateStreak(results);
+
+    await _achievementService.evaluateAndUnlock(
+      userId: userId,
+      results: results,
+      decks: decks,
+      streak: streak,
+      reviewedWrongAnswers: true, 
+    );
+  } catch (e) {
+    print('Achievement eval error: $e');
+  }
+}
 
   @override
   void didChangeDependencies() {
@@ -28,6 +57,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+    _evaluateAchievements();
   }
   
   @override

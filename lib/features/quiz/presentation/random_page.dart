@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
@@ -20,6 +22,8 @@ class RandomPage extends StatefulWidget {
 class _RandomPageState extends State<RandomPage> {
   final QuizService _quizService = QuizService();
   final ResultService _resultService = ResultService();
+  final DeckService _deckService = DeckService();
+  final AchievementService _achievementService = AchievementService();
   final TextEditingController _answerController = TextEditingController();
 
   late Deck _deck;
@@ -262,13 +266,13 @@ class _RandomPageState extends State<RandomPage> {
 
     final wrongAnswers = <Map<String, String>>[];
     for (final data in _quizData) {
-      final type = data['type'] as String;
+      final type = data['type'].toString();
       if (type == 'multiple_choice') {
         if (data['selectedAnswer'] != data['correctAnswer']) {
           wrongAnswers.add({
             'type': 'multiple_choice',
             'question': (data['flashcard'] as Flashcard).question,
-            'correctAnswer': data['correctAnswer'] as String,
+            'correctAnswer': data['correctAnswer'].toString(),
             'selectedAnswer': data['selectedAnswer'] ?? 'No answer',
           });
         }
@@ -276,8 +280,8 @@ class _RandomPageState extends State<RandomPage> {
         if (!(data['isCorrect'] as bool? ?? false)) {
           wrongAnswers.add({
             'type': 'identification',
-            'question': data['question'] as String,
-            'correctAnswer': data['correctAnswer'] as String,
+            'question': data['question'].toString(),
+            'correctAnswer': data['correctAnswer'].toString(),
             'selectedAnswer': data['userAnswer'] as String? ?? '',
           });
         }
@@ -285,7 +289,7 @@ class _RandomPageState extends State<RandomPage> {
         if (data['selectedAnswer'] != data['correctAnswer']) {
           wrongAnswers.add({
             'type': 'true_false',
-            'question': data['statement'] as String,
+            'question': data['statement'].toString(),
             'correctAnswer': data['correctAnswer'] as String,
             'selectedAnswer': data['selectedAnswer'] ?? 'No answer',
           });
@@ -308,6 +312,35 @@ class _RandomPageState extends State<RandomPage> {
       ));
     } catch (e) {
       debugPrint('Error saving result: $e');
+    }
+
+    try {
+      final results = await _resultService.getUserResults(userId);
+      final decks = await _deckService.getUserDecks(userId).first;
+      final streak = _resultService.calculateStreak(results);
+
+      final newlyUnlocked = await _achievementService.evaluateAndUnlock(
+        userId: userId,
+        results: results,
+        decks: decks,
+        streak: streak,
+      );
+
+      if (newlyUnlocked.isNotEmpty && mounted) {
+        final name = AchievementService.allAchievement
+            .firstWhere((a) => a.achieveId == newlyUnlocked.first).title;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(children: [
+            const Icon(Icons.emoji_events, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text('Achievement Unlocked: $name!'),
+          ]),
+          backgroundColor: const Color(0xFF665FBE),
+          duration: const Duration(seconds: 3),
+        ));
+      }
+    } catch (e) {
+      print('Achievement evaluation error: $e');
     }
 
     if (!mounted) return;

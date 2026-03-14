@@ -115,6 +115,7 @@ class AuthService {
         email: data['email'],   
         provider: data['provider'] ?? 'password',
         photoUrl: data['photoUrl'],       
+        streak: data['streak'],
       );
     } on FirebaseAuthException catch (e) {
       throw Exception(_handleLoginAuthError(e));
@@ -277,6 +278,7 @@ class AuthService {
         email: data['email'],
         provider: data['provider'] ?? 'google',
         photoUrl: data['photoUrl'],
+        streak: data['streak'],
       );
 
     } catch (e) {

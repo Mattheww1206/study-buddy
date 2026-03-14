@@ -34,7 +34,7 @@ class StudyResult {
   deckTitle: data['decktitle'] ?? '',  
   mode: data['mode'] ?? '', 
   totalCards: data['totalCards'] ?? 0,
-  correctCount: data['totalCards'] ?? 0,
+  correctCount: data['correctCount'] ?? 0,
   easyCount: data['easyCount'] ?? 0,
   againCount: data['againCount'] ?? 0,
   completedAt: (data['completedAt'] as Timestamp).toDate(), 

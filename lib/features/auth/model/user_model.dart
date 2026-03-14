@@ -4,6 +4,7 @@ class AppUser {
     final String email;
     final String provider;
     final String? photoUrl;
+    int streak;
    
 
     AppUser({
@@ -11,7 +12,8 @@ class AppUser {
         this.username,
         required this.email,
         this.provider = 'password',
-        this.photoUrl
+        this.photoUrl,
+        this.streak = 0,
     });
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
@@ -21,6 +23,7 @@ class AppUser {
       email: data['email'] ?? '',
       provider: data['provider'] ?? 'password',
       photoUrl: data['photoUrl'],
+      streak: data['streak'] ?? 0,
        );
   }
 
@@ -31,6 +34,7 @@ class AppUser {
       'email': email,
       'provider': provider,
       'photoUrl': photoUrl,
+      'streak': streak,
     };
   }
 }

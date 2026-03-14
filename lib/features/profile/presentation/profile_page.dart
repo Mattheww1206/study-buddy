@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/features/Achievements/model/achievement_model.dart';
+import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
@@ -18,12 +20,44 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final DeckService _deckService = DeckService();
   final ResultService _resultService = ResultService();
+  final AchievementService _achievementService = AchievementService();
+  List<Achievement> _achievements = [];
 
   List<StudyResult> _results = [];
   bool _isLoading = true;
   String? _userId;
   bool _initialized = false;
   late Stream<List<Deck>> _decksStream;
+
+  IconData _getIcon(String iconName) {
+  const map = {
+    'handshake': Icons.handshake,
+    'note_add': Icons.note_add,
+    'menu_book': Icons.menu_book,
+    'collections_bookmark': Icons.collections_bookmark,
+    'favorite': Icons.favorite,
+    'quiz': Icons.quiz,
+    'psychology': Icons.psychology,
+    'face': Icons.face,
+    'calendar_month': Icons.calendar_month,
+    'emoji_events': Icons.emoji_events,
+    'star_border': Icons.star_border,
+    'military_tech': Icons.military_tech,
+    'workspace_premium': Icons.workspace_premium,
+    'auto_awesome': Icons.auto_awesome,
+    'explore_outlined': Icons.explore_outlined,
+    'shuffle': Icons.shuffle,
+    'search': Icons.search,
+    'checklist': Icons.checklist,
+    'rule': Icons.rule,
+    'rate_review': Icons.rate_review,
+    'bolt': Icons.bolt,
+    'diamond': Icons.diamond,
+  };
+  return map[iconName] ?? Icons.emoji_events;
+}
+
+  
 
   @override
   void didChangeDependencies() {
@@ -40,9 +74,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadResults() async {
     try {
       final results = await _resultService.getUserResults(_userId!);
+      final decks = await _deckService.getUserDecks(_userId!).first; 
+      final streak = _resultService.calculateStreak(results);
+
+      await _achievementService.evaluateAndUnlock(
+      userId: _userId!,
+      results: results,
+      decks: decks,
+      streak: streak,
+    );
+      final achievements = await _achievementService.getAchievements(_userId!);
       if (!mounted) return;
       setState(() {
         _results = results;
+        _achievements = achievements;
         _isLoading = false;
       });
     } catch (e) {
@@ -76,18 +121,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final dailyPercent = (dailyProgress * 100).toInt();
     final weeklyPercent = (weeklyProgress * 100).toInt();
 
-    final List<Map<String, dynamic>> achievements = [
-      {'title': 'First Deck', 'icon': Icons.style, 'progress': 1.0},
-      {'title': 'Quiz Master', 'icon': Icons.psychology, 'progress': 0.6},
-      {'title': '7-Day Streak', 'icon': Icons.local_fire_department, 'progress': 0.3},
-      {'title': 'Early Bird', 'icon': Icons.wb_sunny, 'progress': 1.0},
-    ];
-
-    final int totalAchievements = achievements.length;
-    final int unlockedCount = achievements.where((a) => a['progress'] == 1.0).length;
-    final double overallProgress = totalAchievements > 0 ? unlockedCount / totalAchievements : 0.0;
-    final int overallPercent = (overallProgress * 100).toInt();
-    final List<Map<String, dynamic>> unlockedList = achievements.where((a) => a['progress'] == 1.0).toList();
+    final unlockedList = _achievements.where((a) => a.isUnlocked).toList();
+    final unlockedCount = unlockedList.length;
+    final totalAchievements = _achievements.length;
+    final overallProgress = totalAchievements > 0 ? unlockedCount / totalAchievements : 0.0;
+    final overallPercent = (overallProgress * 100).toInt();
 
     return SafeArea(
       child: Container(
@@ -234,8 +272,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                           ),
-
-            // --- RECENT PERFORMANCE SECTION ---
                                     Transform.translate(
                                     offset: const Offset(0, -20),
                                     child: Container(
@@ -322,7 +358,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       return Container(
                                         width: 120, margin: const EdgeInsets.symmetric(horizontal: 8), padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(color: const Color(0xFFFAEEFF).withAlpha(127), borderRadius: BorderRadius.circular(20)),
-                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(a['icon'], size: 40, color: const Color(0xFFFD9519)), const SizedBox(height: 8), Text(a['title'], textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold))]),
+                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [ Icon(_getIcon(a.icon), size: 40, color: const Color(0xFFFD9519)) , const SizedBox(height: 8), Text(a.title, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold))]),
                                       );
                                     },
                                   ),

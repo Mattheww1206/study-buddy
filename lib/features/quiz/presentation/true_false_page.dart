@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/features/Achievements/model/achievement_model.dart';
+import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
@@ -18,6 +21,8 @@ class TrueFalsePage extends StatefulWidget {
 class _TrueFalsePageState extends State<TrueFalsePage> {
   final ResultService _resultService = ResultService();
   final QuizService _quizService = QuizService();
+  final DeckService _deckService = DeckService();
+  final AchievementService _achievementService = AchievementService();
   late Deck _deck;
   late DateTime _startTime;
   late int _numberOfQuestions;
@@ -127,7 +132,6 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
     }
   }
 
-  // 👈 DESIGN UPDATE: Ang hiningi mong Exit Confirmation Design
   Future<bool> _handleExitConfirmation() async {
     final bool? result = await showDialog<bool>(
       context: context,
@@ -253,6 +257,35 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
       ));
     } catch (e) {
       debugPrint('Error saving result: $e');
+    }
+
+    try {
+      final results = await _resultService.getUserResults(userId);
+      final decks = await _deckService.getUserDecks(userId).first;
+      final streak = _resultService.calculateStreak(results);
+
+      final newlyUnlocked = await _achievementService.evaluateAndUnlock(
+        userId: userId,
+        results: results,
+        decks: decks,
+        streak: streak,
+      );
+
+      if (newlyUnlocked.isNotEmpty && mounted) {
+        final name = AchievementService.allAchievement
+            .firstWhere((a) => a.achieveId == newlyUnlocked.first).title;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Row(children: [
+            const Icon(Icons.emoji_events, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text('Achievement Unlocked: $name!'),
+          ]),
+          backgroundColor: const Color(0xFF665FBE),
+          duration: const Duration(seconds: 3),
+        ));
+      }
+    } catch (e) {
+      print('Achievement evaluation error: $e');
     }
 
     if (!mounted) return;

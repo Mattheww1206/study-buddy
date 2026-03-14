@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
+import 'package:studybuddy/features/results/service/result_service.dart';
 
 class CreateDeckPage extends StatefulWidget {
   const CreateDeckPage({super.key});
@@ -13,6 +15,7 @@ class CreateDeckPage extends StatefulWidget {
 
 class _CreateDeckPageState extends State<CreateDeckPage> {
   final DeckService _deckService = DeckService();
+  final ResultService _resultService = ResultService();
   final _titleController = TextEditingController();
   final _subjectController = TextEditingController();
   bool _isLoading = false;
@@ -179,6 +182,18 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       messenger.showSnackBar(
         SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
       );
+
+      final decks = await _deckService.getUserDecks(userProvider.user!.userId).first;
+      final results = await _resultService.getUserResults(userProvider.user!.userId);
+      final streak = _resultService.calculateStreak(results);
+
+      AchievementService().evaluateAndUnlock(
+          userId: userProvider.user!.userId,
+          results: results,
+          decks: decks,
+          streak: streak,
+      ).catchError((e) => print('Achievement eval error: $e'));
+
     } catch (e) {
       messenger.showSnackBar(const SnackBar(content: Text('Failed to save deck.')));
     } finally {
