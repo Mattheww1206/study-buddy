@@ -72,8 +72,13 @@ class DeckService {
           .toList();
 
       if (cards.isNotEmpty) {
-        // ✅ Update local cache whenever we get fresh data from Firestore
+        final localCards = await _localStorage.loadFlashcards(deckId);
+        final localIds = localCards?.map((c) => c.cardId).toSet() ?? {};
+        final remoteIds = cards.map((c) => c.cardId).toSet();
+
+        if (localIds.length != remoteIds.length || !localIds.containsAll(remoteIds)) {
         await _localStorage.saveFlashcards(deckId, cards);
+      }
         return cards;
       }
 

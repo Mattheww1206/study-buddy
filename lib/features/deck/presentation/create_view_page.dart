@@ -23,6 +23,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
   int editingIndex = -1;
   final TextEditingController _termController = TextEditingController();
   final TextEditingController _defController = TextEditingController();
+  late TextEditingController _titleEditController = TextEditingController();
+  late TextEditingController _subjectEditController = TextEditingController();
 
   final List<Map<String, TextEditingController>> _newCards = [];
 
@@ -31,6 +33,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+      _titleEditController = TextEditingController(text: _deck.title);
+      _subjectEditController = TextEditingController(text: _deck.subject);
       _loadFlashcards();
     });
   }
@@ -39,6 +43,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
   void dispose() {
     _termController.dispose();
     _defController.dispose();
+    _titleEditController.dispose();
+    _subjectEditController.dispose();
     for (final card in _newCards) {
       card['term']?.dispose();
       card['def']?.dispose();
@@ -193,8 +199,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
        _deckService.updateDeck(
         _deck.deckId,
         {
-          'title': _deck.title,
-          'subject': _deck.subject,
+          'title': _titleEditController,
+          'subject': _subjectEditController,
         },
       );
 
@@ -258,7 +264,15 @@ class _CreateViewPageState extends State<CreateViewPage> {
                             children: [
                               const Text('SUBJECT', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
-                              Text(_deck.subject, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              TextField(
+                                controller: _subjectEditController,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -277,7 +291,15 @@ class _CreateViewPageState extends State<CreateViewPage> {
                             children: [
                               const Text('TITLE', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
-                              Text(_deck.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFED9E4F))),
+                              TextField(
+                                controller: _titleEditController,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
                             ],
                           ),
                         ),

@@ -96,6 +96,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
         userId: userId,
         deckId: _deck.deckId,
         deckTitle: _deck.title,
+        deckSubject: _deck.subject,
         mode: 'flashcard',
         totalCards: totalCards,
         correctCount: _easyCount,

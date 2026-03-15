@@ -5,6 +5,7 @@ class StudyResult {
   final String userId;
   final String deckId;
   final String deckTitle;
+  final String deckSubject;
   final String mode;
   final int totalCards;
   final int correctCount;
@@ -18,6 +19,7 @@ class StudyResult {
   required this.userId,
   required this.deckId,
   required this.deckTitle,
+  required this.deckSubject,
   required this.mode,
   required this.totalCards,
   this.correctCount = 0,
@@ -31,7 +33,8 @@ class StudyResult {
   resultId: id, 
   userId: data['userId'] ?? '', 
   deckId: data['deckId'] ?? '', 
-  deckTitle: data['decktitle'] ?? '',  
+  deckTitle: data['deckTitle'] ?? '',  
+  deckSubject: data['deckSubject'] ?? '',
   mode: data['mode'] ?? '', 
   totalCards: data['totalCards'] ?? 0,
   correctCount: data['correctCount'] ?? 0,
@@ -46,6 +49,7 @@ class StudyResult {
     'userId': userId,
     'deckId': deckId,
     'deckTitle': deckTitle,
+    'deckSubject': deckSubject,
     'mode': mode,
     'totalCards': totalCards,
     'correctCount': correctCount,

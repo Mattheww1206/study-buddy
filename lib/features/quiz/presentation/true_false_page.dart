@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:studybuddy/features/Achievements/model/achievement_model.dart';
 import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
@@ -248,6 +247,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
         userId: userId,
         deckId: _deck.deckId,
         deckTitle: _deck.title,
+        deckSubject: _deck.subject,
         mode: 'true_false',
         totalCards: totalCards,
         correctCount: _correctCount,
@@ -309,6 +309,13 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentData = _quizData[_currentIndex];
+    final statement = currentData['statement'] as String;
+    final totalQuestions = _quizData.length;
+    final progressValue = (_currentIndex + 1) / totalQuestions;
+    final progressPercent = (progressValue * 100).toInt();
+    final isLastQuestion = _currentIndex >= totalQuestions - 1;
+
     if (_isLoading) {
       return Scaffold(
         backgroundColor: secondaryColor,
@@ -384,14 +391,6 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
         ),
       );
     }
-
-    final currentData = _quizData[_currentIndex];
-    final statement = currentData['statement'] as String;
-    final totalQuestions = _quizData.length;
-    final progressValue = (_currentIndex + 1) / totalQuestions;
-    final progressPercent = (progressValue * 100).toInt();
-    final isLastQuestion = _currentIndex >= totalQuestions - 1;
-
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(

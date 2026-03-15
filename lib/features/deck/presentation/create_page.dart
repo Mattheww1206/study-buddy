@@ -91,7 +91,7 @@ class _CreatePageState extends State<CreatePage> {
               _buildModalOption(
                 icon: Icons.upload_file_rounded,
                 title: 'Upload Files',
-                subtitle: 'Generate cards from PDF or images',
+                subtitle: 'Generate cards from PDF, Docx, Doc',
                 iconBg: const Color(0xFFE8F5E9),
                 iconColor: Colors.green,
                 onTap: () {
@@ -502,7 +502,7 @@ class _CreatePageState extends State<CreatePage> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${deck.totalCards} Cards', 
+                                                  '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}', 
                                                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                                                 ),
                                               ],

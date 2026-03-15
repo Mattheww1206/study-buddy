@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
@@ -21,6 +22,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
   final DeckService _deckService = DeckService();
   final GeminiService _geminiService = GeminiService();
   final FileTextExtractorService _extractorService = FileTextExtractorService();
+  late ConnectivityProvider _connectivityProvider;
 
   final Color colorDominant = const Color(0xFF665FBE); 
   final Color colorSecondary = const Color(0xFFF8F2FF);
@@ -49,15 +51,27 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _connectivityProvider = Provider.of<ConnectivityProvider>(context, listen: false);
+  }
+
   Future<void> _processAndGenerate() async {
-    if (selectedFile == null || _isProcessing) return;
- 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.user?.userId;
-    if (userId == null) return;
- 
     final navigator = Navigator.of(context);
     final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+    
+    if (selectedFile == null || _isProcessing) return;
+    
+    final online = await _connectivityProvider.checkRealInternet();
+    if (!online) {
+    _showNoInternetDialog();
+    return; 
+   }
+    
+    if (userId == null) return;
  
     setState(() {
       _isProcessing = true;
@@ -154,6 +168,35 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
     if (bytes < 1024) return '${bytes}B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)}KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
+  }
+
+  void _showNoInternetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.wifi_off, color: Colors.red),
+            SizedBox(width: 10),
+            Text('No Internet'),
+          ],
+        ),
+        content: const Text(
+          'Cant generate flashcards from this file because there is no internet'
+          'connection.\n\nPlease connect to the '
+          'internet to be able to generate flashcards from file.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFF665FBE))),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

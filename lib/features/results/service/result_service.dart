@@ -11,6 +11,7 @@ class ResultService {
       userId: result.userId,
       deckId: result.deckId,
       deckTitle: result.deckTitle,
+      deckSubject: result.deckSubject,
       mode: result.mode,
       totalCards: result.totalCards,
       correctCount: result.correctCount,
@@ -52,32 +53,31 @@ class ResultService {
 }
 
   int calculateStreak(List<StudyResult> results) {
-    if (results.isEmpty) return 0;
+  if (results.isEmpty) return 0;
 
-    final dates = results
-        .map((r) => DateTime(
-            r.completedAt.year, r.completedAt.month, r.completedAt.day))
-        .toSet()
-        .toList()
-      ..sort((a, b) => b.compareTo(a));
+  final dates = results
+      .map((r) => DateTime(r.completedAt.year, r.completedAt.month, r.completedAt.day))
+      .toSet()
+      .toList()
+    ..sort((a, b) => b.compareTo(a));
 
-      print('Unique study dates: $dates');
+  final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final yesterday = today.subtract(const Duration(days: 1));
 
-    int streak = 0;
-    DateTime expected = DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  if (dates.first.isBefore(yesterday)) return 0;
 
-    for (final date in dates) {
-      print('Checking date: $date vs expected: $expected');
-      if (date == expected) {
-        streak++;
-        expected = expected.subtract(const Duration(days: 1));
-      } else {
-        break;
-      }
+  DateTime expected = dates.first == today ? today : yesterday;
+  int streak = 0;
+  for (final date in dates) {
+    if (date == expected) {
+      streak++;
+      expected = expected.subtract(const Duration(days: 1));
+    } else {
+      break;
     }
-    return streak;
   }
+  return streak;
+}
 
   int todayQuizCount(List<StudyResult> results) {
     final today = DateTime.now();

@@ -243,6 +243,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
         userId: userId,
         deckId: _deck.deckId,
         deckTitle: _deck.title,
+        deckSubject: _deck.subject,
         mode: 'identification',
         totalCards: totalCards,
         correctCount: _correctCount,

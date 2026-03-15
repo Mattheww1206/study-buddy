@@ -166,6 +166,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
 
     try {
       final cards = cardControllers.map((card) => {
@@ -182,6 +183,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       messenger.showSnackBar(
         SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
       );
+      nav.pop();
 
       final decks = await _deckService.getUserDecks(userProvider.user!.userId).first;
       final results = await _resultService.getUserResults(userProvider.user!.userId);

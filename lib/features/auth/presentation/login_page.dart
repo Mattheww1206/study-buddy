@@ -265,7 +265,6 @@ class _LoginPageState extends State<LoginPage> {
                         CustomTextfield(
                           controller: _emailController,
                           hintText: 'Email or Username',
-                          errorText: _emailError,
                           keyboardType: TextInputType.emailAddress,
                           fillColor: _themeBackgroundColor,
                           validator: (value) {
@@ -279,7 +278,6 @@ class _LoginPageState extends State<LoginPage> {
                         CustomTextfield(
                           controller: _passwordController,
                           hintText: 'Password',
-                          errorText: _passwordError,
                           isPassword: true,
                           fillColor: _themeBackgroundColor,
                           validator: (value) {
@@ -292,6 +290,19 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
+                        if (_emailError != null || _passwordError != null) ...[
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 13),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                _emailError ?? _passwordError!,
+                                style: const TextStyle(color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(

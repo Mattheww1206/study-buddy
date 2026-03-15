@@ -32,8 +32,7 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
     if (_initialized) return;
     _initialized = true;
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _correctCount = args['correctCount'] as int;
     _totalCards = args['totalCards'] as int;
     wrongAnswers =
@@ -280,120 +279,112 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text('+1 day',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14)),
-                                        Text('STREAK',
-                                            style: TextStyle(
-                                                fontSize: 9,
-                                                color: Colors.black38,
-                                                fontWeight:
-                                                    FontWeight.bold)),
+                                          style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14)),
+                                          Text('STREAK',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: Colors.black38,
+                                            fontWeight:FontWeight.bold)),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              )
-                              : Container(
-                                  padding: const EdgeInsets.all(18),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.02),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                        color: const Color(0xFFE8E5FF)),
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      "Daily Streak\nClaimed",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 10, 
-                                        color: Colors.black26, 
-                                        fontWeight: FontWeight.bold
+                                  )
+                                  : Container(
+                                      padding: const EdgeInsets.all(18),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.02),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: const Color(0xFFE8E5FF)),
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          "Daily Streak\nClaimed",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10, 
+                                            color: Colors.black26, 
+                                            fontWeight: FontWeight.bold
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 25),
-
-                        // review wrong answers
-                        if (wrongAnswers.isNotEmpty) ...[
-                          ElevatedButton(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              'iden_review',
-                              arguments: {
-                                'wrongAnswers': wrongAnswers,
-                              },
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                              foregroundColor: secondaryColor,
-                              minimumSize: const Size(double.infinity, 58),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              elevation: 0,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.fact_check, size: 20),
-                                SizedBox(width: 10),
-                                Text('Review Answers',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-
-                        // back to home
-                        ElevatedButton(
-                          onPressed: (){
-                              Navigator.pushNamedAndRemoveUntil(
-                              context, 
-                              'home', 
-                              (route) => false,
-                              arguments: 2, 
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: dominantColor,
-                            minimumSize: const Size(double.infinity, 58),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            side: const BorderSide(
-                                color: Color(0xFFE8E5FF)),
-                            elevation: 0,
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.home_rounded, size: 20),
-                              SizedBox(width: 10),
-                              Text('Back to Study',
-                                  style: TextStyle(
+                            const SizedBox(height: 25),
+                            // review wrong answers
+                            if (wrongAnswers.isNotEmpty) ...[
+                              ElevatedButton(
+                                onPressed: () => Navigator.pushNamed(
+                                  context,
+                                  'iden_review',
+                                  arguments: {
+                                    'wrongAnswers': wrongAnswers,
+                                  },
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: accentColor,
+                                  foregroundColor: secondaryColor,
+                                  minimumSize: const Size(double.infinity, 58),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.fact_check, size: 20),
+                                    SizedBox(width: 10),
+                                    Text('Review Answers',
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 12),
                             ],
-                          ),
+                            // back to home
+                            ElevatedButton(
+                              onPressed: (){
+                                Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false, arguments: 2,);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: dominantColor,
+                                minimumSize: const Size(double.infinity, 58),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                                side: const BorderSide(
+                                  color: Color(0xFFE8E5FF)),
+                                elevation: 0,
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.home_rounded, size: 20),
+                                  SizedBox(width: 10),
+                                  Text('Back to Study',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }

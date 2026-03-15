@@ -202,7 +202,7 @@ class _StudyPageState extends State<StudyPage> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                '${deck.totalCards} Flashcards • ${deck.subject}',
+                                                '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}',
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                   color: Colors.grey,

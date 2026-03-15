@@ -13,7 +13,7 @@ class QuizModePage extends StatefulWidget {
 
 class _QuizModePageState extends State<QuizModePage> {
   final QuizService _quizService = QuizService();
-  late ConnectivityProvider _connectivityProvider;
+  late ConnectivityProvider _connectivityProvider = ConnectivityProvider();
   String selectedType = '';
 
   bool _isChecking = false;

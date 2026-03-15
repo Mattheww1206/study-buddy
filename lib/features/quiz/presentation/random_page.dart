@@ -303,6 +303,7 @@ class _RandomPageState extends State<RandomPage> {
         userId: userId,
         deckId: _deck.deckId,
         deckTitle: _deck.title,
+        deckSubject: _deck.subject,
         mode: 'random',
         totalCards: totalCards,
         correctCount: _correctCount,

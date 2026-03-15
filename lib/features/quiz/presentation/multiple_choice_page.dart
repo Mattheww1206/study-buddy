@@ -268,6 +268,7 @@ Future<bool> _handleExitConfirmation() async {
         userId: userId,
         deckId: _deck.deckId,
         deckTitle: _deck.title,
+        deckSubject: _deck.subject,
         mode: 'multiple_choice',
         totalCards: totalCards,
         correctCount: _correctCount,
