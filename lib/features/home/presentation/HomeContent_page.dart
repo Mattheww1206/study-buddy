@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// Google Fonts import removed
+import 'package:flutter/services.dart'; // Import para sa status bar control
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
@@ -46,13 +46,18 @@ class _HomeContentPageState extends State<HomeContentPage> {
         _isLoading = false;
       });
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final lastResult = _results.isNotEmpty ? _results.first : null;
+    // FIX: Ginagawang visible ang status bar icons sa light background
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, 
+      statusBarIconBrightness: Brightness.dark, // Para sa Android (itim na icons)
+      statusBarBrightness: Brightness.light,    // Para sa iOS (itim na icons)
+    ));
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAEEFF),
@@ -71,7 +76,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 60),
+                      // Naglagay ng SafeArea space para hindi matakpan ng status bar ang content
+                      const SafeArea(child: SizedBox(height: 10)),
 
                       // Pinned decks
                       if (pinnedDecks.isNotEmpty)
@@ -97,7 +103,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                       color: Color(0xFFFF7A01), size: 24),
                                   SizedBox(width: 10),
                                   Text('Pinned decks',
-                                      style: TextStyle( // Changed from GoogleFonts.lora
+                                      style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold)),
                                 ],
@@ -139,7 +145,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                               deck.title,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 20),
@@ -147,7 +153,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                             const SizedBox(height: 8),
                                             Text(
                                               '${deck.totalCards} Flashcards',
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Colors.white70,
                                                   fontSize: 14),
                                             ),
@@ -177,12 +183,12 @@ class _HomeContentPageState extends State<HomeContentPage> {
                             Column(
                               children: [
                                 Text('${decks.length}',
-                                    style: const TextStyle( // Changed
+                                    style: const TextStyle(
                                         fontSize: 38,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF665FBE))),
                                 const Text('DECKS CREATED',
-                                    style: TextStyle( // Changed
+                                    style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.blueGrey,
                                         fontWeight: FontWeight.w900)),
@@ -195,12 +201,12 @@ class _HomeContentPageState extends State<HomeContentPage> {
                             Column(
                               children: [
                                 Text('${_results.where((r) => r.mode != 'flashcard').length}',
-                                    style: const TextStyle( // Changed
+                                    style: const TextStyle(
                                         fontSize: 38,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF665FBE))),
                                 const Text('QUIZ TAKEN',
-                                    style: TextStyle( // Changed
+                                    style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.blueGrey,
                                         fontWeight: FontWeight.w900)),
@@ -212,65 +218,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 25),
 
-                      // Continue Last Session
-                      if (!_isLoading && lastResult != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Container(
-                            padding: const EdgeInsets.all(25),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFF665FBE),
-                                borderRadius: BorderRadius.circular(35)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Continue Last Session!',
-                                    style: TextStyle( // Changed
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 22)),
-                                const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 6),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xFFFF7A01),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Text(
-                                    '${((lastResult.correctCount / lastResult.totalCards) * 100).toInt()}% Last Score',
-                                    style: const TextStyle( // Changed
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  lastResult.deckTitle,
-                                  style: const TextStyle( // Changed
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  lastResult.mode,
-                                  style: const TextStyle( // Changed
-                                      color: Colors.white70, fontSize: 13),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                      const SizedBox(height: 25),
-
                       // Recent Decks
                       const Padding(
                         padding: EdgeInsets.only(left: 25),
                         child: Text('Recent Decks',
-                            style: TextStyle( // Changed
+                            style: TextStyle(
                                 color: Color(0xFF665FBE),
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold)),
@@ -312,13 +264,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                           Text(deck.title,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 18)),
                                           const SizedBox(height: 8),
                                           Text('${deck.totalCards} Cards',
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Colors.white70,
                                                   fontSize: 14)),
                                         ],
@@ -331,11 +283,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
                       const SizedBox(height: 35),
 
-                      // New Added Decks
+                      // Newly Added
                       const Padding(
                         padding: EdgeInsets.only(left: 25),
                         child: Text('Newly added decks',
-                            style: TextStyle( // Changed
+                            style: TextStyle(
                                 color: Color(0xFF665FBE),
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold)),
@@ -381,13 +333,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
                                           Text(deck.title,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Color(0xFF665FBE),
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 18)),
                                           const SizedBox(height: 8),
                                           Text('${deck.totalCards} Cards',
-                                              style: const TextStyle( // Changed
+                                              style: const TextStyle(
                                                   color: Colors.black54,
                                                   fontSize: 14)),
                                         ],

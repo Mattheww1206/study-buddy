@@ -19,10 +19,10 @@ class _LandingPageState extends State<LandingPage> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Color.fromARGB(255, 254, 254, 255),
-        statusBarIconBrightness: Brightness.light,
+        statusBarColor: const Color(0xFFFAEEFF),
+        statusBarIconBrightness: Brightness.dark,
         systemNavigationBarColor: Color.fromARGB(255, 255, 255, 255),
-        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
   }

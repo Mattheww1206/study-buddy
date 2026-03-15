@@ -209,7 +209,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
 
                         CustomButton(
-                          text: 'Create Account →',
+                          text: 'Create Account ',
                           backgroundColor: const Color(0xFFF27E2B), // Orange
                           textColor: Colors.white,
                           fontSize: 20,

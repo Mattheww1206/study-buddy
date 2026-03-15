@@ -14,10 +14,10 @@ class _OpeningPageState extends State<OpeningPage> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF16056B),
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF16056B),
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Color.fromARGB(255, 255, 255, 255),
+        systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
   }

@@ -224,25 +224,24 @@ class _CreatePageState extends State<CreatePage> {
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 16),
         ),
-        actionsPadding: const EdgeInsets.fromLTRB(25, 0, 25, 25), // Nilagyan ng sapat na space sa ilalim
+        actionsPadding: const EdgeInsets.fromLTRB(25, 0, 25, 25),
         actions: [
           Row(
             children: [
-              // --- CANCEL BUTTON (WITH BLACK BORDER) ---
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context, false),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.black, width: 1.2), // Explicit black border
+                    side: const BorderSide(color: Colors.black, width: 1.2),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18), // Match sa screenshot mo
+                      borderRadius: BorderRadius.circular(18),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
                   child: const Text(
                     "CANCEL", 
                     style: TextStyle(
-                      color: Colors.grey, // Grey text based on image
+                      color: Colors.grey,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     )
@@ -250,12 +249,11 @@ class _CreatePageState extends State<CreatePage> {
                 ),
               ),
               const SizedBox(width: 15),
-              // --- DELETE BUTTON (SOLID RED) ---
               Expanded(
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context, true),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5252), // Vibrant Red
+                    backgroundColor: const Color(0xFFFF5252),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -303,6 +301,29 @@ class _CreatePageState extends State<CreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorSecondary,
+      floatingActionButton: StreamBuilder<List<Deck>>(
+        stream: _decksStream,
+        builder: (context, snapshot) {
+          final decks = snapshot.data ?? [];
+          if (isEditMode) {
+            return selectedDecksIds.isNotEmpty
+                ? FloatingActionButton.extended(
+                    onPressed: () => _showActionOptions(decks),
+                    label: Text('Manage (${selectedDecksIds.length})'),
+                    icon: const Icon(Icons.edit_note_rounded),
+                    backgroundColor: colorDominant,
+                  )
+                : const SizedBox.shrink();
+          } else {
+            return FloatingActionButton(
+              onPressed: _showAddOptions,
+              backgroundColor: colorAccent,
+              elevation: 4,
+              child: const Icon(Icons.add, color: Colors.white, size: 35),
+            );
+          }
+        }
+      ),
       body: Stack(
         children: [
           Column(
@@ -323,56 +344,40 @@ class _CreatePageState extends State<CreatePage> {
                       deck.title.toLowerCase().contains(_searchQuery) ||
                       deck.subject.toLowerCase().contains(_searchQuery)).toList();
 
-                    return Scaffold(
-                      backgroundColor: Colors.transparent,
-                      floatingActionButton: isEditMode
-                          ? (selectedDecksIds.isNotEmpty
-                              ? FloatingActionButton.extended(
-                                  onPressed: () => _showActionOptions(sortedDecks),
-                                  label: Text('Manage (${selectedDecksIds.length})'),
-                                  icon: const Icon(Icons.edit_note_rounded),
-                                  backgroundColor: colorDominant,
-                                )
-                              : null)
-                          : FloatingActionButton(
-                              onPressed: _showAddOptions,
-                              backgroundColor: colorAccent,
-                              elevation: 4,
-                              child: const Icon(Icons.add, color: Colors.white, size: 35),
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Column(
+                        children: [
+                          // Search Bar
+                          Container(
+                            decoration: BoxDecoration(
+                              color: colorWhite,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(color: colorDominant.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 10))
+                              ],
                             ),
-                      body: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                        child: Column(
-                          children: [
-                            // Search Bar
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorWhite,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(color: colorDominant.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 10))
-                                ],
-                              ),
-                              child: TextField(
-                                controller: _searchController,
-                                onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
-                                decoration: InputDecoration(
-                                  hintText: 'Search deck',
-                                  hintStyle: TextStyle(color: colorDominant.withValues(alpha: 0.4)),
-                                  prefixIcon: Icon(Icons.search_rounded, color: colorDominant),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                                ),
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+                              decoration: InputDecoration(
+                                hintText: 'Search deck',
+                                hintStyle: TextStyle(color: colorDominant.withValues(alpha: 0.4)),
+                                prefixIcon: Icon(Icons.search_rounded, color: colorDominant),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 15),
                               ),
                             ),
-                            const SizedBox(height: 35),
-                            
-                            // Header Section
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Column(
+                          ),
+                          const SizedBox(height: 35),
+                          
+                          // Header Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -382,7 +387,8 @@ class _CreatePageState extends State<CreatePage> {
                                     ),
                                     Text(
                                       'My Decks', 
-                                      style: TextStyle(color: colorDominant, fontSize: 32, fontWeight: FontWeight.bold, height: 1.0)
+                                      style: TextStyle(color: colorDominant, fontSize: 32, fontWeight: FontWeight.bold, height: 1.0),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 4),
                                     GestureDetector(
@@ -401,9 +407,12 @@ class _CreatePageState extends State<CreatePage> {
                                     ),
                                   ],
                                 ),
-                                Padding(
+                              ),
+                              Flexible(
+                                child: Padding(
                                   padding: const EdgeInsets.only(bottom: 25),
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Padding(
@@ -417,82 +426,103 @@ class _CreatePageState extends State<CreatePage> {
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                            const SizedBox(height: 25),
-                            
-                            // Deck List
-                            ...filteredDecks.map((deck) {
-                              bool isSelected = selectedDecksIds.contains(deck.deckId);
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: GestureDetector(
-                                  onTap: isEditMode ? () => _toggleSelection(deck.deckId) : () {
-                                    Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
-                                    Navigator.pushNamed(context, 'create_view');
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    padding: const EdgeInsets.all(18),
-                                    decoration: BoxDecoration(
-                                      color: colorWhite,
-                                      borderRadius: BorderRadius.circular(24),
-                                      border: Border.all(color: isSelected ? colorDominant : Colors.transparent, width: 2),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: isSelected ? colorDominant.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.03), 
-                                          blurRadius: 15, 
-                                          offset: const Offset(0, 8)
-                                        )
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        if (isEditMode)
-                                          Padding(
-                                            padding: const EdgeInsets.only(right: 10),
-                                            child: Icon(
-                                              isSelected ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
-                                              color: colorDominant,
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 25),
+                          
+                          // --- UPDATED DYNAMIC DECK LIST ---
+                          ...filteredDecks.map((deck) {
+                            bool isSelected = selectedDecksIds.contains(deck.deckId);
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: GestureDetector(
+                                onTap: isEditMode ? () => _toggleSelection(deck.deckId) : () {
+                                  Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
+                                  Navigator.pushNamed(context, 'create_view');
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(18),
+                                  // Inalis ang fixed height para lumaki kusa
+                                  decoration: BoxDecoration(
+                                    color: colorWhite,
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(color: isSelected ? colorDominant : Colors.transparent, width: 2),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: isSelected ? colorDominant.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.03), 
+                                        blurRadius: 15, 
+                                        offset: const Offset(0, 8)
+                                      )
+                                    ],
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start, // Align to top para sa mahabang text
+                                    children: [
+                                      if (isEditMode)
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 10, top: 12),
+                                          child: Icon(
+                                            isSelected ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
+                                            color: colorDominant,
+                                          ),
+                                        ),
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(color: colorSecondary, borderRadius: BorderRadius.circular(15)),
+                                        child: Icon(Icons.collections_bookmark_rounded, color: colorDominant, size: 30),
+                                      ),
+                                      const SizedBox(width: 18),
+                                      // Ginamitan ng Expanded para ang column ay hindi mag-overflow horizontally
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min, // Mahalaga ito para sa dynamic height
+                                          children: [
+                                            Text(
+                                              deck.title, 
+                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorDominant),
+                                              softWrap: true, // Payagan ang pag-wrap sa next line
                                             ),
-                                          ),
-                                        Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(color: colorSecondary, borderRadius: BorderRadius.circular(15)),
-                                          child: Icon(Icons.collections_bookmark_rounded, color: colorDominant, size: 30),
-                                        ),
-                                        const SizedBox(width: 18),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(deck.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorDominant)),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                    decoration: BoxDecoration(color: colorAccent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(5)),
-                                                    child: Text(deck.subject, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorAccent)),
+                                            const SizedBox(height: 6),
+                                            // Wrap Row in a Wrap widget just in case subject and cards count also get too long
+                                            Wrap(
+                                              crossAxisAlignment: WrapCrossAlignment.center,
+                                              spacing: 8,
+                                              runSpacing: 4,
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                  decoration: BoxDecoration(color: colorAccent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(5)),
+                                                  child: Text(
+                                                    deck.subject, 
+                                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorAccent),
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  Text('${deck.totalCards} Cards', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                                ),
+                                                Text(
+                                                  '${deck.totalCards} Cards', 
+                                                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                        if (deck.isPinned) Icon(Icons.push_pin_rounded, color: colorAccent, size: 20),
-                                      ],
-                                    ),
+                                      ),
+                                      if (deck.isPinned) 
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Icon(Icons.push_pin_rounded, color: colorAccent, size: 20),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            }),
-                            const SizedBox(height: 100),
-                          ],
-                        ),
+                              ),
+                            );
+                          }),
+                          const SizedBox(height: 100),
+                        ],
                       ),
                     );
                   },
