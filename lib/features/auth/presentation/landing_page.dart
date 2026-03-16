@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:studybuddy/services/notification_service.dart';
 import 'package:studybuddy/widgets/custom_button.dart';
 
 
@@ -72,7 +73,7 @@ class _LandingPageState extends State<LandingPage> {
                 fontSize: 32,
                 height: 66,
                 width: 279,
-                onTap: () {
+                onTap: ()  async {
                   Navigator.pushNamed(context, 'login');
                 },
               ),

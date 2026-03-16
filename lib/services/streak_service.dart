@@ -37,7 +37,7 @@ class StreakService {
 
   await FirebaseFirestore.instance.collection('users').doc(userId).update({'streak': streak});
   if (streak > 0) {
-    await StreakNotificationService.instance.cancelEveningReminder();
+    await StreakNotificationService.instance.cancelUpcomingRemindersForToday();
   }
 
   return streak;

@@ -77,8 +77,8 @@ class _RegisterPageState extends State<RegisterPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.pop(context); // Go back to login
+                  Navigator.pop(context); 
+                  Navigator.pop(context); 
                 },
                 child: const Text("OK"),
               ),
@@ -105,20 +105,20 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               const SizedBox(height: 10),
               
-              // Fox Logo Header
+           
               Center(
                 child: Image.asset(
                   'assets/study.png',
-                  width: 180, // Standardized size
+                  width: 180, 
                   height: 180,
                   fit: BoxFit.contain,
                 ),
               ),
 
-              // Inilapit ang text sa logo
+          
               Text(
                 'Join StudyBuddy!',
-                style: GoogleFonts.fredoka( // Consistent font with Login
+                style: GoogleFonts.fredoka( 
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -135,7 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               const SizedBox(height: 15),
 
-              // Main White Container (The Card)
+            
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
@@ -210,7 +210,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                         CustomButton(
                           text: 'Create Account ',
-                          backgroundColor: const Color(0xFFF27E2B), // Orange
+                          backgroundColor: const Color(0xFFF27E2B), 
                           textColor: Colors.white,
                           fontSize: 20,
                           height: 55,
@@ -237,7 +237,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.pop(context); // Babalik sa Login page
+                                    Navigator.pop(context); 
                                   },
                               ),
                             ],

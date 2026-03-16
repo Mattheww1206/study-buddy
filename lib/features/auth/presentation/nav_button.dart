@@ -13,7 +13,6 @@ class NavButton extends StatefulWidget {
 
 class _NavButtonState extends State<NavButton> {
   int _selectedIndex = 0;
-  // FLAG: Para masiguro na isang beses lang natin kukunin ang index galing sa arguments
   bool _isInitialLoad = true; 
 
   final List<Widget> _pages = const [
@@ -27,13 +26,12 @@ class _NavButtonState extends State<NavButton> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    // Ang logic na ito ay tatakbo lang sa unang beses na ma-load ang widget
+   
     if (_isInitialLoad) {
       final args = ModalRoute.of(context)?.settings.arguments;
       if (args is int) {
         _selectedIndex = args;
       }
-      // I-set sa false para hindi na maulit ang pag-override sa _selectedIndex
       _isInitialLoad = false;
     }
   }
@@ -55,7 +53,7 @@ class _NavButtonState extends State<NavButton> {
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF665FBE), // Violet primary color
+        selectedItemColor: const Color(0xFF665FBE), 
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

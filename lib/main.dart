@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/core/auth_wrapper.dart';
@@ -48,8 +49,12 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await StreakNotificationService.instance.initialize();              
-    await StreakNotificationService.instance.scheduleReminders();
+    await StreakNotificationService.instance.initNotification();
+    await StreakNotificationService.instance.scheduleAllReminders();
+    final granted = await StreakNotificationService.instance.notifPlugin
+    .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+    ?.areNotificationsEnabled();
+    print('Notifications enabled: $granted');
     await FirebaseService.initializeFirebase();
     await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,

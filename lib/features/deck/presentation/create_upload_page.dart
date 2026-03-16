@@ -228,9 +228,9 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                     children: [
                       const SizedBox(height: 10),
  
-                      // File display area
+                 
                       if (_isDone) ...[
-                        // Success View — your original design
+                        
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(15),
@@ -283,7 +283,6 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                           ),
                         ),
                       ] else ...[
-                        // File Selection View — your original design
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
@@ -359,7 +358,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                         ),
                         const SizedBox(height: 30),
  
-                        // Format tags — your original design
+                      
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: ['PDF', 'DOCX', 'DOC']
@@ -389,7 +388,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                         ),
                       ],
  
-                      // Status message
+                      
                       if (_statusMessage.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Container(
@@ -450,7 +449,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                       const Spacer(),
                       const SizedBox(height: 40),
  
-                      // Main action button — your original design style
+                  
                       SizedBox(
                         width: double.infinity,
                         height: 55,

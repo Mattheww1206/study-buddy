@@ -206,19 +206,17 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Inalis ang malaking top padding para tumaas ang layout
               const SizedBox(height: 10),
-              
               Center(
                 child: Image.asset(
                   'assets/study.png',
-                  width: 180, // Bahagyang linuitan para mas compact
+                  width: 180, 
                   height: 180,
                   fit: BoxFit.contain,
                 ),
               ),
               
-              // Inalis ang SizedBox dito para magkalapit ang Logo at Welcome
+             
               Text(
                 'Welcome!',
                 style: GoogleFonts.fredoka(
@@ -228,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               
-              const SizedBox(height: 4), // Maliit na space para sa subtitle
+              const SizedBox(height: 4), 
               
               Text(
                 'Login to continue your study journey',
@@ -238,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               
-              const SizedBox(height: 15), // Space bago ang card
+              const SizedBox(height: 15), 
               
               // The White Card Container
               Padding(

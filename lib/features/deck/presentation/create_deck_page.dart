@@ -39,7 +39,6 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     super.dispose();
   }
 
-  // --- DINAGDAG NA DELETE DIALOG (image_0fda5d.png design) ---
   void _confirmDelete(int index) {
     showDialog(
       context: context,
@@ -318,7 +317,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // List of Flashcards
+                 
                   ...cardControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     var controllers = entry.value;
@@ -363,7 +362,6 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                           fontSize: 16)),
                                 ],
                               ),
-                              // --- DINAGDAG NA DELETE ICON ---
                               if (cardControllers.length > 1)
                                 IconButton(
                                   onPressed: () => _confirmDelete(index),
@@ -457,38 +455,38 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                 width: 20,
                                 height: 20,
                                 child: CircularProgressIndicator(
-                                    color: Colors.white, strokeWidth: 2))
-                            : const Text('Save Deck',
+                                 color: Colors.white, strokeWidth: 2))
+                                 : const Text('Save Deck',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold))),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      cardControllers.add({
-                        "term": TextEditingController(),
-                        "def": TextEditingController(),
-                      });
-                    });
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 55,
-                    decoration: BoxDecoration(
-                        color: const Color(0xFF665FBE),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: const Icon(Icons.add, size: 28, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              cardControllers.add({
+                                "term": TextEditingController(),
+                                "def": TextEditingController(),
+                              });
+                            });
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 55,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFF665FBE),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Icon(Icons.add, size: 28, color: Colors.white),
+                          ),
+                        ),
+                      ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+          );
+        }
+      }
