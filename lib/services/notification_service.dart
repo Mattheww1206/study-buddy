@@ -1,130 +1,114 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
-import 'package:flutter_timezone/flutter_timezone.dart';
+import 'dart:io';
 
 class StreakNotificationService {
-  static final StreakNotificationService instance = StreakNotificationService._internal();
-  factory StreakNotificationService() => instance;
-  StreakNotificationService._internal();
-  final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+  static StreakNotificationService? _instance;
+  static StreakNotificationService get instance =>
+      _instance ??= StreakNotificationService._();
 
-  bool _isInitialized = false;
-  bool get isInitialized => _isInitialized; 
+  StreakNotificationService._();
 
-  static const int _morningNotifId = 001; 
-  static const int _eveningNotifId = 002; 
+  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  bool _initialized = false;
 
-  Future<void> initNotification() async {
-    if (_isInitialized) return;
+  Future<void> initialize() async {
+    if (_initialized) return;
 
-    tz_data.initializeTimeZones(); 
-    var ph = tz.getLocation('Asia/Manila');
-    tz.setLocalLocation(ph);
+    // ✅ FIXED: Initialize timezone
+    tz_data.initializeTimeZones();
 
-    const initSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher'); 
-                                                              
-    const initSettings = InitializationSettings(
-      android: initSettingsAndroid,
-    );
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    await _plugin.initialize(settings: initSettings); 
+    const InitializationSettings settings = InitializationSettings(android: androidSettings);
 
-    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    await _notifications.initialize(settings);
+    await _createChannels();
+
+    final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
+        _notifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
 
     await androidPlugin?.requestNotificationsPermission();
     await androidPlugin?.requestExactAlarmsPermission();
 
-    _isInitialized = true; 
+    _initialized = true;
+    print('✅ Initialized');
   }
 
-  NotificationDetails _notifDetails({
-    required String channelId,
-    required String channelName,
-  }) {
-    return NotificationDetails(
-      android: AndroidNotificationDetails(
-        channelId,
-        channelName,
-        importance: Importance.high,
-        priority: Priority.high,
-        icon: '@mipmap/ic_launcher', 
+  Future<void> _createChannels() async {
+    const AndroidNotificationChannel morningChannel = AndroidNotificationChannel(
+      'morning', 'Morning Reminder', importance: Importance.high,
+    );
+
+    const AndroidNotificationChannel eveningChannel = AndroidNotificationChannel(
+      'evening', 'Evening Reminder', importance: Importance.high,
+    );
+
+    final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
+        _notifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidPlugin?.createNotificationChannel(morningChannel);
+    await androidPlugin?.createNotificationChannel(eveningChannel);
+  }
+
+  Future<void> scheduleReminders() async {
+    if (!_initialized) await initialize();
+    
+    // ✅ FIXED: Now tz.local works!
+    final now = tz.TZDateTime.now(tz.local);
+    final morningTomorrow = tz.TZDateTime(tz.local, now.year, now.month, now.day + 1, 9, 0);
+    final eveningTomorrow = tz.TZDateTime(tz.local, now.year, now.month, now.day + 1, 21, 0);
+
+    await _notifications.zonedSchedule(
+      1,
+      '🔥 Keep Streak Alive!',
+      'Study today!',
+      morningTomorrow,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'morning',
+          'Morning Reminder',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
       ),
-    );
-  }
-
-  Future<void> requestPermission() async {
-    await _plugin
-        .resolvePlatformSpecificImplementation<  
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-  }
-
-  Future<void> _scheduleMorningReminder() async {
-    final now = tz.TZDateTime.now(tz.local);
-
-    var scheduledTime = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      9,
-    );
-
-    if (scheduledTime.isBefore(now)) {
-      scheduledTime = scheduledTime.add(const Duration(days: 1));
-    }
-
-    await _plugin.zonedSchedule(
-      id: _morningNotifId,
-      title: '🔥 Keep your streak alive!',
-      body: 'Complete a study session today to maintain your streak.',
-      scheduledDate:  scheduledTime,
-      notificationDetails:  _notifDetails(channelId: 'streak_morning', channelName: 'Morning Reminder'),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
-    );
-  }
-
-  Future<void> _scheduleEveningReminder() async {
-    final now = tz.TZDateTime.now(tz.local);
-
-    var scheduledTime = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      22,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
 
-    if (scheduledTime.isBefore(now)) {
-      scheduledTime = scheduledTime.add(const Duration(days: 1));
-    }
-
-    await _plugin.zonedSchedule(
-      id: _eveningNotifId,
-      title: '⏰ Your streak ends in 2 hours!',
-      body: 'You haven\'t studied today yet. Don\'t lose your streak!',
-      scheduledDate: scheduledTime,
-      notificationDetails:  _notifDetails(channelId: 'streak_evening', channelName: 'Evening Reminder'),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    await _notifications.zonedSchedule(
+      2,
+      '⏰ Streak Ending!',
+      'Study now!',
+      eveningTomorrow,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'evening',
+          'Evening Reminder',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-  }
 
-  Future<void> scheduleStreakReminders() async {
-    await _scheduleMorningReminder();
-    await _scheduleEveningReminder();
+    print('✅ Both scheduled for tomorrow');
   }
 
   Future<void> cancelEveningReminder() async {
-    await _plugin.cancel(id: _eveningNotifId);
-    await _scheduleEveningReminder();
+    await _notifications.cancel(2);
+    print('❌ Evening cancelled');
   }
 
-  Future<void> cancelAll() async { 
-    await _plugin.cancelAll(); 
+  Future<void> cancelAll() async {
+    await _notifications.cancelAll();
+    print('❌ All cancelled');
   }
-
-
 }

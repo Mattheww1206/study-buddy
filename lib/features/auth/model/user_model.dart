@@ -15,7 +15,8 @@ class AppUser {
         this.photoUrl,
         this.streak = 0,
     });
-
+  
+  // ginagamit para maread yung data sa firestore, magbibigay ng map yung database then concert to appuser object
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
     return AppUser(
       userId: id,
@@ -26,7 +27,7 @@ class AppUser {
       streak: data['streak'] ?? 0,
        );
   }
-
+   // Dito naman appuser to map
    Map<String, dynamic> toMap() {
     return {
       'userId' : userId,

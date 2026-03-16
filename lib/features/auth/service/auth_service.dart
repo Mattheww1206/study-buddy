@@ -4,9 +4,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:studybuddy/features/auth/model/user_model.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(); 
+  final FirebaseAuth _auth = FirebaseAuth.instance; // naghahandle ng login, signup, reset password
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // nagiistore ng user data
+  final GoogleSignIn _googleSignIn = GoogleSignIn(); // handles google authentication
 
   // sign up
   Future<AppUser?> signUp({
@@ -15,6 +15,7 @@ class AuthService {
     required String username,
   }) async {
     try {
+      // check muna kung yung username is nag eexist na para maprevent yung duplicate usernames
       final usernameCheck = await _firestore
           .collection('users')
           .where('username', isEqualTo: username)
@@ -27,27 +28,27 @@ class AuthService {
           message: 'Username is already taken.'
         );
       }
-
+      // create user account 
       UserCredential userCredential =
         await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
+      // creates appUser model 
       final newUser = AppUser(
         userId: userCredential.user!.uid,
         username: username,
         email: email
       );
-      
+      // store new user sa firestore 
       await _firestore
        .collection('users')
        .doc(userCredential.user!.uid)
        .set(newUser.toMap());
 
-
-      await userCredential.user!.sendEmailVerification();
-
+      // email verifaction sent don sa email na niprovide ng user sa register
+      await userCredential.user!.sendEmailVerification(); 
+      // bawal pa mag login yung user hanggat hindi verified
       await _auth.signOut();
 
       return newUser;
@@ -78,7 +79,7 @@ class AuthService {
     required String password,
   }) async {
     try {
-  
+      // firebase auth check muna kung existing na ang user 
       UserCredential credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -89,26 +90,26 @@ class AuthService {
       if(firebaseUser == null){
         throw Exception('User not found after login.');
       } 
-
+      // nirereturn niya yung updated na email verification status
       await firebaseUser.reload();
       firebaseUser = _auth.currentUser;
-
+      // check kung verified na yung user or hindi pa 
       if(!firebaseUser!.emailVerified){
         await _auth.signOut();
         throw Exception('Please verify your email before logging in.');
       }
-
+      // kinuha yung user profile sa firestore
       DocumentSnapshot doc = await _firestore
-          .collection('users')
+          .collection('users') 
           .doc(firebaseUser.uid)
           .get();
 
       if (!doc.exists) {
         throw Exception('User record is not found.');
       }
-
+      // data ng user profile na galing firebase is macoonvert into maps
       final data = doc.data() as Map<String, dynamic>;
-
+      // converts into appUser object
       return AppUser(
         userId: credential.user!.uid,  
         username: data['username'],
@@ -121,7 +122,7 @@ class AuthService {
       throw Exception(_handleLoginAuthError(e));
     }
   }
-
+  // Sign in with email or username
   Future<AppUser?> signInWithEmailOrUsername({
     required String emailOrUsername,
     required String password,
@@ -129,8 +130,9 @@ class AuthService {
     try {
       String email = emailOrUsername;
 
-      // Check if the input is a username
+      // Check kung yung input niya is username
       if (!emailOrUsername.contains('@')) {
+        // check kung yung emailOrUsername field na ininput is equal sa username na nasa firebase
         final query = await _firestore
             .collection('users')
             .where('username', isEqualTo: emailOrUsername)
@@ -140,7 +142,7 @@ class AuthService {
         if (query.docs.isEmpty) {
           throw Exception('No account found with this username.');
         }
-
+        // if email nilgagy login na kagad
         email = query.docs.first['email'];
       }
 

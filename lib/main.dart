@@ -48,9 +48,8 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await StreakNotificationService.instance.initNotification();
-    await StreakNotificationService.instance.requestPermission();
-    await StreakNotificationService.instance.scheduleStreakReminders();
+    await StreakNotificationService.instance.initialize();              
+    await StreakNotificationService.instance.scheduleReminders();
     await FirebaseService.initializeFirebase();
     await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
