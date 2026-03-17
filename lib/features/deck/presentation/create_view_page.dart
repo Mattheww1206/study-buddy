@@ -20,6 +20,10 @@ class _CreateViewPageState extends State<CreateViewPage> {
   List<Flashcard> _flashcards = [];
   bool _isLoading = true;
   bool _isSaving = false;
+
+  // State control para sa pag-edit ng Subject at Title sa itaas
+  bool _isEditingDeckInfo = false;
+
   int editingIndex = -1;
   final TextEditingController _termController = TextEditingController();
   final TextEditingController _defController = TextEditingController();
@@ -51,7 +55,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     }
     super.dispose();
   }
-  
+
   Future<void> _loadFlashcards() async {
     try {
       final cards = await _deckService.getDeckFlashcards(_deck.deckId);
@@ -80,7 +84,6 @@ class _CreateViewPageState extends State<CreateViewPage> {
   }
 
   Future<void> _deleteFlashcard(String cardId) async {
-    // Confirmation Dialog for deleting flashcard
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -154,7 +157,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
       }
     }
   }
-  // Save flashcard edit
+
   Future<void> _saveCardEdit(int index) async {
     try {
       await _flashcardService.updateFlashcard(
@@ -196,11 +199,11 @@ class _CreateViewPageState extends State<CreateViewPage> {
     final nav = Navigator.of(context);
 
     try {
-       _deckService.updateDeck(
+       await _deckService.updateDeck(
         _deck.deckId,
         {
-          'title': _titleEditController,
-          'subject': _subjectEditController,
+          'title': _titleEditController.text.trim(),
+          'subject': _subjectEditController.text.trim(),
         },
       );
 
@@ -246,7 +249,29 @@ class _CreateViewPageState extends State<CreateViewPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+                // DECK INFO EDIT BUTTON AT THE TOP
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () => setState(() => _isEditingDeckInfo = !_isEditingDeckInfo),
+                        child: Text(
+                          _isEditingDeckInfo ? 'Done' : 'Edit',
+                          style: const TextStyle(
+                            color: Color(0xFF665FBE),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // SUBJECT AND TITLE FIELDS
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -257,7 +282,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: const Color(0xFFFAEEFF), width: 2),
+                            border: Border.all(color: _isEditingDeckInfo ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF), width: 2),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,12 +291,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
                               const SizedBox(height: 4),
                               TextField(
                                 controller: _subjectEditController,
+                                readOnly: !_isEditingDeckInfo,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
+                                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                               ),
                             ],
                           ),
@@ -284,7 +306,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: const Color(0xFFFAEEFF), width: 2),
+                            border: Border.all(color: _isEditingDeckInfo ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF), width: 2),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,12 +315,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
                               const SizedBox(height: 4),
                               TextField(
                                 controller: _titleEditController,
+                                readOnly: !_isEditingDeckInfo,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
+                                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                               ),
                             ],
                           ),
@@ -349,8 +368,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                           } else {
                                             setState(() {
                                               editingIndex = index;
-                                              _termController.text = card.question;
-                                              _defController.text = card.answer;
+                                              // INAYOS DITO:
+                                              _termController.text = card.answer;
+                                              _defController.text = card.question;
                                             });
                                           }
                                         },
@@ -378,7 +398,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                 ),
                                 child: isCurrentlyEditing
                                     ? TextField(controller: _termController, decoration: const InputDecoration(border: InputBorder.none, isDense: true))
-                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.question)),
+                                    // INAYOS DITO:
+                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.answer)),
                               ),
                               const Text('DEFINITION', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
                               Container(
@@ -392,7 +413,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                 ),
                                 child: isCurrentlyEditing
                                     ? TextField(controller: _defController, maxLines: null, decoration: const InputDecoration(border: InputBorder.none, isDense: true))
-                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.answer)),
+                                    // INAYOS DITO:
+                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.question)),
                               ),
                             ],
                           ),

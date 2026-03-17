@@ -98,15 +98,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadQuizResults() async {
-  final userProvider = Provider.of<UserProvider>(context, listen: false);
-  final results = await ResultService().getUserResults(userProvider.user!.userId);
-  if (mounted) {
-    setState(() {
-      _recentResults = results.take(10).toList(); 
-      _isLoadingResults = false;
-    });
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final results = await ResultService().getUserResults(userProvider.user!.userId);
+    if (mounted) {
+      setState(() {
+        _recentResults = results.take(10).toList();
+        _isLoadingResults = false;
+      });
+    }
   }
-}
 
   Widget get _defaultAvatar => Container(
         decoration: const BoxDecoration(
@@ -137,10 +137,11 @@ class _ProfilePageState extends State<ProfilePage> {
       ]),
     ]);
   }
+
   // month helper
   String _monthName(int month) {
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[month - 1];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
   }
 
   @override
@@ -198,17 +199,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: SafeArea(
                           bottom: false,
                           child: Padding(
-                            // BINABAWASAN ANG TOP PADDING PARA UMAKYAT ANG LOGO AT SETTINGS
-                            padding: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 10), 
+                            padding: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 10),
                             child: Column(
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // LOGO
                                     Image.asset('assets/studybuddy-logo.png', height: 70, fit: BoxFit.contain),
-                                    // SETTINGS ICON
                                     Container(
                                       decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
                                       child: IconButton(
@@ -218,10 +216,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ],
                                 ),
-                                // BINAWASAN ANG SPACING SA PAGITAN NG LOGO AT AVATAR
-                                const SizedBox(height: 0), 
+                                const SizedBox(height: 0),
                                 CircleAvatar(
-                                  radius: 60, // Bahagyang nilian ang avatar para mas umakyat lahat
+                                  radius: 60,
                                   backgroundColor: const Color(0xFFFAEEFF),
                                   child: ClipOval(
                                     child: SizedBox(
@@ -236,7 +233,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 8),
                                 Text(loggedUser?.username ?? 'Student', style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 26)),
                                 const SizedBox(height: 10),
-                                // STREAK BADGE
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(color: const Color(0xFFFD9519), borderRadius: BorderRadius.circular(30)),
@@ -249,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(height: 50), // Space para sa naka-float na card
+                                const SizedBox(height: 50),
                               ],
                             ),
                           ),
@@ -323,37 +319,41 @@ class _ProfilePageState extends State<ProfilePage> {
                               Text('Recent Performance', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE))),
                               const SizedBox(height: 20),
                               SizedBox(
-                              height: 240,
-                              child: _isLoadingResults
-                                ? const Center(child: CircularProgressIndicator())
-                                : _recentResults.isEmpty
-                                  ? const Center(child: Text('No recent activity yet.'))
-                                  : ListView.separated(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    physics: const ClampingScrollPhysics(),
-                                    itemCount: _recentResults.length,
-                                    separatorBuilder: (_, __) => const Divider(height: 25),
-                                    itemBuilder: (context, index) {
-                                      final result = _recentResults[index];
-                                      final passed = result.correctCount >= (result.totalCards / 2);
-                                      final date = '${_monthName(result.completedAt.month)} ${result.completedAt.day}, ${result.completedAt.year}';
-                                      return _buildPerformanceItem(
-                                        result.deckSubject,
-                                        result.deckTitle,
-                                        date,
-                                        '${result.correctCount}/${result.totalCards}',
-                                        passed ? 'PASSED' : 'FAILED',
-                                        const Color(0xFFFD9519),
-                                        passed ? Colors.green : Colors.red,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
+                                height: 240,
+                                child: _isLoadingResults
+                                    ? const Center(child: CircularProgressIndicator())
+                                    : _recentResults.isEmpty
+                                        ? const Center(child: Text('No recent activity yet.'))
+                                        : ListView.separated(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            physics: const ClampingScrollPhysics(),
+                                            itemCount: _recentResults.length,
+                                            separatorBuilder: (_, __) => Divider(
+                                              height: 25,
+                                              thickness: 0.8,
+                                              color: const Color.fromARGB(255, 162, 160, 160).withValues(alpha: 0.2), // Eto yung ginawang light gray
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              final result = _recentResults[index];
+                                              final passed = result.correctCount >= (result.totalCards / 2);
+                                              final date = '${_monthName(result.completedAt.month)} ${result.completedAt.day}, ${result.completedAt.year}';
+                                              return _buildPerformanceItem(
+                                                result.deckSubject,
+                                                result.deckTitle,
+                                                date,
+                                                '${result.correctCount}/${result.totalCards}',
+                                                passed ? 'PASSED' : 'FAILED',
+                                                const Color(0xFFFD9519),
+                                                passed ? Colors.green : Colors.red,
+                                              );
+                                            },
+                                          ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
                       // Achievements Section
                       Transform.translate(
                         offset: const Offset(0, -10),

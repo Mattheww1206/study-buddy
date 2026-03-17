@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Required for inputFormatters
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
@@ -18,6 +19,9 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
   int numberOfQuestions = 0;
   late TextEditingController _questionsController;
 
+  // Added for validation
+  String? _errorMessage;
+
   final Color dominantColor = const Color(0xFF665FBE);
   final Color accentColor = const Color(0xFFFF7F32);
   final Color secondaryColor = const Color(0xFFFAEEFF);
@@ -27,9 +31,10 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
     super.didChangeDependencies();
     if (_initialized) return;
     _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
-    numberOfQuestions = _deck.totalCards.clamp(1, _deck.totalCards);
-    _questionsController =
-        TextEditingController(text: numberOfQuestions.toString());
+    
+    // Initial value setup
+    numberOfQuestions = _deck.totalCards;
+    _questionsController = TextEditingController(text: numberOfQuestions.toString());
     
     _initialized = true;
   }
@@ -66,7 +71,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            // Mode
+            // Mode Section
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -97,12 +102,12 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                             Text('True or False',
+                            Text('True or False',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18)),
-                             Text('Verify if the statement is correct',
+                            Text('Verify if the statement is correct',
                                 style: TextStyle(
                                     color: Colors.white70, fontSize: 12)),
                           ],
@@ -115,7 +120,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
             ),
             const SizedBox(height: 16),
 
-            // Number of Questions
+            // Number of Questions Section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -139,17 +144,28 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                     'Max available: ${_deck.totalCards}',
                     style: TextStyle(color: Colors.grey[500], fontSize: 12),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 13),
                   TextField(
                     controller: _questionsController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (val) {
-                      final parsed = int.tryParse(val) ?? 1;
+                      final parsed = int.tryParse(val) ?? 0;
                       setState(() {
-                        numberOfQuestions = parsed.clamp(1, _deck.totalCards);
+                        if (parsed > _deck.totalCards) {
+                          _errorMessage = "Maximum is ${_deck.totalCards} questions only.";
+                          numberOfQuestions = parsed; 
+                        } else if (parsed <= 0 && val.isNotEmpty) {
+                          _errorMessage = "Enter at least 1 question.";
+                          numberOfQuestions = 0;
+                        } else {
+                          _errorMessage = null;
+                          numberOfQuestions = parsed;
+                        }
                       });
                     },
                     decoration: InputDecoration(
+                      errorText: _errorMessage, // Displays error text in red
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
@@ -162,18 +178,26 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         borderSide:
                             BorderSide(color: dominantColor, width: 2.0),
                       ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.red, width: 1.6),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.red, width: 2.0),
+                      ),
                     ),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: dominantColor),
+                        color: _errorMessage == null ? dominantColor : Colors.red),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // Timer
+            // Timer Section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -243,7 +267,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
             ),
             const SizedBox(height: 16),
 
-            // Summary
+            // Summary Section
             Container(
               padding: const EdgeInsets.all(20),
               width: double.infinity,
@@ -297,7 +321,10 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
+                // Button is disabled if there is an error
+                onPressed: (_errorMessage != null || numberOfQuestions <= 0)
+                ? null 
+                : () {
                   Navigator.pushNamed(
                     context,
                     'tf', 
@@ -309,6 +336,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
+                  disabledBackgroundColor: Colors.grey.shade400,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   elevation: 3,
@@ -320,6 +348,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         fontWeight: FontWeight.bold)),
               ),
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

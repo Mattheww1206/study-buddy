@@ -134,18 +134,33 @@ class _QuizModePageState extends State<QuizModePage> {
           children: [
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 30),
+              // Dinagdagan ang horizontal padding (20) para hindi sumasagad ang text sa border
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
               decoration: BoxDecoration(
                 color: const Color(0xFF665FBE),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Column(
+                // Ginawang CrossAxisAlignment.center para laging nasa gitna ang text
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(deck.subject.toUpperCase(), style: const TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)),
+                  Text(
+                    deck.title.toUpperCase(), 
+                    textAlign: TextAlign.center, // I-center ang alignment
+                    style: const TextStyle(color: Colors.white70, letterSpacing: 1.2, fontSize: 11, fontWeight: FontWeight.bold)
+                  ),
                   const SizedBox(height: 8),
-                  Text(deck.title.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  Text(
+                    deck.subject.toUpperCase(), 
+                    textAlign: TextAlign.center, // Para kapag humaba, hindi kakaliwa ang text
+                    style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)
+                  ),
                   const SizedBox(height: 8),
-                   Text('${deck.totalCards} cards available', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                   Text(
+                    '${deck.totalCards} cards available', 
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white60, fontSize: 13)
+                  ),
                 ],
               ),
             ),
