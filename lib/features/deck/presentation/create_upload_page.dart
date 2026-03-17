@@ -184,7 +184,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
           ],
         ),
         content: const Text(
-          'Cant generate flashcards from this file because there is no internet'
+          'Can\'t generate flashcards from this file because there is no internet '
           'connection.\n\nPlease connect to the '
           'internet to be able to generate flashcards from file.',
         ),

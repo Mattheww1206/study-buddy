@@ -43,9 +43,7 @@ import 'package:studybuddy/features/quiz/presentation/true_false_result_page.dar
 import 'package:studybuddy/features/quiz/presentation/true_false_review_page.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:studybuddy/services/notification_service.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,15 +62,20 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Future<void> _initialize() async {
+  Future<void> _initialize() async {  
+    try {
     await FirebaseService.initializeFirebase();
     await StreakNotificationService.instance.initNotification();
-    await StreakNotificationService.instance.scheduleAllReminders();
-
     final granted = await StreakNotificationService.instance.notifPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.areNotificationsEnabled();
     debugPrint('Notifications enabled: $granted');
+
+    } catch (e, stack) {
+      debugPrint('Initialization error: $e');
+      debugPrint('Stack trace: $stack');
+    rethrow; 
+    }
   }
 
   @override
@@ -92,9 +95,17 @@ class MyApp extends StatelessWidget {
 
           // Error during init
           if (snapshot.hasError) {
-            debugPrint('Initialization error: ${snapshot.error}');
-            return const Scaffold(
-              body: Center(child: Text('Something went wrong. Please restart the app.')),
+           return Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
             );
           }
 

@@ -32,10 +32,6 @@ class StreakNotificationService {
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
 
-    await notifPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestExactAlarmsPermission();
-
     _isInitialized = true;
   }
 
@@ -61,32 +57,31 @@ class StreakNotificationService {
   }
 
   Future<void> scheduleNotif({
-    required int id,
-    required String title,
-    required String body,
-    required int hour,
-    required int minute,
-    required String channelId,
-    required String channelName,
-  }) async {
-    if (!_isInitialized) await initNotification();
+  required int id,
+  required String title,
+  required String body,
+  required int hour,
+  required int minute,
+  required String channelId,
+  required String channelName,
+}) async {
+  if (!_isInitialized) await initNotification();
 
-    final now = tz.TZDateTime.now(tz.local);
+  final now = tz.TZDateTime.now(tz.local);
+  var scheduledDate = tz.TZDateTime(
+    tz.local,
+    now.year,
+    now.month,
+    now.day,
+    hour,
+    minute,
+  );
 
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
+  if (scheduledDate.isBefore(now)) {
+    scheduledDate = scheduledDate.add(const Duration(days: 1));
+  }
 
-    // If the time has already passed today, schedule for tomorrow
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
+  try {
     await notifPlugin.zonedSchedule(
       id,
       title,
@@ -95,18 +90,55 @@ class StreakNotificationService {
       notificationDetails(channelId, channelName),
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
       matchDateTimeComponents: DateTimeComponents.time,
     );
-
-    debugPrint('Notification scheduled: $title at $hour:$minute');
+    debugPrint('Notification scheduled: $title at $hour:$minute ✅');
+  } catch (e) {
+    // Fallback to inexact if exact alarms are not permitted
+    debugPrint('Exact alarm failed, trying inexact: $e');
+    try {
+      await notifPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails(channelId, channelName),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, // ← fallback
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('Notification scheduled (inexact): $title at $hour:$minute ✅');
+    } catch (e2) {
+      debugPrint('Failed to schedule notification entirely: $e2');
+    }
   }
+}
 
   /// Called once at the start of each day (e.g. on app launch or after midnight reset).
   /// Schedules all reminders including the midnight "streak ended" notification.
   /// Only schedules notifications whose time hasn't passed yet today.
   Future<void> scheduleAllReminders() async {
-    final hour = tz.TZDateTime.now(tz.local).hour;
+     final now = tz.TZDateTime.now(tz.local);
+    final hour = now.hour;
+    final minute = now.minute;
+
+    // ⚠️ TEMPORARY TEST — schedule 2 minutes from now
+    // Delete this block after testing ↓
+    final testMinute = (minute + 2) % 60;
+    final testHour = (minute + 2) >= 60 ? hour + 1 : hour;
+    await scheduleNotif(
+      id: 99,
+      title: '🧪 Test Scheduled Notification',
+      body: 'Scheduled notifications are working! ✅',
+      hour: testHour,
+      minute: testMinute,
+      channelId: 'test',
+      channelName: 'Test',
+    );
+    return; // ← remove this return after testing
+    // ⚠️ END OF TEST BLOCK
 
     if (hour < 9) {
       await scheduleNotif(
@@ -126,7 +158,7 @@ class StreakNotificationService {
         title: '🌞 Good Afternoon!',
         body: 'Don\'t forget to study and take a quiz today to keep your streak going! 🫶',
         hour: 15,
-        minute: 0,
+        minute: 26,
         channelId: 'afternoon',
         channelName: 'Afternoon Reminder',
       );
@@ -172,5 +204,5 @@ class StreakNotificationService {
 
   Future<void> cancelAllNotifs() async {
     await notifPlugin.cancelAll();
-  }
+  } 
 }
