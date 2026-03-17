@@ -49,17 +49,6 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await StreakNotificationService.instance.initNotification();
-    await StreakNotificationService.instance.scheduleAllReminders();
-    final granted = await StreakNotificationService.instance.notifPlugin
-    .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-    ?.areNotificationsEnabled();
-    print('Notifications enabled: $granted');
-    await FirebaseService.initializeFirebase();
-    await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
-    
   runApp(
     MultiProvider(
       providers: [
@@ -67,7 +56,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => DeckProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     )
   );
 }
@@ -75,51 +64,82 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  Future<void> _initialize() async {
+    await FirebaseService.initializeFirebase();
+    await StreakNotificationService.instance.initNotification();
+    await StreakNotificationService.instance.scheduleAllReminders();
+
+    final granted = await StreakNotificationService.instance.notifPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.areNotificationsEnabled();
+    debugPrint('Notifications enabled: $granted');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: defaultColor,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      home: FutureBuilder(
+        future: _initialize(),
+        builder: (context, snapshot) {
+          // Still initializing — show splash
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // Error during init
+          if (snapshot.hasError) {
+            debugPrint('Initialization error: ${snapshot.error}');
+            return const Scaffold(
+              body: Center(child: Text('Something went wrong. Please restart the app.')),
+            );
+          }
+
+          // Done — go to normal flow
+          return const AuthWrapper();
+        },
+      ),
       routes: {
-        '/': (context) => const AuthWrapper(),
-       'landing': (context) => const LandingPage(),
-       'login': (context) => const LoginPage(),
-       'register':(context) => const RegisterPage(),
-       'home':(context) => const NavButton(),
-       'create':(context) => const CreatePage(),
-       'study':(context) => const StudyPage(),
-       'profile':(context) => const ProfilePage(),
-       'settings':(context) => const SettingsPage(),
-       'account':(context) => const AccountInformationPage(),
-       'achievement': (context) => const AchievementPage(),
-       'change_password':(context) => const ChangePasswordPage(),
-       'create_deck':(context) => const CreateDeckPage(),
-       'upload':(context) => const CreateUploadPage(),
-       'create_view':(context) => const CreateViewPage(),
-       'mode':(context) => const ModePage(),
-       'flashcard_mode':(context) => const FlashcardModePage(),
-       'missed':(context) => const FlashcardMissedPage(),
-       'flashcard_result_great': (context) => const FlashcardResultGreatPage(),
-       'flashcard_result_again':(context) => const  FlashcardResultAgainPage(),
-       'flashcard_missed':(context) => const FlashcardMissedPage(),
-       'quiz_mode':(context) => const QuizModePage(),
-       'multiple_mode':(context) => const MultipleChoiceModePage(),
-       'multiple_choice':(context) => const MultipleChoicePage(),
-       'multiple_result':(context) => const  MultipleResultPage(),
-       'multiple_review':(context) => const MultipleReviewAnswerPage(),
-       'iden_mode':(context) => const IdentificationModePage(),
-       'iden_result':(context) => const IdentificationResultPage(),
-       'identification':(context) => const IdentificationPage(),
-       'iden_review':(context) => const IdentificationReviewPage(),
-       'ran_mode':(context) => const RandomModePage(),
-       'random':(context) => const RandomPage(),
-       'ran_result':(context) => const RandomResultPage(),
-       'ran_review':(context) => const RandomReviewPage(),
-       'tf_mode':(context) => const TrueFalseModePage(),
-       'tf':(context) => const TrueFalsePage(),
-       'tf_result':(context) => const TrueFalseResultPage(),
-       'tf_review':(context) => const TrueFalseReviewPage()
+        'landing': (context) => const LandingPage(),
+        'login': (context) => const LoginPage(),
+        'register': (context) => const RegisterPage(),
+        'home': (context) => const NavButton(),
+        'create': (context) => const CreatePage(),
+        'study': (context) => const StudyPage(),
+        'profile': (context) => const ProfilePage(),
+        'settings': (context) => const SettingsPage(),
+        'account': (context) => const AccountInformationPage(),
+        'achievement': (context) => const AchievementPage(),
+        'change_password': (context) => const ChangePasswordPage(),
+        'create_deck': (context) => const CreateDeckPage(),
+        'upload': (context) => const CreateUploadPage(),
+        'create_view': (context) => const CreateViewPage(),
+        'mode': (context) => const ModePage(),
+        'flashcard_mode': (context) => const FlashcardModePage(),
+        'missed': (context) => const FlashcardMissedPage(),
+        'flashcard_result_great': (context) => const FlashcardResultGreatPage(),
+        'flashcard_result_again': (context) => const FlashcardResultAgainPage(),
+        'flashcard_missed': (context) => const FlashcardMissedPage(),
+        'quiz_mode': (context) => const QuizModePage(),
+        'multiple_mode': (context) => const MultipleChoiceModePage(),
+        'multiple_choice': (context) => const MultipleChoicePage(),
+        'multiple_result': (context) => const MultipleResultPage(),
+        'multiple_review': (context) => const MultipleReviewAnswerPage(),
+        'iden_mode': (context) => const IdentificationModePage(),
+        'iden_result': (context) => const IdentificationResultPage(),
+        'identification': (context) => const IdentificationPage(),
+        'iden_review': (context) => const IdentificationReviewPage(),
+        'ran_mode': (context) => const RandomModePage(),
+        'random': (context) => const RandomPage(),
+        'ran_result': (context) => const RandomResultPage(),
+        'ran_review': (context) => const RandomReviewPage(),
+        'tf_mode': (context) => const TrueFalseModePage(),
+        'tf': (context) => const TrueFalsePage(),
+        'tf_result': (context) => const TrueFalseResultPage(),
+        'tf_review': (context) => const TrueFalseReviewPage(),
       },
     );
   }
