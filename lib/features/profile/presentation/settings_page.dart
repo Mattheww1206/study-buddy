@@ -213,6 +213,41 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   const Divider(height: 25), 
+                  // ITO YUNG DAGDAG: Recently Deleted Section
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, 'delete');
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 50,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE53935), // Red color for delete
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.delete_sweep,
+                              size: 25, color: Colors.white),
+                        ),
+                        const SizedBox(width: 15),
+                        const Text(
+                          'Recently Deleted',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.arrow_forward_ios, size: 20),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 25), 
                   TextButton(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,

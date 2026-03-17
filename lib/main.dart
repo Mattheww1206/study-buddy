@@ -17,6 +17,7 @@ import 'package:studybuddy/features/profile/presentation/account_information_pag
 import 'package:studybuddy/features/profile/presentation/achievement_page.dart';
 import 'package:studybuddy/features/profile/presentation/change_password_page.dart';
 import 'package:studybuddy/features/profile/presentation/profile_page.dart';
+import 'package:studybuddy/features/profile/presentation/recently_deleted_page.dart';
 import 'package:studybuddy/features/profile/presentation/settings_page.dart';
 import 'package:studybuddy/features/quiz/presentation/True_False_mode_page.dart';
 import 'package:studybuddy/features/quiz/presentation/flashcard_missed_page.dart';
@@ -124,6 +125,7 @@ class MyApp extends StatelessWidget {
         'settings': (context) => const SettingsPage(),
         'account': (context) => const AccountInformationPage(),
         'achievement': (context) => const AchievementPage(),
+         'delete': (context) => const RecentlyDeletedPage(),
         'change_password': (context) => const ChangePasswordPage(),
         'create_deck': (context) => const CreateDeckPage(),
         'upload': (context) => const CreateUploadPage(),
