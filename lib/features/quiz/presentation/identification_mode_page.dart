@@ -1,46 +1,50 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Required for inputFormatters
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
-  class IdentificationModePage extends StatefulWidget {
-    const IdentificationModePage({super.key});
+class IdentificationModePage extends StatefulWidget {
+  const IdentificationModePage({super.key});
 
-    @override
-    State<IdentificationModePage> createState() => _IdentificationModePageState();
-  }
+  @override
+  State<IdentificationModePage> createState() => _IdentificationModePageState();
+}
 
-  class _IdentificationModePageState extends State<IdentificationModePage> {
-    late Deck _deck;
-    bool _initialized = false;
-    bool isTimerEnabled = true;
-    int selectedTime = 20;
-    int numberOfQuestions = 0;
-    late TextEditingController _questionsController;
+class _IdentificationModePageState extends State<IdentificationModePage> {
+  late Deck _deck;
+  bool _initialized = false;
+  bool isTimerEnabled = true;
+  int selectedTime = 20;
+  int numberOfQuestions = 0;
+  late TextEditingController _questionsController;
 
-    final Color dominantColor = const Color(0xFF665FBE);
-    final Color accentColor = const Color(0xFFFF7F32);
-    final Color secondaryColor = const Color(0xFFFAEEFF);
+  // Validation variable
+  String? _errorMessage;
 
-    @override
+  final Color dominantColor = const Color(0xFF665FBE);
+  final Color accentColor = const Color(0xFFFF7F32);
+  final Color secondaryColor = const Color(0xFFFAEEFF);
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
     _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
-    // cap default to deck total
-    numberOfQuestions = _deck.totalCards.clamp(1, _deck.totalCards);
-    _questionsController =
-        TextEditingController(text: numberOfQuestions.toString());
+    
+    // Initial value setup
+    numberOfQuestions = _deck.totalCards;
+    _questionsController = TextEditingController(text: numberOfQuestions.toString());
   }
 
   @override
   void dispose() {
     _questionsController.dispose();
     super.dispose();
-  } 
+  }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: secondaryColor,
@@ -51,7 +55,7 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
           onPressed: () => Navigator.pop(context),
         ),
-         title: Image.asset(
+        title: Image.asset(
           'assets/studybuddy-logo.png',
           height: 95,
           fit: BoxFit.contain,
@@ -132,20 +136,31 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Max: ${_deck.totalCards}', 
+                    'Max: ${_deck.totalCards} cards available',
                     style: TextStyle(color: Colors.grey[500], fontSize: 12),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 13),
                   TextField(
                     controller: _questionsController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onChanged: (val) {
-                      final parsed = int.tryParse(val) ?? 1;
+                      final parsed = int.tryParse(val) ?? 0;
                       setState(() {
-                        numberOfQuestions = parsed.clamp(1, _deck.totalCards);
+                        if (parsed > _deck.totalCards) {
+                          _errorMessage = "Maximum is ${_deck.totalCards} questions only.";
+                          numberOfQuestions = parsed; // keep value to trigger UI error
+                        } else if (parsed <= 0 && val.isNotEmpty) {
+                          _errorMessage = "Enter at least 1 question.";
+                          numberOfQuestions = 0;
+                        } else {
+                          _errorMessage = null;
+                          numberOfQuestions = parsed;
+                        }
                       });
                     },
                     decoration: InputDecoration(
+                      errorText: _errorMessage, // Validation message
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
@@ -158,11 +173,19 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
                         borderSide:
                             BorderSide(color: dominantColor, width: 2.0),
                       ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.red, width: 1.6),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Colors.red, width: 2.0),
+                      ),
                     ),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: dominantColor),
+                        color: _errorMessage == null ? dominantColor : Colors.red),
                   ),
                 ],
               ),
@@ -188,7 +211,7 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
                           const SizedBox(width: 8),
                           const Text('Quiz Timer',
                               style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
                         ],
                       ),
                       Switch(
@@ -306,7 +329,10 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {
+                // Button is disabled if there's an error
+                onPressed: (_errorMessage != null || numberOfQuestions <= 0)
+                ? null 
+                : () {
                   Navigator.pushNamed(
                     context,
                     'identification',
@@ -319,6 +345,7 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
+                  disabledBackgroundColor: Colors.grey.shade400,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   elevation: 3,
