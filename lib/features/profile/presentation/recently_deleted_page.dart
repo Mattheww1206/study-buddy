@@ -69,7 +69,7 @@ class _RecentlyDeletedPageState extends State<RecentlyDeletedPage> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: actionColor.withOpacity(0.1),
+                backgroundColor: actionColor.withValues(alpha: 0.1),
                 child: Icon(icon, color: actionColor, size: 32),
               ),
               const SizedBox(height: 20),
@@ -298,7 +298,7 @@ class _RecentlyDeletedPageState extends State<RecentlyDeletedPage> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
+              backgroundColor: color.withValues(alpha: 0.1),
               child: Icon(icon, color: color),
             ),
             const SizedBox(width: 16),
@@ -350,7 +350,7 @@ class _RecentlyDeletedPageState extends State<RecentlyDeletedPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -484,7 +484,7 @@ class _RecentlyDeletedPageState extends State<RecentlyDeletedPage> {
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: accentBlue.withOpacity(0.2)),
+                border: Border.all(color: accentBlue.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [

@@ -22,7 +22,6 @@ class RandomPage extends StatefulWidget {
 class _RandomPageState extends State<RandomPage> {
   final QuizService _quizService = QuizService();
   final ResultService _resultService = ResultService();
-  final DeckService _deckService = DeckService();
   final AchievementService _achievementService = AchievementService();
   final TextEditingController _answerController = TextEditingController();
 
@@ -317,7 +316,7 @@ class _RandomPageState extends State<RandomPage> {
 
     try {
       final results = await _resultService.getUserResults(userId);
-      final decks = await _deckService.getUserDecks(userId).first;
+      final decks = Provider.of<DeckProvider>(context, listen: false).decks;
       final streak = _resultService.calculateStreak(results);
 
       final newlyUnlocked = await _achievementService.evaluateAndUnlock(

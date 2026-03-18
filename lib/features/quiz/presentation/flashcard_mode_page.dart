@@ -17,7 +17,6 @@ class FlashcardModePage extends StatefulWidget {
 }
 
 class _FlashcardModePageState extends State<FlashcardModePage> {
-  final DeckService _deckService = DeckService();
   final ResultService _resultService = ResultService();
   late Deck _deck;
   List<Flashcard> _flashcards = [];
@@ -47,7 +46,9 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
 
   Future<void> _loadFlashcards() async {
     try {
-      final cards = await _deckService.getDeckFlashcards(_deck.deckId);
+     final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+    await deckProvider.loadFlashcards(_deck.deckId);
+    final cards = List<Flashcard>.from(deckProvider.currentFlashcards);
       cards.shuffle();
       setState(() {
         _flashcards = cards;
@@ -259,7 +260,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: primaryColor.withOpacity(0.2),
+                                          color: primaryColor.withValues(alpha: 0.2),
                                           blurRadius: 15,
                                           offset: const Offset(0, 8)),
                                     ],
@@ -319,7 +320,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                                     Container(
                                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.white.withOpacity(0.2),
+                                                        color: Colors.white.withValues(alpha: 0.2),
                                                         borderRadius: BorderRadius.circular(10)
                                                       ),
                                                       child: const Text(
@@ -365,7 +366,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                     decoration: BoxDecoration(
                       color: i <= (_currentIndex % 8)
                           ? primaryColor
-                          : primaryColor.withOpacity(0.15),
+                          : primaryColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

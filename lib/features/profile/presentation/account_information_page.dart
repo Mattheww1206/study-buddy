@@ -131,7 +131,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
                 autofocus: true,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: secondaryColor.withOpacity(0.5),
+                  fillColor: secondaryColor.withValues(alpha: 0.5),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                   focusedBorder: OutlineInputBorder(
@@ -322,7 +322,7 @@ class _AccountInformationPageState extends State<AccountInformationPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8))
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8))
         ],
       ),
       child: child,

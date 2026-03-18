@@ -7,6 +7,8 @@ import 'package:studybuddy/features/auth/presentation/landing_page.dart';
 import 'package:studybuddy/features/auth/presentation/nav_button.dart';
 import 'package:studybuddy/features/auth/presentation/opening_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 import 'package:studybuddy/services/notification_service.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -91,6 +93,10 @@ void initState() {
         provider: data['provider'] ?? 'password',
         photoUrl: data['photoUrl'],
       ));
+
+      Provider.of<DeckProvider>(context, listen: false).listenToDecks(uid);
+      Provider.of<ResultProvider>(context, listen: false).loadResults(uid);
     }
   }
+  
 }

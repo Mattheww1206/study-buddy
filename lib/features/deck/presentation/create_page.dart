@@ -4,7 +4,7 @@ import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
+
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -22,24 +22,11 @@ class _CreatePageState extends State<CreatePage> {
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
-  final DeckService _deckService = DeckService();
 
   bool isEditMode = false;
   bool isOnline = true;
   Set<String> selectedDecksIds = {};
   bool _isProcessing = false;
-  late Stream<List<Deck>> _decksStream;
-  bool _isStreamInitialized = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isStreamInitialized) {
-      final userId = Provider.of<UserProvider>(context).user?.userId ?? '';
-      _decksStream = _deckService.getUserDecks(userId);
-      _isStreamInitialized = true;
-    }
-  }
 
   void _toggleSelection(String deckId) {
     setState(() {
@@ -154,7 +141,7 @@ class _CreatePageState extends State<CreatePage> {
                 ),
                 title: Text(isAllPinned ? 'Unpin Selected' : 'Pin Selected', 
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                onTap: () => _handlePinDecks(allDecks),
+                onTap: () => _handlePinDecks(),
               ),
               ListTile(
                 leading: const CircleAvatar(
@@ -175,16 +162,18 @@ class _CreatePageState extends State<CreatePage> {
     );
   }
 
-  void _handlePinDecks(List<Deck> allDecks) async {
+  void _handlePinDecks() async {
     Navigator.pop(context);
     setState(() => _isProcessing = true);
     try {
-      final selectedDecks = allDecks.where((d) => selectedDecksIds.contains(d.deckId));
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+      final selectedDecks = deckProvider.decks.where((d) => selectedDecksIds.contains(d.deckId));
       bool isAllPinned = selectedDecks.every((d) => d.isPinned);
       bool newPinnedStatus = !isAllPinned;
+     
 
       for (var id in selectedDecksIds) {
-        await _deckService.updateDeck(id, {'isPinned': newPinnedStatus});
+        await deckProvider.updateDeck(id, {'isPinned': newPinnedStatus});
       }
       setState(() {
         selectedDecksIds.clear();
@@ -283,8 +272,7 @@ class _CreatePageState extends State<CreatePage> {
 
       try {
         for (var id in selectedDecksIds) {
-          deckProvider.removeDecks(id);
-          _deckService.deleteDeck(id, userId: userId, isOnline: isOnline,);
+          deckProvider.deleteDeck(id, userId: userId, isOnline: isOnline);
         }
         setState(() {
           selectedDecksIds.clear();
@@ -316,17 +304,14 @@ class _CreatePageState extends State<CreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final deckProvider = context.watch<DeckProvider>();
     return Scaffold(
       backgroundColor: colorSecondary, // 30% Secondary Background
-      floatingActionButton: StreamBuilder<List<Deck>>(
-        stream: _decksStream,
-        builder: (context, snapshot) {
-          final decks = snapshot.data ?? [];
+      floatingActionButton: Consumer<DeckProvider>(
+        builder: (context, deckProvider, snapshot) {
           if (isEditMode) {
             return selectedDecksIds.isNotEmpty
                 ? FloatingActionButton.extended(
-                    onPressed: () => _showActionOptions(decks),
+                    onPressed: () => _showActionOptions(deckProvider.decks),
                     label: Text('Manage (${selectedDecksIds.length})'),
                     icon: const Icon(Icons.edit_note_rounded),
                     backgroundColor: colorDominant, // 60% Primary
@@ -348,23 +333,19 @@ class _CreatePageState extends State<CreatePage> {
             children: [
               const SizedBox(height: 60),
               Expanded(
-                child: StreamBuilder<List<Deck>>(
-                  stream: _decksStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                      return Center(child: CircularProgressIndicator(color: colorDominant));
-                    }
-
-                    if (snapshot.hasData) {
-                      Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
-                    }
-
-                    final providerDecks = deckProvider.decks;
-                    final filteredDecks = _searchQuery.isEmpty
-                    ? providerDecks
-                    : providerDecks.where((d) =>
-                        d.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                        d.subject.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+               child: Consumer<DeckProvider>(
+                builder: (context, deckProvider, child) {
+                  if (deckProvider.isLoading && deckProvider.decks.isEmpty) {
+                    return Center(child: CircularProgressIndicator(color: colorDominant));
+                  }
+                  final allDecks = deckProvider.decks;
+                  final filteredDecks = _searchQuery.isEmpty
+                      ? allDecks
+                      : allDecks.where((d) {
+                          final q = _searchQuery.toLowerCase();
+                          return d.title.toLowerCase().contains(q) ||
+                              d.subject.toLowerCase().contains(q);
+                        }).toList();
                     return SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       child: Column(
@@ -460,7 +441,7 @@ class _CreatePageState extends State<CreatePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    providerDecks.isEmpty
+                                      allDecks.isEmpty
                                         ? 'No decks yet.\nCreate one to start studying!'
                                         : 'No decks found for "$_searchQuery"',
                                     textAlign: TextAlign.center,

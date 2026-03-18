@@ -16,7 +16,8 @@ class CreateViewPage extends StatefulWidget {
 }
 
 class _CreateViewPageState extends State<CreateViewPage> {
-  final DeckService _deckService = DeckService();
+
+
   final FlashcardService _flashcardService = FlashcardService();
   late Deck _deck;
   List<Flashcard> _flashcards = [];
@@ -64,7 +65,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
 
   Future<void> _loadFlashcards() async {
     try {
-      final cards = await _deckService.getDeckFlashcards(_deck.deckId);
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+      await deckProvider.loadFlashcards(_deck.deckId);
+      final cards = deckProvider.currentFlashcards;
       if (mounted) {
         setState(() {
           _flashcards = cards;
@@ -159,7 +162,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     if (confirm == true) {
       final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
       final isOnline = Provider.of<ConnectivityProvider>(context, listen: false).isOnline;
-      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
       try {
         deckProvider.removeFlashcard(cardId);
         setState(() {
@@ -230,6 +233,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
   }
 
   Future<void> _saveChanges() async {
+     final deckProvider = Provider.of<DeckProvider>(context, listen: false);
     for (int i = 0; i < _newCards.length; i++) {
       if (_newCards[i]['def']!.text.trim().isEmpty ||
           _newCards[i]['term']!.text.trim().isEmpty) {
@@ -252,7 +256,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     final nav = Navigator.of(context);
 
     try {
-      await _deckService.updateDeck(
+      await deckProvider.updateDeck(
         _deck.deckId,
         {
           'title': _titleEditController.text.trim(),

@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/features/Achievements/model/achievement_model.dart';
 import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
-import 'package:studybuddy/features/deck/model/deck_model.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
-import 'package:studybuddy/features/results/model/study_result.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -19,18 +19,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final DeckService _deckService = DeckService();
   final ResultService _resultService = ResultService();
   final AchievementService _achievementService = AchievementService();
   List<Achievement> _achievements = [];
-  List<StudyResult> _recentResults = [];
-
-  List<StudyResult> _results = [];
   bool _isLoading = true;
-  bool _isLoadingResults = false;
   String? _userId;
   bool _initialized = false;
-  late Stream<List<Deck>> _decksStream;
 
   // Blue Palette Colors
   final Color primaryBlue = const Color(0xFF1976D2);   // Darker Blue
@@ -66,6 +60,16 @@ class _ProfilePageState extends State<ProfilePage> {
     return map[iconName] ?? Icons.emoji_events;
   }
 
+  Future<void> _loadResultsThenAchievements() async {
+  final resultProvider = Provider.of<ResultProvider>(context, listen: false);
+
+  // ✅ Await the results load so data is ready before achievements run
+  await resultProvider.loadResults(_userId!);
+
+  // Now load achievements with fresh data
+  await _loadAchievements();
+}
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -74,45 +78,36 @@ class _ProfilePageState extends State<ProfilePage> {
     if (user == null) return;
     _initialized = true;
     _userId = user.userId;
-    _decksStream = _deckService.getUserDecks(_userId!);
-    _loadAchievements();
-    _loadQuizResults();
+    _loadResultsThenAchievements();
   }
 
   Future<void> _loadAchievements() async {
-    try {
-      final results = await _resultService.getUserResults(_userId!);
-      final decks = await _deckService.getUserDecks(_userId!).first;
-      final streak = _resultService.calculateStreak(results);
+  try {
+    final resultService = ResultService();
+    final results = await resultService.getUserResults(_userId!);
+    final deckService = DeckService();
+    final decks = await deckService.getUserDecks(_userId!).first;
+    final streak = resultService.calculateStreak(results);
 
-      await _achievementService.evaluateAndUnlock(
-        userId: _userId!,
-        results: results,
-        decks: decks,
-        streak: streak,
-      );
-      final achievements = await _achievementService.getAchievements(_userId!);
-      if (!mounted) return;
-      setState(() {
-        _results = results;
-        _achievements = achievements;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+    await _achievementService.evaluateAndUnlock(
+      userId: _userId!,
+      results: results,
+      decks: decks,
+      streak: streak,
+    );
 
-  Future<void> _loadQuizResults() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final results = await ResultService().getUserResults(userProvider.user!.userId);
-    if (mounted) {
-      setState(() {
-        _recentResults = results.take(10).toList();
-        _isLoadingResults = false;
-      });
-    }
+    final achievements = await _achievementService.getAchievements(_userId!);
+    if (!mounted) return;
+    setState(() {
+      _achievements = achievements;
+      _isLoading = false;
+    });
+  } catch (e, stack) {
+    print('_loadAchievements error: $e');
+    print('stack: $stack');
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   Widget get _defaultAvatar => Container(
         decoration: BoxDecoration(
@@ -172,8 +167,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final loggedUser = Provider.of<UserProvider>(context).user;
     final photoUrl = loggedUser?.photoUrl;
+    final resultProvider = context.watch<ResultProvider>();
 
-    final streak = _resultService.calculateStreak(_results);
+    final streak = resultProvider.streak; 
     final unlockedList = _achievements.where((a) => a.isUnlocked).toList();
     final unlockedCount = unlockedList.length;
     final totalAchievements = _achievements.length;
@@ -184,12 +180,11 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: backgroundBlue, 
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : StreamBuilder<List<Deck>>(
-              stream: _decksStream,
-              builder: (context, snapshot) {
-                final decks = snapshot.data ?? [];
+          : Consumer<DeckProvider>(
+              builder: (context, deckProvider, child) {
+                final decks = deckProvider.decks;
                 final totalDecks = decks.length;
-                final totalQuizTaken = _results.where((r) => r.mode != 'flashcard').length;
+                final totalQuizTaken = resultProvider.totalQuizTaken;
 
                 return SingleChildScrollView(
                   child: Column(
@@ -216,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   children: [
                                     Image.asset('assets/studybuddy-logo.png', height: 70, fit: BoxFit.contain),
                                     Container(
-                                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
                                       child: IconButton(
                                         icon: const Icon(Icons.settings, color: Colors.white, size: 25),
                                         onPressed: () => Navigator.pushNamed(context, 'settings'),
@@ -278,9 +273,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Column(children: [Text('$totalDecks', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Decks\nCreated', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
-                                Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.2)),
+                                Container(height: 40, width: 1, color: Colors.grey.withValues(alpha: 0.2)),
                                 Column(children: [Text('$totalQuizTaken', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Quiz\nTaken', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
-                                Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.2)),
+                                Container(height: 40, width: 1, color: Colors.grey.withValues(alpha: 0.2)),
                                 Column(children: [Text('$streak', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Day\nStreak', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
                               ],
                             ),
@@ -297,16 +292,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(25),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Recent Performance', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: primaryBlue)),
                             const SizedBox(height: 20),
-                            _isLoadingResults
+                            resultProvider.isLoading
                                 ? const Center(child: CircularProgressIndicator())
-                                : _recentResults.isEmpty
+                                : resultProvider.results.isEmpty
                                     ? const Center(child: Text('No recent activity yet.'))
                                     : SizedBox(
                                         // Eto yung sikreto: Fixed height para sa 3 items lang
@@ -316,9 +311,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                           shrinkWrap: true,
                                           // Pinalitan natin ito para maging scrollable ang loob ng card
                                           physics: const AlwaysScrollableScrollPhysics(), 
-                                          itemCount: _recentResults.length,
+                                          itemCount: resultProvider.results.take(10).length,
                                           itemBuilder: (context, index) {
-                                            final result = _recentResults[index];
+                                           final result = resultProvider.results.take(10).toList()[index]; 
                                             final passed = result.correctCount >= (result.totalCards / 2);
                                             final date = '${_monthName(result.completedAt.month)} ${result.completedAt.day}, ${result.completedAt.year}';
                                             
@@ -348,7 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(25),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +388,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
-                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('$unlockedCount of $totalAchievements unlocked', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: primaryBlue.withOpacity(0.7))), Text('$overallPercent%', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: accentBlue))]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('$unlockedCount of $totalAchievements unlocked', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: primaryBlue.withValues(alpha: 0.7))), Text('$overallPercent%', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: accentBlue))]),
                                     const SizedBox(height: 8),
                                     ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: overallProgress, backgroundColor: backgroundBlue, color: accentBlue, minHeight: 10)),
                                   ],

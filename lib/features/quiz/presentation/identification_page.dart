@@ -20,7 +20,6 @@ class IdentificationPage extends StatefulWidget {
 class _IdentificationPageState extends State<IdentificationPage> {
   final QuizService _quizService = QuizService();
   final ResultService _resultService = ResultService();
-  final DeckService _deckService = DeckService();
   final AchievementService _achievementService = AchievementService();
   final TextEditingController _answerController = TextEditingController();
   
@@ -114,6 +113,17 @@ class _IdentificationPageState extends State<IdentificationPage> {
   }
 
   void _onNextTapped() {
+      if (_answerController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter an answer before proceeding.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      return;
+    }
     _saveCurrentAnswer();
 
     if (_currentIndex >= _quizData.length - 1) {
@@ -225,7 +235,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.user!.userId;
     final totalCards = _quizData.length;
-
+    
     _correctCount = _quizData.where((q) => q['isCorrect'] == true).length;
 
     final wrongAnswers = <Map<String, String>>[];
@@ -260,7 +270,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
     
     try {
       final results = await _resultService.getUserResults(userId);
-      final decks = await _deckService.getUserDecks(userId).first;
+      final decks = Provider.of<DeckProvider>(context, listen: false).decks;
       final streak = _resultService.calculateStreak(results);
 
       final newlyUnlocked = await _achievementService.evaluateAndUnlock(
@@ -544,16 +554,26 @@ class _IdentificationPageState extends State<IdentificationPage> {
                               BoxShadow(color: actionOrange.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
                             ],
                           ),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isLastQuestion ? primaryColor : actionOrange,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                              elevation: 0,
-                            ),
-                            onPressed: _onNextTapped,
-                            child: Text(isLastQuestion ? 'Submit' : 'Next',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          child: ValueListenableBuilder<TextEditingValue>( // ✅ moved inside child:
+                            valueListenable: _answerController,
+                            builder: (context, value, child) {
+                              final hasInput = value.text.trim().isNotEmpty;
+                              return ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: !hasInput
+                                      ? Colors.grey[300]
+                                      : isLastQuestion ? primaryColor : actionOrange,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  elevation: 0,
+                                ),
+                                onPressed: hasInput ? _onNextTapped : null,
+                                child: Text(
+                                  isLastQuestion ? 'Submit' : 'Next',
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),

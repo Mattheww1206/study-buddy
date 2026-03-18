@@ -164,7 +164,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: primaryBlue.withOpacity(0.15), // Shadow color synced to blue
+                    color: primaryBlue.withValues(alpha: 0.15), // Shadow color synced to blue
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   )
@@ -181,7 +181,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
+                      border: Border.all(color: primaryBlue.withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _currentController,
@@ -213,7 +213,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
+                      border: Border.all(color: primaryBlue.withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _newController,
@@ -250,7 +250,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
+                      border: Border.all(color: primaryBlue.withValues(alpha: 0.1)),
                     ),
                     child: TextFormField(
                       controller: _confirmController,
@@ -287,7 +287,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: accentBlue.withOpacity(0.4), // Shadow color synced to Accent Blue
+                      color: accentBlue.withValues(alpha: 0.4), // Shadow color synced to Accent Blue
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     )

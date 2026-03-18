@@ -142,7 +142,7 @@ class _AchievementPageState extends State<AchievementPage> {
                               : null,
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
+                                color: Colors.black.withValues(alpha: 0.02),
                                 blurRadius: 5)
                           ],
                         ),
@@ -214,7 +214,7 @@ class _AchievementPageState extends State<AchievementPage> {
                                         '${item.unlockedAt!.month}/${item.unlockedAt!.day}/${item.unlockedAt!.year}',
                                         style: TextStyle(
                                             fontSize: 7,
-                                            color: primaryBlue.withOpacity(0.7)),
+                                            color: primaryBlue.withValues(alpha: 0.7)),
                                       ),
                                     ],
                                   ],
@@ -242,7 +242,7 @@ class _AchievementPageState extends State<AchievementPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05), blurRadius: 10)
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)
           ],
         ),
         child: Column(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
 
 class CreateDeckPage extends StatefulWidget {
@@ -13,7 +13,6 @@ class CreateDeckPage extends StatefulWidget {
 }
 
 class _CreateDeckPageState extends State<CreateDeckPage> {
-  final DeckService _deckService = DeckService();
   final ResultService _resultService = ResultService();
   final _titleController = TextEditingController();
   final _subjectController = TextEditingController();
@@ -185,8 +184,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
             'term': card['term']!.text.trim(),
             'def': card['def']!.text.trim(),
           }).toList();
-
-      _deckService.createDeck(
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+          deckProvider.createDeck(
           userId: userProvider.user!.userId,
           title: _titleController.text.trim(),
           subject: _subjectController.text.trim(),
@@ -203,7 +202,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       );
       nav.pop();
 
-      final decks = await _deckService.getUserDecks(userProvider.user!.userId).first;
+     final decks = deckProvider.decks;
       final results = await _resultService.getUserResults(userProvider.user!.userId);
       final streak = _resultService.calculateStreak(results);
 

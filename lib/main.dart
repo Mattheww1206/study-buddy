@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/core/ConnectivityProvider.dart';
@@ -42,18 +43,26 @@ import 'package:studybuddy/features/quiz/presentation/study_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_result_page.dart';
 import 'package:studybuddy/features/quiz/presentation/true_false_review_page.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 import 'package:studybuddy/features/theme/theme_data.dart';
 import 'package:studybuddy/services/firebase_service.dart';
 import 'package:studybuddy/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+  ));
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DeckProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+        ChangeNotifierProvider(create: (_) => ResultProvider()),
       ],
       child: const MyApp(),
     )

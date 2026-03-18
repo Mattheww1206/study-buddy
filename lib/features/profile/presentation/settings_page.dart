@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -52,6 +54,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           final nav = Navigator.of(context);
                           userProvider.clearUser();
                           await _authService.signOut();
+                          Provider.of<DeckProvider>(context, listen: false).stopListening();
+                          Provider.of<ResultProvider>(context, listen: false).clearResults();
                           nav.pushNamedAndRemoveUntil('/', (route) => false);
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: primaryBlue),
@@ -166,7 +170,7 @@ class _SettingsPageState extends State<SettingsPage> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: iconColor.withOpacity(0.1),
+          color: iconColor.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: iconColor, size: 24),

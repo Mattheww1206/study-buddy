@@ -150,9 +150,9 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: primaryColor.withOpacity(0.3)),
+                  border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
                 ),
                 child: const Text(
                   'Reviewing Missed Cards',
@@ -202,7 +202,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withValues(alpha: 0.1),
                                           blurRadius: 15,
                                           offset: const Offset(0, 8)),
                                     ],
@@ -286,7 +286,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                     decoration: BoxDecoration(
                       color: i <= (_currentIndex % 8)
                           ? primaryColor
-                          : primaryColor.withOpacity(0.2),
+                          : primaryColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

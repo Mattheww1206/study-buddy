@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 
 class HomeContentPage extends StatefulWidget {
   const HomeContentPage({super.key});
@@ -13,8 +14,6 @@ class HomeContentPage extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContentPage> {
-  final DeckService _deckService = DeckService();
-  late Stream<List<Deck>> _decksStream;
   final bool _isLoading = false;
 
   // Blue 60-30-10 Palette
@@ -26,13 +25,7 @@ class _HomeContentState extends State<HomeContentPage> {
   final PageController _recentController = PageController(viewportFraction: 0.65);
   final PageController _newlyAddedController = PageController(viewportFraction: 0.65);
 
-  final List<dynamic> _results = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _decksStream = _deckService.getDecksStream();
-  }
+  
 
   @override
   void dispose() {
@@ -43,28 +36,33 @@ class _HomeContentState extends State<HomeContentPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+void initState() {
+  super.initState();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+  ));
+}
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: secondaryColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : StreamBuilder<List<Deck>>(
-              stream: _decksStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator(color: primaryColor));
-                }
+          : Consumer<DeckProvider>(
+            builder: (context, deckProvider, child) {
+              if (deckProvider.isLoading && deckProvider.decks.isEmpty) {
+                return const Center(child: CircularProgressIndicator(color: primaryColor));
+              }
 
-                final decks = snapshot.data ?? [];
+                final decks = deckProvider.decks;
                 if (decks.isEmpty) return _buildGlobalEmptyState();
+                final resultProvider = context.watch<ResultProvider>();
 
                 final pinnedDecks = decks.where((d) => d.isPinned).toList();
-                final recentDecks = decks.take(5).toList();
+                final recentDecks = _getRecentlyStudiedDecks(decks, resultProvider);
                 final newlyAdded = decks.take(5).toList();
 
                 return SingleChildScrollView(
@@ -131,7 +129,7 @@ class _HomeContentState extends State<HomeContentPage> {
               height: 6,
               width: isActive ? 18 : 6,
               decoration: BoxDecoration(
-                color: isActive ? primaryColor : primaryColor.withOpacity(0.2),
+                color: isActive ? primaryColor : primaryColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
             );
@@ -154,7 +152,7 @@ class _HomeContentState extends State<HomeContentPage> {
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withOpacity(0.05),
+                color: primaryColor.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               )
@@ -196,7 +194,7 @@ class _HomeContentState extends State<HomeContentPage> {
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               )
@@ -246,20 +244,21 @@ class _HomeContentState extends State<HomeContentPage> {
   }
 
   Widget _buildStatsSection(List<Deck> decks) {
+     final resultProvider = context.watch<ResultProvider>(); 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(vertical: 30),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(35),
-        border: Border.all(color: primaryColor.withOpacity(0.1), width: 1.5),
+        border: Border.all(color: primaryColor.withValues(alpha: 0.1), width: 1.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStatColumn('${decks.length}', 'DECKS'),
           Container(height: 40, width: 1.5, color: secondaryColor),
-          _buildStatColumn('${_results.where((r) => r.mode != 'flashcard').length}', 'QUIZZES'),
+          _buildStatColumn('${resultProvider.totalQuizTaken}', 'QUIZZES'),
         ],
       ),
     );
@@ -292,12 +291,12 @@ class _HomeContentState extends State<HomeContentPage> {
           color: isColored ? primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(30),
           border: !isColored
-              ? Border.all(color: primaryColor.withOpacity(0.2), width: 1.5)
+              ? Border.all(color: primaryColor.withValues(alpha: 0.2), width: 1.5)
               : null,
           boxShadow: [
             if (isColored)
               BoxShadow(
-                color: primaryColor.withOpacity(0.3),
+                color: primaryColor.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               )
@@ -343,7 +342,7 @@ class _HomeContentState extends State<HomeContentPage> {
         children: [
           Icon(Icons.auto_stories_outlined,
               size: 80,
-              color: primaryColor.withOpacity(0.2)),
+              color: primaryColor.withValues(alpha: 0.2)),
           const SizedBox(height: 20),
           const Text('No decks yet.\nStart your journey today!',
             textAlign: TextAlign.center,
@@ -353,4 +352,41 @@ class _HomeContentState extends State<HomeContentPage> {
       ),
     );
   }
+
+      List<Deck> _getRecentlyStudiedDecks(List<Deck> decks, ResultProvider resultProvider) {
+      if (resultProvider.results.isEmpty) {
+        // fallback to newest decks if no quiz history
+        return decks.take(5).toList();
+      }
+
+      // Get unique deckIds ordered by most recently quizzed
+      final seenIds = <String>{};
+      final recentDeckIds = <String>[];
+
+      for (final result in resultProvider.results) {
+        if (!seenIds.contains(result.deckId)) {
+          seenIds.add(result.deckId);
+          recentDeckIds.add(result.deckId);
+        }
+        if (recentDeckIds.length >= 5) break;
+      }
+
+      // Map back to Deck objects, preserving order
+      final deckMap = {for (final d in decks) d.deckId: d};
+      final recentDecks = recentDeckIds
+          .where((id) => deckMap.containsKey(id))
+          .map((id) => deckMap[id]!)
+          .toList();
+
+      // Fill remaining slots with newest decks if less than 5
+      if (recentDecks.length < 5) {
+        final existing = recentDecks.map((d) => d.deckId).toSet();
+        final remaining = decks
+            .where((d) => !existing.contains(d.deckId))
+            .take(5 - recentDecks.length);
+        recentDecks.addAll(remaining);
+      }
+
+      return recentDecks;
+    }
 }

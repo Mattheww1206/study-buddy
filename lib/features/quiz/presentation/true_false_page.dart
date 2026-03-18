@@ -20,7 +20,6 @@ class TrueFalsePage extends StatefulWidget {
 class _TrueFalsePageState extends State<TrueFalsePage> {
   final ResultService _resultService = ResultService();
   final QuizService _quizService = QuizService();
-  final DeckService _deckService = DeckService();
   final AchievementService _achievementService = AchievementService();
   late Deck _deck;
   late DateTime _startTime;
@@ -263,7 +262,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
 
     try {
       final results = await _resultService.getUserResults(userId);
-      final decks = await _deckService.getUserDecks(userId).first;
+      final decks = Provider.of<DeckProvider>(context, listen: false).decks;
       final streak = _resultService.calculateStreak(results);
 
       final newlyUnlocked = await _achievementService.evaluateAndUnlock(

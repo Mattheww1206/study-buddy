@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/gemini/service/gemini_service.dart';
 import 'package:studybuddy/services/file_text_extractor.dart';
 
@@ -17,7 +16,7 @@ class CreateUploadPage extends StatefulWidget {
 }
 
 class _CreateUploadPageState extends State<CreateUploadPage> {
-  final DeckService _deckService = DeckService();
+
   final GeminiService _geminiService = GeminiService();
   final FileTextExtractorService _extractorService = FileTextExtractorService();
   late ConnectivityProvider _connectivityProvider;
@@ -57,10 +56,10 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
   }
 
   Future<void> _processAndGenerate() async {
+    final deckProvider = Provider.of<DeckProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final userId = userProvider.user?.userId;
     final navigator = Navigator.of(context);
-    final deckProvider = Provider.of<DeckProvider>(context, listen: false);
 
     if (selectedFile == null || _isProcessing) return;
 
@@ -122,7 +121,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
 
       setState(() => _statusMessage = 'Saving deck (${cards.length} cards)...');
 
-      final newDeck = await _deckService.createDeck(
+     final newDeck = await deckProvider.createDeck(
         userId: userId,
         title: title,
         subject: subject,
@@ -218,7 +217,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               )
@@ -264,7 +263,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                              color: selectedFile != null ? primaryColor : primaryColor.withOpacity(0.1),
+                              color: selectedFile != null ? primaryColor : primaryColor.withValues(alpha: 0.1),
                               width: 2,
                             ),
                           ),
@@ -273,7 +272,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                               Container(
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: secondaryColor.withOpacity(0.5),
+                                  color: secondaryColor.withValues(alpha: 0.5),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -318,11 +317,11 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: primaryColor.withOpacity(0.1)),
+                                      border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
                                     ),
                                     child: Text(
                                       txt,
-                                      style: TextStyle(color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.bold, fontSize: 12),
+                                      style: TextStyle(color: primaryColor.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 12),
                                     ),
                                   ))
                               .toList(),
@@ -337,7 +336,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: _hasError ? Colors.red.withOpacity(0.3) : _isDone ? colorSuccessIcon.withOpacity(0.3) : primaryColor.withOpacity(0.2),
+                              color: _hasError ? Colors.red.withValues(alpha: 0.3) : _isDone ? colorSuccessIcon.withValues(alpha: 0.3) : primaryColor.withValues(alpha: 0.2),
                               width: 1.5,
                             ),
                           ),

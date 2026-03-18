@@ -2,9 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
-import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
+
 
 class StudyPage extends StatefulWidget {
   const StudyPage({super.key});
@@ -14,7 +13,6 @@ class StudyPage extends StatefulWidget {
 }
 
 class _StudyPageState extends State<StudyPage> {
-  final DeckService _deckService = DeckService();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   
@@ -86,27 +84,24 @@ class _StudyPageState extends State<StudyPage> {
 
               // Deck list section
               Expanded(
-                child: StreamBuilder<List<Deck>>(
-                  stream: _deckService.getUserDecks(userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator(color: primaryColor));
+                child: Consumer<DeckProvider>(
+                  builder: (context, deckProvider, child) {
+                    if (deckProvider.isLoading && deckProvider.decks.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (snapshot.hasData) {
-                      Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
-                    }
-
-                    final providerDecks = deckProvider.decks;
-                    final filteredDecks = providerDecks.where((d) =>
-                        d.title.toLowerCase().contains(_searchQuery) ||
-                        d.subject.toLowerCase().contains(_searchQuery)).toList();
+                    final allDecks = deckProvider.decks;
+                    final filteredDecks = _searchQuery.isEmpty
+                        ? allDecks
+                        : allDecks.where((d) =>
+                            d.title.toLowerCase().contains(_searchQuery) ||
+                            d.subject.toLowerCase().contains(_searchQuery)).toList();
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Header section
-                        if (providerDecks.isNotEmpty) ...[
+                        if (allDecks.isNotEmpty) ...[
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

@@ -34,10 +34,10 @@ class AchievementService {
   Future<List<String>> getUnlockedIds(String userId) async {
     try {
       final snapshot = await _firestore
-                       .collection('users')
-                       .doc(userId)
-                       .collection('achievements')
-                       .get();
+          .collection('users')
+          .doc(userId)
+          .collection('achievements')
+          .get();
       return snapshot.docs.map((doc) => doc.id).toList();
     } catch (e) {
       print('AchievementService: getUnlockedIds error: $e');
@@ -51,43 +51,44 @@ class AchievementService {
 
     try {
       final snapshot = await _firestore
-                       .collection('users')
-                       .doc(userId)
-                       .collection('achievements')
-                       .get();
+          .collection('users')
+          .doc(userId)
+          .collection('achievements')
+          .get();
 
-      for(final doc in snapshot.docs){
+      for (final doc in snapshot.docs) {
         final timeStamp = doc.data()['unlockedAt'];
-        if(timeStamp != null) {
+        if (timeStamp != null) {
           unlockedMap[doc.id] = (timeStamp as Timestamp).toDate();
         }
       }
     } catch (e) {
-      print('Achievement Service: getAchivements error: $e');
+      print('AchievementService: getAchievements error: $e');
     }
+
     return allAchievement.map((a) {
-      if(unlockedIds.contains(a.achieveId)) {
+      if (unlockedIds.contains(a.achieveId)) {
         return a.copyWith(isUnlocked: true, unlockedAt: unlockedMap[a.achieveId]);
       }
       return a;
     }).toList();
   }
 
-  Future<void> _unlock(String userId, String achivementId) async {
+  Future<void> _unlock(String userId, String achievementId) async {
     try {
       final ref = _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('achievements')
-            .doc(achivementId);
+          .collection('users')
+          .doc(userId)
+          .collection('achievements')
+          .doc(achievementId);
 
       final doc = await ref.get();
-      if(!doc.exists) {
+      if (!doc.exists) {
         await ref.set({'unlockedAt': FieldValue.serverTimestamp()});
-        print('Achievement unlocked: $achivementId');
+        print('Achievement unlocked: $achievementId');
       }
     } catch (e) {
-      print('Achievement Service: unlock error: $e');
+      print('AchievementService: _unlock error for $achievementId: $e');
     }
   }
 
@@ -98,61 +99,81 @@ class AchievementService {
     required int streak,
     bool reviewedWrongAnswers = false,
   }) async {
-    final alreadyUnlocked = await getUnlockedIds(userId);
-    final newlyUnlocked = <String>[];
- 
-    Future<void> tryUnlock(String id, bool condition) async {
-      if (condition && !alreadyUnlocked.contains(id)) {
-        await _unlock(userId, id);
-        newlyUnlocked.add(id);
+    try {
+      print('=== evaluateAndUnlock START ===');
+
+      final alreadyUnlocked = await getUnlockedIds(userId);
+      print('alreadyUnlocked: $alreadyUnlocked');
+
+      final newlyUnlocked = <String>[];
+      Future<void> tryUnlock(String id, bool condition) async {
+        try {
+          if (condition && !alreadyUnlocked.contains(id)) {
+            await _unlock(userId, id);
+            newlyUnlocked.add(id);
+            print('newly unlocked: $id');
+          }
+        } catch (e) {
+          print('tryUnlock error for $id: $e');
+        }
       }
+
+      final quizResults = results.where((r) => r.mode != 'flashcard').toList();
+      final totalQuizzes = quizResults.length;
+      print('quizResults: $totalQuizzes');
+
+      double scorePercent(StudyResult r) =>
+          r.totalCards > 0 ? r.correctCount / r.totalCards : 0.0;
+
+      final perfectScores = quizResults.where((r) => scorePercent(r) == 1.0).length;
+      final ninetyPlusScores = quizResults.where((r) => scorePercent(r) >= 0.9).length;
+      final modesUsed = quizResults.map((r) => r.mode).toSet();
+      print('modesUsed: $modesUsed');
+      print('perfectScores: $perfectScores');
+
+      await tryUnlock('welcome', true);
+      await tryUnlock('card_maker', decks.isNotEmpty);
+      await tryUnlock('bookworm', decks.length >= 5);
+      await tryUnlock('collector', decks.length >= 10);
+      await tryUnlock('fox_favorite', totalQuizzes >= 5);
+      await tryUnlock('quiz_x10', totalQuizzes >= 10);
+      await tryUnlock('quiz_x50', totalQuizzes >= 50);
+      await tryUnlock('fox_friend', streak >= 3);
+      await tryUnlock('two_weeks', streak >= 14);
+      await tryUnlock('monthly', streak >= 30);
+      await tryUnlock('clean_sweep', perfectScores >= 1);
+      await tryUnlock('unstoppable', perfectScores >= 5);
+      await tryUnlock('high_achiever', ninetyPlusScores >= 3);
+      await tryUnlock('top_class', perfectScores >= 3);
+      await tryUnlock('mix_master', modesUsed.contains('random'));
+      await tryUnlock('identifier', modesUsed.contains('identification'));
+      await tryUnlock('choice_maker', modesUsed.contains('multiple_choice'));
+      await tryUnlock('true_false_taker', modesUsed.contains('true_false'));
+      await tryUnlock('reviewer', reviewedWrongAnswers);
+      await tryUnlock(
+        'explorer',
+        modesUsed.contains('multiple_choice') &&
+            modesUsed.contains('identification') &&
+            modesUsed.contains('true_false') &&
+            modesUsed.contains('random'),
+      );
+
+      if (quizResults.isNotEmpty) {
+        final firstQuiz = quizResults.last;
+        await tryUnlock('rising_star', scorePercent(firstQuiz) >= 0.7);
+      }
+
+      final totalUnlocked = alreadyUnlocked.length + newlyUnlocked.length;
+      await tryUnlock('fox_legend', totalUnlocked >= 10);
+
+      print('=== evaluateAndUnlock DONE — newlyUnlocked: $newlyUnlocked ===');
+      return newlyUnlocked;
+
+    } catch (e, stack) {  // ✅ stack is now properly declared here
+      print('=== evaluateAndUnlock CRASH ===');
+      print('error: $e');
+      print('stack: $stack');
+      return [];
     }
-
-    final quizResults = results.where((r) => r.mode != 'flashcard').toList();
-    final totalQuizzes = quizResults.length;
- 
-    // Score helpers
-    double scorePercent(StudyResult r) => r.totalCards > 0 ? r.correctCount / r.totalCards : 0.0;
- 
-    final perfectScores = quizResults.where((r) => scorePercent(r) == 1.0).length;
-    final ninetyPlusScores = quizResults.where((r) => scorePercent(r) >= 0.9).length;
-    final modesUsed = quizResults.map((r) => r.mode).toSet();
-
-    await tryUnlock('welcome', true); // always unlocked
-    await tryUnlock('card_maker', decks.isNotEmpty);
-    await tryUnlock('bookworm', decks.length >= 5);
-    await tryUnlock('collector', decks.length >= 10);
-    await tryUnlock('fox_favorite', totalQuizzes >= 5);
-    await tryUnlock('quiz_x10', totalQuizzes >= 10);
-    await tryUnlock('quiz_x50', totalQuizzes >= 50);
-    await tryUnlock('fox_friend', streak >= 3);
-    await tryUnlock('two_weeks', streak >= 14);
-    await tryUnlock('monthly', streak >= 30);
-    await tryUnlock('clean_sweep', perfectScores >= 1);
-    await tryUnlock('unstoppable', perfectScores >= 5);
-    await tryUnlock('high_achiever', ninetyPlusScores >= 3);
-    await tryUnlock('top_class', perfectScores >= 3);
-    await tryUnlock('mix_master', modesUsed.contains('random'));
-    await tryUnlock('identifier', modesUsed.contains('identification'));
-    await tryUnlock('choice_maker', modesUsed.contains('multiple_choice'));
-    await tryUnlock('true_false_taker', modesUsed.contains('true_false'));
-    await tryUnlock('reviewer', reviewedWrongAnswers);
-    await tryUnlock('explorer',modesUsed.contains('multiple_choice') &&
-          modesUsed.contains('identification') &&
-          modesUsed.contains('true_false') &&
-          modesUsed.contains('random'),
-    );
-
-    if (quizResults.isNotEmpty) {
-      final firstQuiz = quizResults.last; 
-      await tryUnlock('rising_star', scorePercent(firstQuiz) >= 0.7);
-    }
- 
-    final totalUnlocked = alreadyUnlocked.length + newlyUnlocked.length;
-    await tryUnlock('fox_legend', totalUnlocked >= 10);
- 
-    return newlyUnlocked;
   }
-
-
 }

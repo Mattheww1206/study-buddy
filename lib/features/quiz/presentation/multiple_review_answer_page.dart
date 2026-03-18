@@ -4,7 +4,6 @@ import 'package:studybuddy/features/Achievements/services/achievement_service.da
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/results/service/result_service.dart';
 
 class MultipleReviewAnswerPage extends StatefulWidget {
@@ -15,7 +14,6 @@ class MultipleReviewAnswerPage extends StatefulWidget {
 }
 
 class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
-  final DeckService _deckService = DeckService();
   final ResultService _resultService = ResultService();
   final AchievementService _achievementService = AchievementService();
   List<Map<String, String>> wrongAnswers = [];
@@ -33,7 +31,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
       if (userId == null) return;
 
       final results = await _resultService.getUserResults(userId);
-      final decks = await _deckService.getUserDecks(userId).first;
+      final decks = Provider.of<DeckProvider>(context, listen: false).decks;
       final streak = _resultService.calculateStreak(results);
 
       await _achievementService.evaluateAndUnlock(
