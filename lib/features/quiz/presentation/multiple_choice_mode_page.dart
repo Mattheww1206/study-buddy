@@ -19,8 +19,12 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
   late Deck deck;
   bool _initialized = false;
 
-  // Added for validation
   String? _errorMessage;
+
+  static const Color primaryColor = Color(0xFF1976D2);
+  static const Color secondaryColor = Color(0xFFE3F2FD);
+  static const Color accentColor = Color(0xFF2196F3);
+  static const Color actionblue = Color(0xFF00B0FF);
 
   @override
   void didChangeDependencies() {
@@ -29,7 +33,6 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
     _initialized = true;
     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
 
-    // Initial value setup
     numberOfQuestions = deck.totalCards;
     _questionsController.text = '$numberOfQuestions';
   }
@@ -43,88 +46,54 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size:28),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        // PINALITAN: Inalis ang logo, pinalitan ng text ng napiling mode
+        title: const Text(
+          "Multiple Choice",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           children: [
-            // Mode Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF665FBE),
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("SELECTED MODE",
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.edit_document, color: Colors.white, size: 26),
-                      ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Multiple Choice",
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                            Text("Pick 1 correct answer from 4 options",
-                                style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            
+            // TINANGGAL: Ang "SELECTED MODE" Container card dito ay inalis na.
+
             // Question Input Section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.quiz_outlined, color: Color(0xFF665FBE), size: 24),
+                      Icon(Icons.quiz_outlined, color: primaryColor, size: 24),
                       SizedBox(width: 8),
-                      Text("Number of Questions", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Number of Questions",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text('Max: ${deck.totalCards} cards available',
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  Text(
+                    'Max: ${deck.totalCards} cards available',
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                   const SizedBox(height: 13),
                   TextField(
@@ -136,7 +105,7 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                       setState(() {
                         if (parsed > deck.totalCards) {
                           _errorMessage = "Maximum is ${deck.totalCards} questions only.";
-                          numberOfQuestions = parsed; // keep the value to trigger error
+                          numberOfQuestions = parsed;
                         } else if (parsed <= 0 && val.isNotEmpty) {
                           _errorMessage = "Enter at least 1 question.";
                           numberOfQuestions = 0;
@@ -147,15 +116,15 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText: _errorMessage, // Displays the red reminder text
+                      errorText: _errorMessage,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFF665FBE), width: 1.6),
+                        borderSide: const BorderSide(color: accentColor, width: 1.6),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFF665FBE), width: 2.0),
+                        borderSide: const BorderSide(color: primaryColor, width: 2.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -167,22 +136,22 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                       ),
                     ),
                     style: TextStyle(
-                      fontSize: 20, 
-                      fontWeight: FontWeight.bold, 
-                      color: _errorMessage == null ? const Color(0xFF665FBE) : Colors.red
-                    ),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: _errorMessage == null ? primaryColor : Colors.red),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Timer Section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 children: [
@@ -191,16 +160,17 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.timer_outlined, color: Color(0xFF2D2D5E), size: 24),
+                          Icon(Icons.timer_outlined, color: primaryColor, size: 24),
                           SizedBox(width: 8),
-                          Text("Quiz Timer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text("Quiz Timer",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ],
                       ),
                       Switch(
                         value: isTimerEnabled,
                         onChanged: (val) => setState(() => isTimerEnabled = val),
-                        activeThumbColor: const Color(0xFF665FBE),
-                        materialTapTargetSize: MaterialTapTargetSize.padded,
+                        activeThumbColor: primaryColor,
+                        activeColor: accentColor.withValues(alpha: 0.3),
                       ),
                     ],
                   ),
@@ -217,13 +187,13 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF),
+                                color: isSelected ? primaryColor : secondaryColor,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 "${time}m",
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : const Color(0xFF665FBE),
+                                  color: isSelected ? Colors.white : primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -237,40 +207,44 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Quiz Summary Section
             Container(
               padding: const EdgeInsets.all(20),
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text("QUIZ SUMMARY",
-                      style: TextStyle(color: Color(0xFF665FBE), fontSize: 12, fontWeight: FontWeight.bold)),
+                      style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 13),
                   const Row(
                     children: [
-                      Icon(Icons.edit_document, color: Color(0xFFFF7F32), size: 28),
+                      Icon(Icons.edit_document, color: actionblue, size: 28),
                       SizedBox(width: 10),
-                      Text("Multiple Choice", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Multiple Choice",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(Icons.format_list_numbered, color: Color(0xFF665FBE), size: 28),
+                      const Icon(Icons.format_list_numbered, color: primaryColor, size: 28),
                       const SizedBox(width: 10),
-                      Text("$numberOfQuestions Questions", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("$numberOfQuestions Questions",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(isTimerEnabled ? Icons.timer : Icons.all_inclusive, color: const Color(0xFF665FBE), size: 28),
+                      Icon(isTimerEnabled ? Icons.timer : Icons.all_inclusive,
+                          color: primaryColor, size: 28),
                       const SizedBox(width: 10),
                       Text(isTimerEnabled ? "$selectedTime min" : "No Limit",
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -279,24 +253,23 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 23),
-            
+            const SizedBox(height: 32),
+
             // Start Button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                // Button is disabled if there's a validation error
-                onPressed: (_errorMessage != null || numberOfQuestions <= 0) 
-                ? null 
-                : () {
-                  Navigator.pushNamed(context, 'multiple_choice', arguments: {
-                    'numberOfQuestions': numberOfQuestions,
-                    'timerMinutes': isTimerEnabled ? selectedTime : null
-                  });
-                },
+                onPressed: (_errorMessage != null || numberOfQuestions <= 0)
+                    ? null
+                    : () {
+                        Navigator.pushNamed(context, 'multiple_choice', arguments: {
+                          'numberOfQuestions': numberOfQuestions,
+                          'timerMinutes': isTimerEnabled ? selectedTime : null
+                        });
+                      },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF7F32),
+                  backgroundColor: actionblue,
                   disabledBackgroundColor: Colors.grey.shade400,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   elevation: 3,
@@ -305,7 +278,6 @@ class _MultipleChoiceModePageState extends State<MultipleChoiceModePage> {
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               ),
             ),
-            const SizedBox(height: 8),
           ],
         ),
       ),

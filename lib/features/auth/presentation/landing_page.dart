@@ -30,7 +30,7 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF), 
+      backgroundColor: const Color(0xFFE3F2FD), 
       body: Center(
           child: Column(
             children: [
@@ -54,7 +54,7 @@ class _LandingPageState extends State<LandingPage> {
               ),
               CustomButton(
                 text: 'Create Account',
-                backgroundColor: Theme.of(context).colorScheme.secondary,
+                backgroundColor: Color(0xFF1976D2),
                 textColor: Colors.white,
                 fontSize: 32,
                 height: 66,
@@ -68,8 +68,10 @@ class _LandingPageState extends State<LandingPage> {
               ),
               CustomButton(
                 text: 'Login',
-                backgroundColor: const Color(0xFF4A449A),
-                textColor: const Color.fromARGB(255, 255, 255, 255),
+                backgroundColor: Colors.white,
+                borderColor: Color(0xFF1976D2),
+                borderWidth: 3,
+                textColor: const Color.fromARGB(255, 0, 0, 0),
                 fontSize: 32,
                 height: 66,
                 width: 279,

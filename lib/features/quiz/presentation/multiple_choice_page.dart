@@ -39,10 +39,11 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
   int _secondsLeft = 0;
   bool _geminiUnavailable = false;
 
-  // Color Palette
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF6D00);
+  // NEW COLOR PALETTE APPLIED
+  static const Color primaryColor = Color(0xFF1976D2);   
+  static const Color secondaryColor = Color(0xFFE3F2FD); 
+  static const Color accentColor = Color(0xFF2196F3);    
+  static const Color actionblue = Color(0xFF00B0FF); 
 
   @override
   void didChangeDependencies() {
@@ -128,117 +129,106 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
     }
   }
 
-  // Method para sa Confirmation Dialog
-Future<bool> _handleExitConfirmation() async {
-  final bool? result = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      content: Column(
-        mainAxisSize: MainAxisSize.min, // Mahalaga para hindi mag-stretch ang dialog
-        children: [
-          // Icon Section (Circular background gamit ang dominantColor)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: dominantColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+  Future<bool> _handleExitConfirmation() async {
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.exit_to_app_rounded, 
+                color: primaryColor, 
+                size: 44,
+              ),
             ),
-            child: Icon(
-              Icons.exit_to_app_rounded, 
-              color: dominantColor, 
-              size: 44,
+            const SizedBox(height: 24),
+            const Text(
+              'Quit Quiz?',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF4A4A6A),
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          
-          // Original Title
-          const Text(
-            'Quit Quiz?',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF4A4A6A), // Neutral dark color para sa text
+            const SizedBox(height: 12),
+            const Text(
+              'Are you sure you want to quit? Your current progress will be submitted.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 15,
+                height: 1.5,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          
-          // Original Content Message
-          const Text(
-            'Are you sure you want to quit? Your current progress will be submitted.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 15,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 32),
-          
-          // Buttons Section (Row para sa magkatabing buttons)
-          Row(
-            children: [
-              // Cancel Button (Transparent/Bordered look)
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: Colors.grey.shade300),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: const Text(
-                    'CANCEL',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(color: Colors.grey.shade300),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text(
+                      'CANCEL',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.1,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              
-              // Submit & Quit Button (Solid dominantColor)
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: dominantColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: const Text(
-                    'SUBMIT & QUIT',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      letterSpacing: 0.5,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text(
+                      'SUBMIT & QUIT',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
 
-  // Original Logic (Walang binago rito)
-  if (result == true) {
-    if (_selectedOption != null) {
-      _quizData[_currentIndex]['selectedAnswer'] = _selectedOption;
+    if (result == true) {
+      if (_selectedOption != null) {
+        _quizData[_currentIndex]['selectedAnswer'] = _selectedOption;
+      }
+      _finishQuiz();
+      return true;
     }
-    _finishQuiz();
-    return true;
+    return false;
   }
-  return false;
-}
+
   Future<void> _finishQuiz() async {
     if (_isFinished) return;
     _isFinished = true;
@@ -280,7 +270,7 @@ Future<bool> _handleExitConfirmation() async {
       print('Error saving result: $e');
     }
 
-     try {
+    try {
       final results = await _resultService.getUserResults(userId);
       final decks = await _deckService.getUserDecks(userId).first;
       final streak = _resultService.calculateStreak(results);
@@ -301,7 +291,7 @@ Future<bool> _handleExitConfirmation() async {
             const SizedBox(width: 8),
             Text('Achievement Unlocked: $name!'),
           ]),
-          backgroundColor: const Color(0xFF665FBE),
+          backgroundColor: primaryColor,
           duration: const Duration(seconds: 3),
         ));
       }
@@ -309,18 +299,18 @@ Future<bool> _handleExitConfirmation() async {
       print('Achievement evaluation error: $e');
     }
 
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(
-        context,
-        'multiple_result',
-        arguments: {
-          'correctCount': _correctCount,
-          'totalCards': totalCards,
-          'wrongAnswers': wrongAnswers,
-          'timeUsed': timeUsed,
-        },
-      );
-    }
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(
+      context,
+      'multiple_result',
+      arguments: {
+        'correctCount': _correctCount,
+        'totalCards': totalCards,
+        'wrongAnswers': wrongAnswers,
+        'timeUsed': timeUsed,
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -334,7 +324,7 @@ Future<bool> _handleExitConfirmation() async {
       return Scaffold(
         backgroundColor: secondaryColor,
         appBar: AppBar(
-          backgroundColor: dominantColor,
+          backgroundColor: primaryColor,
           elevation: 0,
           title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
           centerTitle: true,
@@ -343,9 +333,9 @@ Future<bool> _handleExitConfirmation() async {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              CircularProgressIndicator(color: primaryColor),
               SizedBox(height: 20),
-              Text('Generating quiz questions...', style: TextStyle(color: Color(0xFF665FBE), fontSize: 16)),
+              Text('Generating quiz questions...', style: TextStyle(color: primaryColor, fontSize: 16)),
             ],
           ),
         ),
@@ -353,9 +343,9 @@ Future<bool> _handleExitConfirmation() async {
     }
 
     if (_geminiUnavailable || _flashcards.isEmpty) {
-       return Scaffold(
+      return Scaffold(
         backgroundColor: secondaryColor,
-        appBar: AppBar(backgroundColor: dominantColor, title: Text(_deck.title)),
+        appBar: AppBar(backgroundColor: primaryColor, title: Text(_deck.title)),
         body: const Center(child: Text("No quiz data available.")),
       );
     }
@@ -368,7 +358,6 @@ Future<bool> _handleExitConfirmation() async {
     final progressPercent = (progressValue * 100).toInt();
     final isLastQuestion = _currentIndex >= totalQuestions - 1;
 
-    // PopScope handles the physical back button
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -378,19 +367,32 @@ Future<bool> _handleExitConfirmation() async {
       child: Scaffold(
         backgroundColor: secondaryColor,
         appBar: AppBar(
-          backgroundColor: dominantColor,
+          backgroundColor: primaryColor,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () => _handleExitConfirmation(), // Gagamit ng confirmation bago mag-exit
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+            onPressed: () => _handleExitConfirmation(),
           ),
-          title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-          centerTitle: true,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _deck.title,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              ),
+            ),
+          ),
+        ),
+         centerTitle:true,
         ),
         body: SafeArea(
           child: Column(
             children: [
-              // Status Section (Progress Bar & Timer)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
                 child: Column(
@@ -402,7 +404,7 @@ Future<bool> _handleExitConfirmation() async {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Question ${_currentIndex + 1}/$totalQuestions",
-                                style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor, fontSize: 22)),
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor, fontSize: 22)),
                             Text("$progressPercent% Completed",
                                 style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16)),
                           ],
@@ -413,13 +415,13 @@ Future<bool> _handleExitConfirmation() async {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: _secondsLeft < 60 ? Colors.red : dominantColor.withValues(alpha: 0.2)),
+                              border: Border.all(color: _secondsLeft < 60 ? Colors.red : primaryColor.withValues(alpha: 0.2)),
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.timer_outlined, color: _secondsLeft < 60 ? Colors.red : dominantColor, size: 18),
+                                Icon(Icons.timer_outlined, color: _secondsLeft < 60 ? Colors.red : primaryColor, size: 18),
                                 const SizedBox(width: 6),
-                                Text(_timerDisplay, style: TextStyle(color: _secondsLeft < 60 ? Colors.red : dominantColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                                Text(_timerDisplay, style: TextStyle(color: _secondsLeft < 60 ? Colors.red : primaryColor, fontSize: 16, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -431,17 +433,14 @@ Future<bool> _handleExitConfirmation() async {
                       child: LinearProgressIndicator(
                         value: progressValue,
                         backgroundColor: Colors.white,
-                        color: accentColor,
+                        color: actionblue,
                         minHeight: 10,
                       ),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 5),
-
-              // Question Card
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 width: double.infinity,
@@ -457,14 +456,12 @@ Future<bool> _handleExitConfirmation() async {
                     child: Text(
                       flashcard.question,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: dominantColor, fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: primaryColor, fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Options Section
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -484,7 +481,7 @@ Future<bool> _handleExitConfirmation() async {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isSelected ? dominantColor : Colors.transparent,
+                            color: isSelected ? actionblue : Colors.transparent,
                             width: 2.5,
                           ),
                           boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2))],
@@ -493,8 +490,8 @@ Future<bool> _handleExitConfirmation() async {
                           children: [
                             CircleAvatar(
                               radius: 18,
-                              backgroundColor: isSelected ? dominantColor : secondaryColor,
-                              child: Text(letter, style: TextStyle(color: isSelected ? Colors.white : dominantColor, fontWeight: FontWeight.bold)),
+                              backgroundColor: isSelected ? actionblue : secondaryColor,
+                              child: Text(letter, style: TextStyle(color: isSelected ? Colors.white : primaryColor, fontWeight: FontWeight.bold)),
                             ),
                             const SizedBox(width: 20),
                             Expanded(
@@ -507,8 +504,6 @@ Future<bool> _handleExitConfirmation() async {
                   },
                 ),
               ),
-
-              // NAVIGATION BUTTONS
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 25),
                 child: Row(
@@ -525,16 +520,15 @@ Future<bool> _handleExitConfirmation() async {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             onPressed: _onPrevTapped,
-                            child: Text(
+                            child: const Text(
                               'Previous',
-                              style: TextStyle(color: dominantColor, fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: primaryColor, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 15),
                     ],
-
                     Expanded(
                       flex: 2,
                       child: Container(
@@ -544,7 +538,7 @@ Future<bool> _handleExitConfirmation() async {
                           boxShadow: [
                             if (_selectedOption != null)
                               BoxShadow(
-                                color: accentColor.withValues(alpha: 0.3),
+                                color: actionblue.withValues(alpha: 0.3),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -552,7 +546,7 @@ Future<bool> _handleExitConfirmation() async {
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _selectedOption != null ? (isLastQuestion ? dominantColor : accentColor) : Colors.grey[300],
+                            backgroundColor: _selectedOption != null ? (isLastQuestion ? primaryColor : actionblue) : Colors.grey[300],
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             elevation: 0,

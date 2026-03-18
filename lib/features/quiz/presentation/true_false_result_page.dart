@@ -18,12 +18,13 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
   bool _initialized = false;
   String timeUsed = '';
   
-  // BAGONG VARIABLE: Flag para sa streak logic
   bool _isFirstQuizToday = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF7D00);
+  // INAPPLY NA MGA COLORS DITO:
+  final Color dominantColor = const Color(0xFF1976D2);  // Solid Primary Blue
+  final Color secondaryColor = const Color(0xFFF5F9FF); // Very Light Blue/White Background
+  final Color accentColor = const Color(0xFF2196F3);    // Bright Blue
+  final Color actionBlue = const Color(0xFF1976D2);    // Same as dominant for buttons
 
   @override
   void didChangeDependencies() {
@@ -38,7 +39,6 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     timeUsed = args['timeUsed'] as String;
     
-    // Kunin ang streak flag mula sa quiz page arguments
     _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
   }
 
@@ -71,7 +71,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white24, width: 2),
-                    color: const Color(0xFF867FE0),
+                    color: Colors.white.withValues(alpha: 0.2), // Lightened for blue theme
                   ),
                   child: Icon(isExcellent ? 
                     Icons.emoji_events : Icons.sentiment_satisfied_alt,
@@ -79,14 +79,14 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                 ),
                 Text(
                   "$accuracyPercent%",
-                  style: TextStyle(
-                    color: accentColor,
+                  style: const TextStyle(
+                    color: Colors.white, // Changed to white for better contrast on blue
                     fontSize: 56,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  isExcellent ? 'Excellent Work! 🎉' : "Keep Practicing! 💪",
+                  isExcellent ? 'Excellent Work! ' : "Keep Practicing! ",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -129,9 +129,9 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 22),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F7FF),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFE8E5FF)),
+                        border: Border.all(color: actionBlue.withValues(alpha: 0.1)),
                       ),
                       child: Column(
                         children: [
@@ -158,9 +158,9 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F7FF),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFE8E5FF)),
+                        border: Border.all(color: actionBlue.withValues(alpha: 0.1)),
                       ),
                       child: Column(
                         children: [
@@ -170,7 +170,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                               Row(
                                 children: [
                                   Icon(Icons.bar_chart_rounded,
-                                      color: dominantColor, size: 20),
+                                      color: actionBlue, size: 20),
                                   const SizedBox(width: 8),
                                   const Text('Accuracy',
                                       style: TextStyle(
@@ -181,7 +181,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                               Text('$accuracyPercent%',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: dominantColor)),
+                                      color: actionBlue)),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -190,7 +190,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                             child: LinearProgressIndicator(
                               value: accuracy,
                               minHeight: 10,
-                              backgroundColor: const Color(0xFFE0E0E0),
+                              backgroundColor: Colors.grey[200],
                               valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                             ),
                           ),
@@ -206,9 +206,9 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                           child: Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8F7FF),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFE8E5FF)),
+                              border: Border.all(color: actionBlue.withValues(alpha: 0.1)),
                             ),
                             child: Row(
                               children: [
@@ -237,20 +237,19 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                         ),
                         const SizedBox(width: 12),
                         
-                        // CONDITIONAL RENDERING: Streak Logic
                         Expanded(
                           child: _isFirstQuizToday
                           ? Container(
                               padding: const EdgeInsets.all(18),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF8F7FF),
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
+                                border: Border.all(color: actionBlue.withValues(alpha: 0.1)),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.local_fire_department,
-                                      color: accentColor, size: 22),
+                                  const Icon(Icons.local_fire_department,
+                                      color: Colors.orange, size: 22),
                                   const SizedBox(width: 8),
                                   const Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,7 +273,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.02),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE8E5FF)),
+                                border: Border.all(color: Colors.black12),
                               ),
                               child: const Center(
                                 child: Text(
@@ -304,12 +303,12 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                           },
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor,
-                          foregroundColor: secondaryColor,
+                          backgroundColor: actionBlue,
+                          foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 58),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
-                          elevation: 0,
+                          elevation: 2,
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -327,7 +326,7 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                     ],
                     
                     // Back to Home Button 
-                    ElevatedButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.pushNamedAndRemoveUntil(
                           context,
@@ -336,13 +335,12 @@ class _TrueFalseResultPageState extends State<TrueFalseResultPage> {
                           arguments: 2,
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: dominantColor,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: actionBlue,
+                        side: BorderSide(color: actionBlue, width: 2),
                         minimumSize: const Size(double.infinity, 58),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        elevation: 0,
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,

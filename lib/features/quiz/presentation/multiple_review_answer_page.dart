@@ -22,31 +22,31 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
   late Deck deck;
   bool _initialized = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFF665FBE);
-
+  // IN-UPDATE NA COLOR PALETTE (BLUE THEME)
+  final Color primaryColor = Color(0xFF1976D2);   // Deep Blue
+  final Color secondaryColor = const Color(0xFFE3F2FD); // Very Light Blue
+  final Color actionBlue = const Color(0xFF00B0FF);     // Vibrant Blue
 
   Future<void> _evaluateAchievements() async {
-  try {
-    final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
-    if (userId == null) return;
+    try {
+      final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
+      if (userId == null) return;
 
-    final results = await _resultService.getUserResults(userId);
-    final decks = await _deckService.getUserDecks(userId).first;
-    final streak = _resultService.calculateStreak(results);
+      final results = await _resultService.getUserResults(userId);
+      final decks = await _deckService.getUserDecks(userId).first;
+      final streak = _resultService.calculateStreak(results);
 
-    await _achievementService.evaluateAndUnlock(
-      userId: userId,
-      results: results,
-      decks: decks,
-      streak: streak,
-      reviewedWrongAnswers: true, 
-    );
-  } catch (e) {
-    print('Achievement eval error: $e');
+      await _achievementService.evaluateAndUnlock(
+        userId: userId,
+        results: results,
+        decks: decks,
+        streak: streak,
+        reviewedWrongAnswers: true, 
+      );
+    } catch (e) {
+      print('Achievement eval error: $e');
+    }
   }
-}
 
   @override
   void didChangeDependencies() {
@@ -63,18 +63,18 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondaryColor,
+      backgroundColor: secondaryColor, // Light blue background
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryColor, // Deep blue app bar
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Review — ${deck.title}', 
-          style: TextStyle(
-              color: secondaryColor, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -89,11 +89,11 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: dominantColor)),
+                          color: primaryColor)),
                   const SizedBox(height: 5),
                   const Text('You got everything right!',
                       style:
-                          TextStyle(color: Colors.grey, fontSize: 16)),
+                          TextStyle(color: Colors.black54, fontSize: 16)),
                 ],
               ),
             )
@@ -107,7 +107,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: dominantColor),
+                        color: primaryColor),
                   ),
                 ),
                 Expanded(
@@ -141,8 +141,8 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                 crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.cancel,
-                                      color: Colors.red, size: 28),
+                                  const Icon(Icons.edit_note, // Icon para sa Identification
+                                      color: Colors.orange, size: 28),
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Text(
@@ -150,7 +150,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: dominantColor),
+                                          color: primaryColor),
                                     ),
                                   ),
                                 ],
@@ -166,7 +166,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFDEEFF),
+                                      color: Colors.red.withValues(alpha: 0.05),
                                       borderRadius:
                                           BorderRadius.circular(15),
                                     ),
@@ -177,15 +177,14 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                             text: TextSpan(
                                               style: TextStyle(
                                                   fontSize: 15,
-                                                  color: dominantColor
-                                                      .withValues(alpha: 0.7)),
+                                                  color: Colors.black87),
                                               children: [
                                                 const TextSpan(
                                                     text: 'Your Answer: '),
                                                 TextSpan(
                                                   text: item['selectedAnswer'] ?? '',
-                                                  style: TextStyle(
-                                                      color: dominantColor,
+                                                  style: const TextStyle(
+                                                      color: Colors.red,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -204,7 +203,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF3F2FF),
+                                      color: Colors.green.withValues(alpha: 0.05),
                                       borderRadius:
                                           BorderRadius.circular(15),
                                     ),
@@ -213,17 +212,16 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                                         Expanded(
                                           child: RichText(
                                             text: TextSpan(
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 15,
-                                                  color: dominantColor
-                                                      .withValues(alpha: 0.7)),
+                                                  color: Colors.black87),
                                               children: [
                                                 const TextSpan(
                                                     text: 'Correct Answer: '),
                                                 TextSpan(
                                                   text: item['correctAnswer'] ?? '',
-                                                  style: TextStyle(
-                                                      color: accentColor,
+                                                  style: const TextStyle(
+                                                      color: Colors.green,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -245,7 +243,7 @@ class _MultipleReviewAnswerPageState extends State<MultipleReviewAnswerPage> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
                                   vertical: 12, horizontal: 20),
-                              color: accentColor,
+                              color: actionBlue, // Vibrant blue footer
                               child: const Text(
                                 'Incorrect',
                                 style: TextStyle(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
@@ -19,7 +18,11 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   final _titleController = TextEditingController();
   final _subjectController = TextEditingController();
   bool _isLoading = false;
-  final Color colorDominant = const Color(0xFF665FBE);
+
+  // Blue 60-30-10 Palette
+  final Color primaryColor = const Color(0xFF1976D2);   // 60%
+  final Color secondaryColor = const Color(0xFFE3F2FD); // 30%
+  final Color accentColor = const Color(0xFF2196F3);    // 10%
 
   // List of card data
   List<Map<String, TextEditingController>> cardControllers = [
@@ -65,13 +68,13 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   "Delete this card?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF665FBE),
+                    color: primaryColor, 
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -142,14 +145,13 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
     );
   }
 
-  // Pag save ng Deck
   Future<void> _saveDeck() async {
     if (_titleController.text.trim().isEmpty || _subjectController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(
-          content: Text("Title and Subject are required."),
+        SnackBar(
+          content: const Text("Title and Subject are required."),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: colorDominant,
+          backgroundColor: primaryColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
@@ -163,9 +165,9 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
           SnackBar(
             content: Text("Card ${i + 1} is missing a term or definition."),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: colorDominant,
+            backgroundColor: primaryColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
+          ),
         );
         return;
       }
@@ -184,19 +186,20 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
             'def': card['def']!.text.trim(),
           }).toList();
 
-       _deckService.createDeck(
-        userId: userProvider.user!.userId, 
-        title: _titleController.text.trim(), 
-        subject: _subjectController.text.trim(), 
-        cards: cards
-        ).catchError((e) => print('Error saving decks: $e'));
+      _deckService.createDeck(
+          userId: userProvider.user!.userId,
+          title: _titleController.text.trim(),
+          subject: _subjectController.text.trim(),
+          cards: cards
+      ).catchError((e) => print('Error saving decks: $e'));
+
       messenger.showSnackBar(
-        SnackBar(
-          content: Text('Deck Saved!', style: GoogleFonts.itim()),
-           behavior: SnackBarBehavior.floating,
-           backgroundColor: colorDominant,
-           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        )
+          SnackBar(
+            content: Text('Deck Saved!',),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: primaryColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          )
       );
       nav.pop();
 
@@ -205,21 +208,21 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       final streak = _resultService.calculateStreak(results);
 
       AchievementService().evaluateAndUnlock(
-          userId: userProvider.user!.userId,
-          results: results,
-          decks: decks,
-          streak: streak,
+        userId: userProvider.user!.userId,
+        results: results,
+        decks: decks,
+        streak: streak,
       ).catchError((e) => print('Achievement eval error: $e'));
 
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to save deck.'),
-           behavior: SnackBarBehavior.floating,
-           backgroundColor: colorDominant,
-           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-         ),
-          );
+          content: const Text('Failed to save deck.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: primaryColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -228,45 +231,51 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        title: Text(
+          "Create Deck",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.fromLTRB(20, 15, 20, 15), // Itinaas ang top padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // Deck Info Row (Total cards count displayed here)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Create Deck",
+                      Text("Deck Info",
                           style: TextStyle(
-                              fontSize: 26,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1A1A1A))),
-                      Text("${cardControllers.length} cards total",
-                          style: const TextStyle(
-                              color: Color(0xFF665FBE), fontSize: 14)),
+                      Text("${cardControllers.length} cards",
+                          style: TextStyle(
+                              color: primaryColor, 
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14)),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
-                  // Subject and Title
+                  // Subject and Title Section
                   Row(
                     children: [
                       Expanded(
@@ -277,14 +286,14 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: const Color(0xFF665FBE)
+                                  color: primaryColor
                                       .withValues(alpha: 0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("SUBJECT",
                                   style: TextStyle(
-                                      color: const Color(0xFF665FBE)
+                                      color: primaryColor
                                           .withValues(alpha: 0.5),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold)),
@@ -310,14 +319,14 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: const Color(0xFF665FBE)
+                                  color: primaryColor
                                       .withValues(alpha: 0.05))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("TITLE",
                                   style: TextStyle(
-                                      color: const Color(0xFF665FBE)
+                                      color: primaryColor
                                           .withValues(alpha: 0.5),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold)),
@@ -327,8 +336,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                     isDense: true,
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.zero),
-                                style: const TextStyle(
-                                    color: Color(0xFFFF7B67),
+                                style: TextStyle(
+                                    color: accentColor,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16),
                               ),
@@ -338,9 +347,9 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
-                 
+                  // Cards List
                   ...cardControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     var controllers = entry.value;
@@ -352,7 +361,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                            color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
+                            color: primaryColor.withValues(alpha: 0.1)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,8 +376,8 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                         horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: index % 2 == 0
-                                          ? const Color(0xFFFF7B67)
-                                          : const Color(0xFF665FBE),
+                                          ? accentColor
+                                          : primaryColor,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text("${index + 1}",
@@ -378,9 +387,9 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                                             fontSize: 14)),
                                   ),
                                   const SizedBox(width: 10),
-                                  const Text("Card",
+                                  Text("Card",
                                       style: TextStyle(
-                                          color: Color(0xFF665FBE),
+                                          color: primaryColor,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16)),
                                 ],
@@ -396,7 +405,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                           const SizedBox(height: 15),
                           Text("TERM",
                               style: TextStyle(
-                                  color: const Color(0xFF665FBE)
+                                  color: primaryColor
                                       .withValues(alpha: 0.5),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold)),
@@ -405,10 +414,10 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
-                                color: const Color(0xFFFAEEFF),
+                                color: secondaryColor,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                    color: const Color(0xFF665FBE)
+                                    color: primaryColor
                                         .withValues(alpha: 0.05))),
                             child: TextFormField(
                               controller: controllers["term"],
@@ -423,7 +432,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                           const SizedBox(height: 12),
                           Text("DEFINITION",
                               style: TextStyle(
-                                  color: const Color(0xFF665FBE)
+                                  color: primaryColor
                                       .withValues(alpha: 0.5),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold)),
@@ -432,10 +441,10 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
-                                color: const Color(0xFFFAEEFF),
+                                color: secondaryColor,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                    color: const Color(0xFF665FBE)
+                                    color: primaryColor
                                         .withValues(alpha: 0.05))),
                             child: TextFormField(
                               controller: controllers["def"],
@@ -468,48 +477,48 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
                     child: ElevatedButton(
                         onPressed: _isLoading ? null : _saveDeck,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFED9E4F),
+                          backgroundColor: primaryColor,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
                         child: _isLoading
                             ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                 color: Colors.white, strokeWidth: 2))
-                                 : const Text('Save Deck',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold))),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              cardControllers.add({
-                                "term": TextEditingController(),
-                                "def": TextEditingController(),
-                              });
-                            });
-                          },
-                          child: Container(
-                            height: 50,
-                            width: 55,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFF665FBE),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: const Icon(Icons.add, size: 28, color: Colors.white),
-                          ),
-                        ),
-                      ],
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2))
+                            : const Text('Save Deck',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold))),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      cardControllers.add({
+                        "term": TextEditingController(),
+                        "def": TextEditingController(),
+                      });
+                    });
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 55,
+                    decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.add, size: 28, color: Colors.white),
                   ),
                 ),
               ],
             ),
-          );
-        }
-      }
+          ),
+        ],
+      ),
+    );
+  }
+}

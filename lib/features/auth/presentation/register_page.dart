@@ -24,7 +24,10 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _authError;
   bool _isLoading = false;
 
-  final Color _themeBackgroundColor = const Color(0xFFFAEEFF);
+  // Blue 60-30-10 Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
 
   @override
   void dispose() {
@@ -41,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light, // Light icons for dark bg
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
@@ -77,8 +80,8 @@ class _RegisterPageState extends State<RegisterPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); 
-                  Navigator.pop(context); 
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 child: const Text("OK"),
               ),
@@ -98,30 +101,26 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _themeBackgroundColor,
+      backgroundColor: secondaryColor, // Applied Primary (60%)
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 10),
-              
-           
               Center(
                 child: Image.asset(
                   'assets/study.png',
-                  width: 180, 
+                  width: 180,
                   height: 180,
                   fit: BoxFit.contain,
                 ),
               ),
-
-          
               Text(
                 'Join StudyBuddy!',
-                style: GoogleFonts.fredoka( 
+                style: GoogleFonts.fredoka(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.black, // White text for primary bg
                 ),
               ),
               const SizedBox(height: 4),
@@ -129,13 +128,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 'Create your free account today',
                 style: GoogleFonts.itim(
                   fontSize: 16,
-                  color: Colors.black.withValues(alpha: 0.8),
+                  color: Colors.black.withValues(alpha: 0.9),
                 ),
               ),
-
               const SizedBox(height: 15),
-
-            
+              // The White Card Container
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
@@ -146,7 +143,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderRadius: BorderRadius.circular(40),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         spreadRadius: 2,
                         offset: const Offset(0, 10),
@@ -161,17 +158,21 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: _usernameController,
                           hintText: 'Username',
                           keyboardType: TextInputType.name,
-                          fillColor: _themeBackgroundColor,
-                          validator: (value) => (value == null || value.isEmpty) ? 'Username is required' : null,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
+                          validator: (value) => (value == null || value.isEmpty)
+                              ? 'Username is required'
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         CustomTextfield(
                           controller: _emailController,
                           hintText: 'Email Address',
                           keyboardType: TextInputType.emailAddress,
-                          fillColor: _themeBackgroundColor,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
                           validator: (value) {
-                            if (value == null || value.isEmpty) return 'Email Address is required';
+                            if (value == null || value.isEmpty) {
+                              return 'Email Address is required';
+                            }
                             if (!value.contains('@')) return 'Enter a valid Email';
                             return null;
                           },
@@ -181,36 +182,41 @@ class _RegisterPageState extends State<RegisterPage> {
                           controller: _passwordController,
                           hintText: 'Password',
                           isPassword: true,
-                          fillColor: _themeBackgroundColor,
-                          validator: (value) => (value == null || value.length < 8) ? 'At least 8 characters required' : null,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
+                          validator: (value) => (value == null || value.length < 8)
+                              ? 'At least 8 characters required'
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         CustomTextfield(
                           controller: _confirmpasswordController,
                           hintText: 'Confirm Password',
                           isPassword: true,
-                          fillColor: _themeBackgroundColor,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
                           validator: (value) {
-                            if (value == null || value.isEmpty) return 'Confirm Password is required';
-                            if (_passwordController.text != _confirmpasswordController.text) return 'Passwords do not match';
+                            if (value == null || value.isEmpty) {
+                              return 'Confirm Password is required';
+                            }
+                            if (_passwordController.text !=
+                                _confirmpasswordController.text) {
+                              return 'Passwords do not match';
+                            }
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 30),
-
                         if (_authError != null) ...[
                           Text(
                             _authError!,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.itim(color: Colors.red, fontSize: 14),
+                            style: GoogleFonts.itim(
+                                color: Colors.red, fontSize: 14),
                           ),
                           const SizedBox(height: 15),
                         ],
-
                         CustomButton(
-                          text: 'Create Account ',
-                          backgroundColor: const Color(0xFFF27E2B), 
+                          text: 'Create Account',
+                          backgroundColor: accentColor, // Applied Accent (10%)
                           textColor: Colors.white,
                           fontSize: 20,
                           height: 55,
@@ -218,26 +224,24 @@ class _RegisterPageState extends State<RegisterPage> {
                           isLoading: _isLoading,
                           onTap: signUp,
                         ),
-
                         const SizedBox(height: 25),
-
                         RichText(
                           text: TextSpan(
                             style: GoogleFonts.itim(
                               fontSize: 16,
-                              color: const Color(0xFF3B338B),
+                              color: Colors.black87,
                             ),
                             children: [
                               const TextSpan(text: 'Already studying with us? '),
                               TextSpan(
                                 text: 'Login',
                                 style: const TextStyle(
-                                  color: Color(0xFF5D59D1),
+                                  color: primaryColor, // Used primary for link
                                   fontWeight: FontWeight.bold,
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.pop(context); 
+                                    Navigator.pop(context);
                                   },
                               ),
                             ],

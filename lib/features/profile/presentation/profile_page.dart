@@ -32,6 +32,12 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _initialized = false;
   late Stream<List<Deck>> _decksStream;
 
+  // Blue Palette Colors
+  final Color primaryBlue = const Color(0xFF1976D2);   // Darker Blue
+  final Color backgroundBlue = const Color(0xFFE3F2FD); // Lightest Blue
+  final Color accentBlue = const Color(0xFF2196F3);    // Bright Blue
+  final Color streakBlue = const Color(0xFF1976D2);    // Pinalit sa orange
+
   IconData _getIcon(String iconName) {
     const map = {
       'handshake': Icons.handshake,
@@ -109,36 +115,48 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget get _defaultAvatar => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
-            colors: [Color(0xFF90CAF9), Color(0xFFE1F5FE)],
+            colors: [const Color(0xFF90CAF9), backgroundBlue],
           ),
         ),
         child: const Icon(Icons.person, size: 90, color: Colors.black54),
       );
 
   Widget _buildPerformanceItem(String subject, String title, String date, String score, String status, Color scoreColor, Color statusColor) {
-    return Row(children: [
-      Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: const Color(0xFFFAEEFF), borderRadius: BorderRadius.circular(15)),
-          child: const Icon(Icons.assessment_rounded, color: Color(0xFF665FBE))),
-      const SizedBox(width: 15),
-      Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF665FBE))),
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        Text(date, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
-      ])),
-      Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        Text(score, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 18, color: scoreColor)),
-        Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor)),
-      ]),
-    ]);
+    return Card(
+      elevation: 6, 
+      color: Colors.white, 
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20), 
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0), 
+        child: Row(children: [
+          Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: backgroundBlue, borderRadius: BorderRadius.circular(15)),
+              child: Icon(Icons.assessment_rounded, color: primaryBlue)),
+          const SizedBox(width: 15),
+          Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(subject, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
+            const SizedBox(height: 2),
+            Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 2),
+            Text(date, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+          ])),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(score, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 18, color: scoreColor)),
+            Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor)),
+          ]),
+        ]),
+      ),
+    );
   }
 
-  // month helper
   String _monthName(int month) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
@@ -156,16 +174,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final photoUrl = loggedUser?.photoUrl;
 
     final streak = _resultService.calculateStreak(_results);
-    final todayCount = _resultService.todayQuizCount(_results);
-    final weekCount = _resultService.weekQuizCount(_results);
-
-    const dailyGoal = 6;
-    const weeklyGoal = 15;
-    final dailyProgress = (todayCount / dailyGoal).clamp(0.0, 1.0);
-    final weeklyProgress = (weekCount / weeklyGoal).clamp(0.0, 1.0);
-    final dailyPercent = (dailyProgress * 100).toInt();
-    final weeklyPercent = (weeklyProgress * 100).toInt();
-
     final unlockedList = _achievements.where((a) => a.isUnlocked).toList();
     final unlockedCount = unlockedList.length;
     final totalAchievements = _achievements.length;
@@ -173,7 +181,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final overallPercent = (overallProgress * 100).toInt();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: backgroundBlue, 
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : StreamBuilder<List<Deck>>(
@@ -189,9 +197,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Header Section
                       Container(
                         width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF665FBE),
-                          borderRadius: BorderRadius.only(
+                        decoration: BoxDecoration(
+                          color: primaryBlue,
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(40),
                             bottomRight: Radius.circular(40),
                           ),
@@ -208,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   children: [
                                     Image.asset('assets/studybuddy-logo.png', height: 70, fit: BoxFit.contain),
                                     Container(
-                                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
+                                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
                                       child: IconButton(
                                         icon: const Icon(Icons.settings, color: Colors.white, size: 25),
                                         onPressed: () => Navigator.pushNamed(context, 'settings'),
@@ -216,10 +224,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 0),
                                 CircleAvatar(
                                   radius: 60,
-                                  backgroundColor: const Color(0xFFFAEEFF),
+                                  backgroundColor: backgroundBlue,
                                   child: ClipOval(
                                     child: SizedBox(
                                       width: 110,
@@ -233,15 +240,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 8),
                                 Text(loggedUser?.username ?? 'Student', style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 26)),
                                 const SizedBox(height: 10),
+                                
+                                // UPDATED: Streak color is now backgroundBlue to match the page background
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(color: const Color(0xFFFD9519), borderRadius: BorderRadius.circular(30)),
+                                  decoration: BoxDecoration(
+                                    color: backgroundBlue, 
+                                    borderRadius: BorderRadius.circular(30), 
+                                    border: Border.all(color: Colors.white24),
+                                  ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.local_fire_department, color: Colors.white, size: 20),
+                                      Icon(Icons.local_fire_department, color: primaryBlue, size: 20),
                                       const SizedBox(width: 6),
-                                      Text('$streak Day Study Streak', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                                      Text('$streak Day Study Streak', style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 14)),
                                     ],
                                   ),
                                 ),
@@ -255,105 +268,77 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Main Stats Card
                       Transform.translate(
                         offset: const Offset(0, -40),
-                        child: Container(
+                        child: Card(
                           margin: const EdgeInsets.symmetric(horizontal: 20),
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(children: [Text('$totalDecks', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: const Color(0xFF665FBE))), Text('Decks\nCreated', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF665FBE)))]),
-                              Container(height: 40, width: 1, color: Colors.grey.withValues(alpha: 0.2)),
-                              Column(children: [Text('$totalQuizTaken', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: const Color(0xFF665FBE))), Text('Quiz\nTaken', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF665FBE)))]),
-                              Container(height: 40, width: 1, color: Colors.grey.withValues(alpha: 0.2)),
-                              Column(children: [Text('$streak', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: const Color(0xFF665FBE))), Text('Day\nStreak', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: const Color(0xFF665FBE)))]),
-                            ],
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(children: [Text('$totalDecks', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Decks\nCreated', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
+                                Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.2)),
+                                Column(children: [Text('$totalQuizTaken', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Quiz\nTaken', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
+                                Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.2)),
+                                Column(children: [Text('$streak', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 25, color: primaryBlue)), Text('Day\nStreak', textAlign: TextAlign.center, style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue))]),
+                              ],
+                            ),
                           ),
                         ),
                       ),
 
-                      // Progress Section
-                      Transform.translate(
-                        offset: const Offset(0, -30),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Daily Study ($todayCount / $dailyGoal)', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE))),
-                              const SizedBox(height: 12),
-                              Row(children: [const Icon(Icons.check, color: Color(0xFF665FBE), size: 24), const SizedBox(width: 8), Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: dailyProgress, backgroundColor: const Color(0xFFFAEEFF), color: const Color(0xFF665FBE), minHeight: 15))), const SizedBox(width: 10), Text('$dailyPercent%', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE)))]),
-                              const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider(color: Colors.grey, thickness: 0.5)),
-                              Text('Weekly Study ($weekCount / $weeklyGoal)', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE))),
-                              const SizedBox(height: 12),
-                              Row(children: [const Icon(Icons.check, color: Color(0xFF665FBE), size: 24), const SizedBox(width: 8), Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: weeklyProgress, backgroundColor: const Color(0xFFFAEEFF), color: const Color(0xFF665FBE), minHeight: 15))), const SizedBox(width: 10), Text('$weeklyPercent%', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE)))]),
-                            ],
-                          ),
+                    // Recent Performance Section
+                    Transform.translate(
+                      offset: const Offset(0, -20),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Recent Performance', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: primaryBlue)),
+                            const SizedBox(height: 20),
+                            _isLoadingResults
+                                ? const Center(child: CircularProgressIndicator())
+                                : _recentResults.isEmpty
+                                    ? const Center(child: Text('No recent activity yet.'))
+                                    : SizedBox(
+                                        // Eto yung sikreto: Fixed height para sa 3 items lang
+                                        height: 330, 
+                                        child: ListView.builder(
+                                          padding: EdgeInsets.zero,
+                                          shrinkWrap: true,
+                                          // Pinalitan natin ito para maging scrollable ang loob ng card
+                                          physics: const AlwaysScrollableScrollPhysics(), 
+                                          itemCount: _recentResults.length,
+                                          itemBuilder: (context, index) {
+                                            final result = _recentResults[index];
+                                            final passed = result.correctCount >= (result.totalCards / 2);
+                                            final date = '${_monthName(result.completedAt.month)} ${result.completedAt.day}, ${result.completedAt.year}';
+                                            
+                                            return _buildPerformanceItem(
+                                              result.deckSubject,
+                                              result.deckTitle,
+                                              date,
+                                              '${result.correctCount}/${result.totalCards}',
+                                              passed ? 'PASSED' : 'FAILED',
+                                              accentBlue, 
+                                              passed ? Colors.green : Colors.red,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                          ],
                         ),
                       ),
+                    ),
 
-                      // Recent Performance Section
-                      Transform.translate(
-                        offset: const Offset(0, -20),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Recent Performance', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 20, color: const Color(0xFF665FBE))),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                height: 240,
-                                child: _isLoadingResults
-                                    ? const Center(child: CircularProgressIndicator())
-                                    : _recentResults.isEmpty
-                                        ? const Center(child: Text('No recent activity yet.'))
-                                        : ListView.separated(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            physics: const ClampingScrollPhysics(),
-                                            itemCount: _recentResults.length,
-                                            separatorBuilder: (_, __) => Divider(
-                                              height: 25,
-                                              thickness: 0.8,
-                                              color: const Color.fromARGB(255, 162, 160, 160).withValues(alpha: 0.2), // Eto yung ginawang light gray
-                                            ),
-                                            itemBuilder: (context, index) {
-                                              final result = _recentResults[index];
-                                              final passed = result.correctCount >= (result.totalCards / 2);
-                                              final date = '${_monthName(result.completedAt.month)} ${result.completedAt.day}, ${result.completedAt.year}';
-                                              return _buildPerformanceItem(
-                                                result.deckSubject,
-                                                result.deckTitle,
-                                                date,
-                                                '${result.correctCount}/${result.totalCards}',
-                                                passed ? 'PASSED' : 'FAILED',
-                                                const Color(0xFFFD9519),
-                                                passed ? Colors.green : Colors.red,
-                                              );
-                                            },
-                                          ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                       // Achievements Section
                       Transform.translate(
                         offset: const Offset(0, -10),
@@ -363,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(25),
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +358,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Achievements', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 22, color: const Color(0xFF665FBE))),
+                                    Text('Achievements', style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 22, color: primaryBlue)),
                                     TextButton(onPressed: () => Navigator.pushNamed(context, 'achievement'), child: Text('See All', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold))),
                                   ],
                                 ),
@@ -387,12 +372,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                   itemCount: unlockedList.length,
                                   itemBuilder: (context, index) {
                                     final achieve = unlockedList[index];
-                                    return Container(
-                                      width: 120,
-                                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(color: const Color(0xFFFAEEFF).withValues(alpha: 0.5), borderRadius: BorderRadius.circular(20)),
-                                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(_getIcon(achieve.icon), size: 40, color: const Color(0xFFFD9519)), const SizedBox(height: 8), Text(achieve.title, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold))]),
+                                    return Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                      child: Container(
+                                        width: 120,
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                          Icon(_getIcon(achieve.icon), size: 40, color: accentBlue),
+                                          const SizedBox(height: 8),
+                                          Text(achieve.title, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold))
+                                        ]),
+                                      ),
                                     );
                                   },
                                 ),
@@ -402,9 +393,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
-                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('$unlockedCount of $totalAchievements unlocked', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE).withValues(alpha: 0.7))), Text('$overallPercent%', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFFFD9519)))]),
+                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('$unlockedCount of $totalAchievements unlocked', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: primaryBlue.withOpacity(0.7))), Text('$overallPercent%', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: accentBlue))]),
                                     const SizedBox(height: 8),
-                                    ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: overallProgress, backgroundColor: const Color(0xFFFAEEFF), color: const Color(0xFFFD9519), minHeight: 10)),
+                                    ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: overallProgress, backgroundColor: backgroundBlue, color: accentBlue, minHeight: 10)),
                                   ],
                                 ),
                               ),

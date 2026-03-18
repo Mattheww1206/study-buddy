@@ -15,16 +15,31 @@ class HomeContentPage extends StatefulWidget {
 class _HomeContentState extends State<HomeContentPage> {
   final DeckService _deckService = DeckService();
   late Stream<List<Deck>> _decksStream;
-  bool _isLoading = false;
-  
-  // Mock data for your results (Replace with your actual logic)
-  final List<dynamic> _results = []; 
+  final bool _isLoading = false;
+
+  // Blue 60-30-10 Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+
+  final PageController _pinnedController = PageController(viewportFraction: 0.65);
+  final PageController _recentController = PageController(viewportFraction: 0.65);
+  final PageController _newlyAddedController = PageController(viewportFraction: 0.65);
+
+  final List<dynamic> _results = [];
 
   @override
   void initState() {
     super.initState();
-    // Using the stream with includeMetadataChanges: true for instant offline updates
     _decksStream = _deckService.getDecksStream();
+  }
+
+  @override
+  void dispose() {
+    _pinnedController.dispose();
+    _recentController.dispose();
+    _newlyAddedController.dispose();
+    super.dispose();
   }
 
   @override
@@ -32,30 +47,22 @@ class _HomeContentState extends State<HomeContentPage> {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
     ));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : StreamBuilder<List<Deck>>(
               stream: _decksStream,
               builder: (context, snapshot) {
-                // 1. Handle initial loading
                 if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: primaryColor));
                 }
 
                 final decks = snapshot.data ?? [];
+                if (decks.isEmpty) return _buildGlobalEmptyState();
 
-                // 2. GLOBAL EMPTY STATE
-                // This is the fix: If 0 decks, everything disappears and shows this.
-                if (decks.isEmpty) {
-                  return _buildGlobalEmptyState();
-                }
-
-                // 3. DATA LOGIC (Filtered from the same source)
                 final pinnedDecks = decks.where((d) => d.isPinned).toList();
                 final recentDecks = decks.take(5).toList();
                 final newlyAdded = decks.take(5).toList();
@@ -66,43 +73,25 @@ class _HomeContentState extends State<HomeContentPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SafeArea(child: SizedBox(height: 10)),
+                      
+                      // NAGDAGDAG NG OVERVIEW HEADER DITO
+                      _buildSectionHeader('Overview'),
+                      const SizedBox(height: 15),
+                      _buildStatsSection(decks),
+                      const SizedBox(height: 25),
 
-                      // Pinned Section
                       if (pinnedDecks.isNotEmpty) ...[
                         _buildPinnedSection(pinnedDecks),
                         const SizedBox(height: 25),
                       ],
 
-                      // Stats Section
-                      _buildStatsSection(decks),
-                      const SizedBox(height: 25),
-
-                      // Recent Decks Section
-                      const Padding(
-                        padding: EdgeInsets.only(left: 25),
-                        child: Text('Recent Decks',
-                            style: TextStyle(
-                                color: Color(0xFF665FBE),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold)),
-                      ),
+                      _buildSectionHeader('Recent Decks'),
                       const SizedBox(height: 15),
-                      _buildHorizontalList(recentDecks, isRecent: true),
-
+                      _buildSwipeableSection(recentDecks, _recentController, isRecent: true),
                       const SizedBox(height: 35),
-
-                      // Newly Added Section
-                      const Padding(
-                        padding: EdgeInsets.only(left: 25),
-                        child: Text('Newly added decks',
-                            style: TextStyle(
-                                color: Color(0xFF665FBE),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold)),
-                      ),
+                      _buildSectionHeader('Newly added decks'),
                       const SizedBox(height: 15),
-                      _buildHorizontalList(newlyAdded, isRecent: false),
-
+                      _buildSwipeableSection(newlyAdded, _newlyAddedController, isRecent: false),
                       const SizedBox(height: 80),
                     ],
                   ),
@@ -112,83 +101,165 @@ class _HomeContentState extends State<HomeContentPage> {
     );
   }
 
-  // --- UI COMPONENTS (Keeping your exact styling) ---
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 25),
+      child: Text(title,
+          style: const TextStyle(
+              color: primaryColor,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5)),
+    );
+  }
 
-  Widget _buildGlobalEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.layers_clear_outlined, 
-               size: 80, 
-               color: const Color(0xFF665FBE).withValues(alpha: 0.2)),
-          const SizedBox(height: 20),
-          const Text(
-            'No decks yet.\nCreate one to start studying!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18,
-              color: Color(0xFF665FBE),
-              fontWeight: FontWeight.w500,
+  Widget _buildPageIndicator(int count, PageController controller) {
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, child) {
+        int currentPage = 0;
+        if (controller.hasClients && controller.page != null) {
+          currentPage = controller.page!.round();
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(count, (index) {
+            bool isActive = (currentPage.clamp(0, count - 1)) == index;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 6,
+              width: isActive ? 18 : 6,
+              decoration: BoxDecoration(
+                color: isActive ? primaryColor : primaryColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            );
+          }),
+        );
+      },
+    );
+  }
+
+  Widget _buildSwipeableSection(List<Deck> decks, PageController controller, {required bool isRecent}) {
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Container(
+          height: 250,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(35),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 25),
+            child: PageView.builder(
+              controller: controller,
+              padEnds: false,
+              itemCount: decks.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+                  child: _buildDeckCard(decks[index], isRecentCard: isRecent),
+                );
+              },
             ),
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          bottom: 15,
+          child: _buildPageIndicator(decks.length, controller),
+        ),
+      ],
     );
   }
 
   Widget _buildPinnedSection(List<Deck> pinnedDecks) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(35),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 15, offset: Offset(0, 8))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(Icons.push_pin, color: Color(0xFFFF7A01), size: 24),
-              SizedBox(width: 10),
-              Text('Pinned decks',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(top: 20, bottom: 30),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(35),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              )
             ],
           ),
-          const SizedBox(height: 15),
-          SizedBox(
-            height: 150,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              itemCount: pinnedDecks.length,
-              itemBuilder: (context, index) {
-                final deck = pinnedDecks[index];
-                return _buildDeckCard(deck, isPinnedCard: true);
-              },
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: Row(
+                  children: [
+                    Icon(Icons.push_pin, color: accentColor, size: 24),
+                    SizedBox(width: 10),
+                    Text('Pinned decks',
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                height: 180,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: PageView.builder(
+                    controller: _pinnedController,
+                    padEnds: false,
+                    itemCount: pinnedDecks.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: _buildDeckCard(pinnedDecks[index], isPinnedCard: true),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          bottom: 15,
+          child: _buildPageIndicator(pinnedDecks.length, _pinnedController),
+        ),
+      ],
     );
   }
 
   Widget _buildStatsSection(List<Deck> decks) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(vertical: 35),
+      padding: const EdgeInsets.symmetric(vertical: 30),
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(35)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        border: Border.all(color: primaryColor.withOpacity(0.1), width: 1.5),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildStatColumn('${decks.length}', 'DECKS CREATED'),
-          Container(height: 40, width: 2, color: Colors.grey[100]),
-          _buildStatColumn('${_results.where((r) => r.mode != 'flashcard').length}', 'QUIZ TAKEN'),
+          _buildStatColumn('${decks.length}', 'DECKS'),
+          Container(height: 40, width: 1.5, color: secondaryColor),
+          _buildStatColumn('${_results.where((r) => r.mode != 'flashcard').length}', 'QUIZZES'),
         ],
       ),
     );
@@ -199,73 +270,86 @@ class _HomeContentState extends State<HomeContentPage> {
       children: [
         Text(count,
             style: const TextStyle(
-                fontSize: 38, fontWeight: FontWeight.bold, color: Color(0xFF665FBE))),
+                fontSize: 32, fontWeight: FontWeight.bold, color: primaryColor)),
         Text(label,
             style: const TextStyle(
-                fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w900)),
+                fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
       ],
     );
   }
 
-  Widget _buildHorizontalList(List<Deck> list, {required bool isRecent}) {
-    return SizedBox(
-      height: 140,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          return _buildDeckCard(list[index], isPinnedCard: false, isRecentCard: isRecent);
-        },
-      ),
-    );
-  }
-
   Widget _buildDeckCard(Deck deck, {bool isPinnedCard = false, bool isRecentCard = true}) {
+    bool isColored = isPinnedCard || isRecentCard;
+
     return GestureDetector(
       onTap: () {
         Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
         Navigator.pushNamed(context, 'mode');
       },
       child: Container(
-        width: isPinnedCard ? 250 : 200,
-        margin: const EdgeInsets.only(right: 15),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          // Recent/Pinned use Purple, Newly Added uses White with Border
-          color: (isPinnedCard || isRecentCard) ? const Color(0xFF665FBE) : Colors.white,
+          color: isColored ? primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(30),
-          border: (!isPinnedCard && !isRecentCard) 
-              ? Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.3), width: 1.5)
+          border: !isColored
+              ? Border.all(color: primaryColor.withOpacity(0.2), width: 1.5)
               : null,
+          boxShadow: [
+            if (isColored)
+              BoxShadow(
+                color: primaryColor.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              )
+          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (isPinnedCard)
-              const Align(
-                alignment: Alignment.topRight,
-                child: Icon(Icons.push_pin, color: Color(0xFFFF7A01), size: 20),
-              ),
+            Icon(
+              Icons.layers_rounded,
+              size: 36,
+              color: isColored ? Colors.white : primaryColor,
+            ),
+            const SizedBox(height: 12),
             Text(
               deck.title,
+              textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  color: (isPinnedCard || isRecentCard) ? Colors.white : const Color(0xFF665FBE),
+                  color: isColored ? Colors.white : primaryColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                  fontSize: 17),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               '${deck.totalCards} Cards',
               style: TextStyle(
-                  color: (isPinnedCard || isRecentCard) ? Colors.white70 : Colors.black54,
-                  fontSize: 14),
+                  color: isColored ? Colors.white70 : Colors.black45,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildGlobalEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.auto_stories_outlined,
+              size: 80,
+              color: primaryColor.withOpacity(0.2)),
+          const SizedBox(height: 20),
+          const Text('No decks yet.\nStart your journey today!',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18, color: primaryColor, fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

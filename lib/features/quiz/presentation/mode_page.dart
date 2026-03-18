@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: ModePage(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
 class ModePage extends StatefulWidget {
   const ModePage({super.key});
 
@@ -20,60 +13,58 @@ class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     final deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+    
+    // Blue 60-30-10 Palette
+    const Color primaryColor = Color(0xFF1976D2);   // 60% (Dominant)
+    const Color secondaryColor = Color(0xFFE3F2FD); // 30% (Background/Support)
+    const Color accentColor = Color(0xFF2196F3);    // 10% (Accent/Highlights)
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor, // Ginamit ang 30% background color
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryColor, // Ginamit ang 60% primary color
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        title: const Text(
+          'Study',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, // Horizontal center
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 35), // Space sa taas
+              const SizedBox(height: 35),
 
-              // subject card
+              // Subject Card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Container(
                   width: double.infinity,
-                  // Ginamitan ng padding imbes na fixed height para mag-adjust ang card
                   padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF8B80F0), Color(0xFF665FBE)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: primaryColor, // 60% Blue for the main card
                     borderRadius: BorderRadius.circular(35),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
                     ],
                   ),
                   child: Column(
-                    // Sinisiguro na nasa gitna lahat ng elements
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         '${deck.totalCards} cards',
-                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -83,7 +74,7 @@ class _ModePageState extends State<ModePage> {
                       const SizedBox(height: 10),
                       Text(
                         deck.title,
-                        textAlign: TextAlign.center, // Center text alignment
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
@@ -93,7 +84,6 @@ class _ModePageState extends State<ModePage> {
                       const SizedBox(height: 6),
                       Text(
                         deck.subject,
-                        textAlign: TextAlign.center, // Center text alignment
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
@@ -101,19 +91,15 @@ class _ModePageState extends State<ModePage> {
                       ),
                       const SizedBox(height: 15),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Colors.black.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.circle, color: Colors.orange, size: 8),
+                            Icon(Icons.circle, color: Colors.white, size: 8),
                             SizedBox(width: 8),
                             Text(
                               'Tap a mode to start studying',
@@ -126,25 +112,26 @@ class _ModePageState extends State<ModePage> {
                   ),
                 ),
               ),
+              
               const SizedBox(height: 30),
               const Text(
                 'Choose Study Mode',
                 style: TextStyle(
-                  color: Color(0xFF665FBE),
+                  color: primaryColor, // Main title in primary blue
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 20),
               
-              // flashcard mode button
+              // Flashcard Mode Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, 'flashcard_mode'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0D0074),
+                    surfaceTintColor: Colors.white,
                     elevation: 2,
                     padding: const EdgeInsets.all(15),
                     shape: RoundedRectangleBorder(
@@ -156,10 +143,10 @@ class _ModePageState extends State<ModePage> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF2F1FF),
+                          color: secondaryColor, // 30% Blue for icon background
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: const Icon(Icons.style, color: Colors.orange, size: 30),
+                        child: const Icon(Icons.style, color: accentColor, size: 30), // 10% Accent icon
                       ),
                       const SizedBox(width: 15),
                       const Expanded(
@@ -168,93 +155,70 @@ class _ModePageState extends State<ModePage> {
                           children: [
                             Text(
                               'Flashcard Mode',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                fontSize: 18, 
+                                color: primaryColor, 
+                              ),
                             ),
                             Text(
                               'Flip cards to study terms',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                              ),
+                              style: TextStyle(color: Colors.grey, fontSize: 13),
                             ),
                           ],
                         ),
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: const BoxDecoration(
-                              color: Colors.orange,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
-                      )
+                      const Icon(Icons.chevron_right, color: Colors.grey),
                     ],
                   ),
                 ),
               ),
 
-              // quiz mode button
+              // Quiz Mode Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, 'quiz_mode'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0D0074),
+                    surfaceTintColor: Colors.white,
                     elevation: 2,
                     padding: const EdgeInsets.all(15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.stars_rounded, color: Colors.redAccent, size: 45),
-                      SizedBox(width: 12),
-                      Expanded(
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(Icons.stars_rounded, color: accentColor, size: 30),
+                      ),
+                      const SizedBox(width: 15),
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Quiz Mode',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                fontSize: 18, 
+                                color: primaryColor,
+                              ),
                             ),
                             Text(
                               'Test yourself with questions',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                              ),
+                              style: TextStyle(color: Colors.grey, fontSize: 13),
                             ),
                           ],
                         ),
                       ),
-                      Icon(Icons.check_box, color: Color(0xFF5AD69B), size: 30),
-                      Icon(Icons.check_box, color: Color(0xFF5AD69B), size: 30),
+                      const Icon(Icons.chevron_right, color: Colors.grey),
                     ],
                   ),
                 ),

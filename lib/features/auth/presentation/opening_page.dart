@@ -25,7 +25,7 @@ class _OpeningPageState extends State<OpeningPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: const Color(0xFFE3F2FD),
       body: Center(
         child: OverflowBox(
           maxWidth: double.infinity,

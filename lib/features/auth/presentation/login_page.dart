@@ -23,8 +23,10 @@ class _LoginPageState extends State<LoginPage> {
   String? _emailError;
   String? _passwordError;
 
-  final Color _themeBackgroundColor = const Color(0xFFFAEEFF);
-  final Color colorDominant = const Color(0xFF665FBE);
+  // New Blue 60-30-10 Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
 
   @override
   void dispose() {
@@ -39,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light, // Changed to light for blue bg
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
@@ -177,13 +179,14 @@ class _LoginPageState extends State<LoginPage> {
                         await _authService.resetPassword(
                             email: emailController.text.trim());
                         nav.pop();
-                        messenger.showSnackBar( SnackBar(
-                            content: Text(
-                                'Password reset email has been sent! Please check your email.'),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: colorDominant,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ));
+                        messenger.showSnackBar(SnackBar(
+                          content: const Text(
+                              'Password reset email has been sent! Please check your email.'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: primaryColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ));
                       } catch (e) {
                         setDialogState(() {
                           errorMessage =
@@ -194,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       'Send',
                       style: GoogleFonts.itim(
-                        color: Colors.blueAccent,
+                        color: accentColor,
                       ),
                     ),
                   )
@@ -206,43 +209,37 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _themeBackgroundColor,
+      backgroundColor: secondaryColor, // Applied Primary (60%)
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Center(
                 child: Image.asset(
                   'assets/study.png',
-                  width: 180, 
+                  width: 180,
                   height: 180,
                   fit: BoxFit.contain,
                 ),
               ),
-              
-             
               Text(
                 'Welcome!',
                 style: GoogleFonts.fredoka(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.black, // Changed to White for contrast on blue
                 ),
               ),
-              
-              const SizedBox(height: 4), 
-              
+              const SizedBox(height: 4),
               Text(
                 'Login to continue your study journey',
                 style: GoogleFonts.itim(
-                  color: Colors.black.withValues(alpha: 0.8),
+                  color: Colors.black.withValues(alpha: 0.9),
                   fontSize: 16,
                 ),
               ),
-              
-              const SizedBox(height: 15), 
-              
+              const SizedBox(height: 25),
               // The White Card Container
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -250,11 +247,11 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 25, vertical: 30),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white, // Card acts as the Secondary surface (30%)
                     borderRadius: BorderRadius.circular(40),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         spreadRadius: 2,
                         offset: const Offset(0, 10),
@@ -269,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _emailController,
                           hintText: 'Email or Username',
                           keyboardType: TextInputType.emailAddress,
-                          fillColor: _themeBackgroundColor,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Email or Username is required';
@@ -282,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _passwordController,
                           hintText: 'Password',
                           isPassword: true,
-                          fillColor: _themeBackgroundColor,
+                          fillColor: secondaryColor, // Applied Secondary (30%)
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Password is required';
@@ -301,7 +298,10 @@ class _LoginPageState extends State<LoginPage> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 _emailError ?? _passwordError!,
-                                style: const TextStyle(color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -313,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text(
                               'Forgot Password?',
                               style: GoogleFonts.itim(
-                                color: const Color(0xFF4A449A),
+                                color: accentColor, // Applied Accent (10%)
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -323,7 +323,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 10),
                         CustomButton(
                           text: 'Login',
-                          backgroundColor: const Color(0xFF5D54D0),
+                          backgroundColor: primaryColor, // Applied Primary (60%)
                           textColor: Colors.white,
                           fontSize: 22,
                           width: 160,
@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           backgroundColor: Colors.white,
                           textColor: Colors.black87,
-                          borderColor: Colors.grey.shade300,
+                          borderColor: accentColor.withValues(alpha: 0.3), // Lightened Accent
                           borderWidth: 1.5,
                           fontSize: 18,
                           icon: Image.asset(
@@ -382,7 +382,7 @@ class _LoginPageState extends State<LoginPage> {
                                 'Create Account',
                                 style: GoogleFonts.itim(
                                   fontSize: 16,
-                                  color: Colors.orange.shade800,
+                                  color: accentColor, // Applied Accent (10%)
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

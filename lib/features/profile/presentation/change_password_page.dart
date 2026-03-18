@@ -24,6 +24,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _obscureNew = true;
   bool _obscureConfirm = true;
 
+  // Blue Palette
+  final Color primaryBlue = const Color(0xFF1976D2);   // 60%
+  final Color backgroundBlue = const Color(0xFFE3F2FD); // 30%
+  final Color accentBlue = const Color(0xFF2196F3);    // 10%
+
   void _showConfirmDialog() {
     setState(() {
       _isCurrentRequired = _currentController.text.isEmpty;
@@ -50,16 +55,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           backgroundColor: Colors.white, 
           title: Column(
             children: [
-              const Icon(
+              Icon(
                 Icons.lock_reset, 
                 size: 50, 
-                color: Color(0xFF665FBE)), 
+                color: primaryBlue), // Iniba ang kulay to Primary Blue
               const SizedBox(height: 10),
               Text(
                 'Confirm Change',
                 style: GoogleFonts.lora(
                   fontWeight: FontWeight.bold, 
-                  color: const Color(0xFF665FBE)), 
+                  color: primaryBlue), // Iniba ang kulay to Primary Blue
               ),
             ],
           ),
@@ -84,7 +89,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF665FBE), 
+                backgroundColor: primaryBlue, // Iniba ang kulay to Primary Blue
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
@@ -126,13 +131,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF), 
+      backgroundColor: backgroundBlue, // Pinalitan ng Light Blue
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF665FBE), 
+        backgroundColor: primaryBlue, // Pinalitan ng Primary Blue
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -151,15 +156,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.white, Color(0xFFFAEEFF)],
+                  colors: [Colors.white, backgroundBlue], // Gradient to background blue
                 ),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF665FBE).withValues(alpha: 0.15),
+                    color: primaryBlue.withOpacity(0.15), // Shadow color synced to blue
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   )
@@ -170,20 +175,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 children: [
                   Text(
                     'Current Password', 
-                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)), // Text to Primary Blue
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
+                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
                     ),
                     child: TextFormField(
                       controller: _currentController,
                       obscureText: _obscureCurrent,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
+                        prefixIcon: Icon(Icons.lock, color: primaryBlue), // Icon to Primary Blue
                         suffixIcon: IconButton(
                           icon: Icon(_obscureCurrent ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
@@ -202,20 +207,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
                   Text(
                     'New Password', 
-                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)), // Text to Primary Blue
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
+                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
                     ),
                     child: TextFormField(
                       controller: _newController,
                       obscureText: _obscureNew,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
+                        prefixIcon: Icon(Icons.lock, color: primaryBlue), // Icon to Primary Blue
                         suffixIcon: IconButton(
                           icon: Icon(_obscureNew ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureNew = !_obscureNew),
@@ -239,20 +244,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
                   Text(
                     'Confirm New Password', 
-                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF665FBE))),
+                    style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)), // Text to Primary Blue
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white, 
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF665FBE).withValues(alpha: 0.1)),
+                      border: Border.all(color: primaryBlue.withOpacity(0.1)),
                     ),
                     child: TextFormField(
                       controller: _confirmController,
                       obscureText: _obscureConfirm,
                       style: GoogleFonts.lora(),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF665FBE)),
+                        prefixIcon: Icon(Icons.lock, color: primaryBlue), // Icon to Primary Blue
                         suffixIcon: IconButton(
                           icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                           onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
@@ -278,11 +283,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 width: double.infinity,
                 height: 55,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF7A01), 
+                  color: accentBlue, // Pinalitan ng Accent Blue
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF7A01).withValues(alpha: 0.4),
+                      color: accentBlue.withOpacity(0.4), // Shadow color synced to Accent Blue
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     )

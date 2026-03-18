@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +8,6 @@ import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/gemini/service/gemini_service.dart';
 import 'package:studybuddy/services/file_text_extractor.dart';
-
 
 class CreateUploadPage extends StatefulWidget {
   const CreateUploadPage({super.key});
@@ -24,10 +22,11 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
   final FileTextExtractorService _extractorService = FileTextExtractorService();
   late ConnectivityProvider _connectivityProvider;
 
-  final Color colorDominant = const Color(0xFF665FBE); 
-  final Color colorSecondary = const Color(0xFFF8F2FF);
-  final Color colorAccent = const Color(0xFFFF7A00); 
-  final Color colorSuccessIcon = const Color(0xFF3CD288);
+  // Blue 60-30-10 Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+  static const Color colorSuccessIcon = Color(0xFF3CD288);
 
   PlatformFile? selectedFile;
   bool _isProcessing = false;
@@ -36,7 +35,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
   bool _hasError = false;
 
   Future<void> pickFile() async {
-       final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'docx', 'doc'],
     );
@@ -62,17 +61,17 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
     final userId = userProvider.user?.userId;
     final navigator = Navigator.of(context);
     final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-    
+
     if (selectedFile == null || _isProcessing) return;
-    
+
     final online = await _connectivityProvider.checkRealInternet();
     if (!online) {
-    _showNoInternetDialog();
-    return; 
-   }
-    
+      _showNoInternetDialog();
+      return;
+    }
+
     if (userId == null) return;
- 
+
     setState(() {
       _isProcessing = true;
       _hasError = false;
@@ -82,46 +81,37 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
       final file = File(selectedFile!.path!);
       final extension = selectedFile!.extension ?? '';
       final rawText = await _extractorService.extractText(file, extension);
- 
+
       if (rawText == null || rawText.trim().isEmpty) {
         setState(() {
           _isProcessing = false;
           _hasError = true;
-          _statusMessage = 'Could not extract text from this file. Please try a different file.';
+          _statusMessage = 'Could not extract text. Please try another file.';
         });
         return;
       }
- 
+
       final truncatedText = _extractorService.truncateForGemini(rawText);
- 
+
       setState(() => _statusMessage = 'AI is generating flashcards...');
 
       final generated = await _geminiService.generateFlashcardsFromText(
         extractedText: truncatedText,
       );
- 
+
       if (generated == null) {
         setState(() {
           _isProcessing = false;
           _hasError = true;
-          _statusMessage = 'AI is unavailable or rate limited. Please try again later.';
+          _statusMessage = 'AI is unavailable. Please try again later.';
         });
         return;
       }
- 
+
       final title = generated['title']?.toString() ?? 'Uploaded Deck';
       final subject = generated['subject']?.toString() ?? 'General';
       final flashcardsRaw = generated['flashcards'] as List<dynamic>;
- 
-      if (flashcardsRaw.isEmpty) {
-        setState(() {
-          _isProcessing = false;
-          _hasError = true;
-          _statusMessage = 'No flashcards could be generated from this file.';
-        });
-        return;
-      }
- 
+
       final cards = flashcardsRaw
           .map((f) => {
                 'term': f['answer']?.toString() ?? '',
@@ -129,35 +119,32 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
               })
           .where((c) => c['term']!.isNotEmpty && c['def']!.isNotEmpty)
           .toList();
- 
+
       setState(() => _statusMessage = 'Saving deck (${cards.length} cards)...');
- 
-      // Step 3: Save deck
+
       final newDeck = await _deckService.createDeck(
         userId: userId,
         title: title,
         subject: subject,
         cards: cards,
       );
- 
+
       setState(() {
         _isProcessing = false;
         _isDone = true;
-        _statusMessage = 'Done! Created "$title" with ${cards.length} flashcards.';
+        _statusMessage = 'Done! Created "$title"';
       });
- 
+
       await Future.delayed(const Duration(milliseconds: 800));
       if (!mounted) return;
- 
+
       deckProvider.selectDeck(newDeck);
       navigator.pushReplacementNamed('create_view');
- 
     } catch (e) {
-      print('CreateUploadPage error: $e');
       setState(() {
         _isProcessing = false;
         _hasError = true;
-        _statusMessage = 'Something went wrong. Please try again.';
+        _statusMessage = 'Something went wrong.';
       });
     }
   }
@@ -174,8 +161,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
             Icon(Icons.wifi_off, color: Colors.red),
@@ -183,16 +169,11 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
             Text('No Internet'),
           ],
         ),
-        content: const Text(
-          'Can\'t generate flashcards from this file because there is no internet '
-          'connection.\n\nPlease connect to the '
-          'internet to be able to generate flashcards from file.',
-        ),
+        content: const Text('Connect to the internet to generate flashcards.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK',
-                style: TextStyle(color: Color(0xFF665FBE))),
+            child: const Text('OK', style: TextStyle(color: primaryColor)),
           ),
         ],
       ),
@@ -202,9 +183,9 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorSecondary,
+      backgroundColor: secondaryColor, // 30% background
       appBar: AppBar(
-        backgroundColor: colorDominant,
+        backgroundColor: primaryColor, // 60% App Bar
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -227,10 +208,8 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
- 
-                 
                       if (_isDone) ...[
-                        
+                        // Success View
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(15),
@@ -239,7 +218,7 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color: Colors.black.withOpacity(0.05),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               )
@@ -250,11 +229,10 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: colorSecondary,
+                                  color: secondaryColor,
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: Icon(Icons.description,
-                                    color: colorDominant, size: 35),
+                                child: const Icon(Icons.description, color: primaryColor, size: 35),
                               ),
                               const SizedBox(width: 15),
                               Expanded(
@@ -263,37 +241,30 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                                   children: [
                                     Text(
                                       selectedFile?.name ?? '',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: colorDominant),
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       '$_fileSize · ${selectedFile?.extension?.toUpperCase() ?? 'FILE'}',
-                                      style: const TextStyle(
-                                          color: Colors.grey, fontSize: 13),
+                                      style: const TextStyle(color: Colors.grey, fontSize: 13),
                                     ),
                                   ],
                                 ),
                               ),
-                              Icon(Icons.check_circle,
-                                  color: colorSuccessIcon, size: 28),
+                              const Icon(Icons.check_circle, color: colorSuccessIcon, size: 28),
                             ],
                           ),
                         ),
                       ] else ...[
+                        // Upload Box
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 40, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                              color: selectedFile != null
-                                  ? colorDominant
-                                  : colorDominant.withValues(alpha: 0.1),
+                              color: selectedFile != null ? primaryColor : primaryColor.withOpacity(0.1),
                               width: 2,
                             ),
                           ),
@@ -302,93 +273,61 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                               Container(
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: colorSecondary.withValues(alpha: 0.5),
+                                  color: secondaryColor.withOpacity(0.5),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  selectedFile != null
-                                      ? Icons.insert_drive_file
-                                      : Icons.cloud_upload_outlined,
+                                  selectedFile != null ? Icons.insert_drive_file : Icons.cloud_upload_outlined,
                                   size: 50,
-                                  color: colorDominant,
+                                  color: primaryColor,
                                 ),
                               ),
                               const SizedBox(height: 20),
                               Text(
-                                selectedFile != null
-                                    ? selectedFile!.name
-                                    : 'Upload your file',
+                                selectedFile != null ? selectedFile!.name : 'Upload your file',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
-                              if (selectedFile != null) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  '$_fileSize · ${selectedFile!.extension?.toUpperCase()}',
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 13),
-                                ),
-                              ] else ...[
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Tap the button below to choose\na file from your device',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 14),
-                                ),
-                              ],
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Tap the button below to choose\na file from your device',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.grey, fontSize: 14),
+                              ),
                               const SizedBox(height: 25),
                               ElevatedButton(
                                 onPressed: _isProcessing ? null : pickFile,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorDominant,
+                                  backgroundColor: primaryColor,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                                 ),
-                                child: Text(selectedFile != null
-                                    ? 'Change File'
-                                    : 'Choose File'),
+                                child: Text(selectedFile != null ? 'Change File' : 'Choose File'),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 30),
- 
-                      
+                        // Supported Formats
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: ['PDF', 'DOCX', 'DOC']
                               .map((txt) => Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 5),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 15, vertical: 8),
+                                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color:
-                                              colorDominant.withValues(alpha: 0.1),
-                                          width: 1),
+                                      border: Border.all(color: primaryColor.withOpacity(0.1)),
                                     ),
                                     child: Text(
                                       txt,
-                                      style: TextStyle(
-                                        color: colorDominant.withValues(alpha: 0.7),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
+                                      style: TextStyle(color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.bold, fontSize: 12),
                                     ),
                                   ))
                               .toList(),
                         ),
                       ],
- 
-                      
                       if (_statusMessage.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Container(
@@ -398,92 +337,47 @@ class _CreateUploadPageState extends State<CreateUploadPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: _hasError
-                                  ? Colors.red.withValues(alpha: 0.3)
-                                  : _isDone
-                                      ? colorSuccessIcon.withValues(alpha: 0.3)
-                                      : colorDominant.withValues(alpha: 0.2),
+                              color: _hasError ? Colors.red.withOpacity(0.3) : _isDone ? colorSuccessIcon.withOpacity(0.3) : primaryColor.withOpacity(0.2),
                               width: 1.5,
                             ),
                           ),
                           child: Row(
                             children: [
-                              _isProcessing
-                                  ? SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: colorDominant,
-                                      ),
-                                    )
-                                  : Icon(
-                                      _hasError
-                                          ? Icons.error_rounded
-                                          : Icons.check_circle_rounded,
-                                      color: _hasError
-                                          ? Colors.red
-                                          : colorSuccessIcon,
-                                      size: 22,
-                                    ),
+                              if (_isProcessing)
+                                const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: primaryColor))
+                              else
+                                Icon(_hasError ? Icons.error_rounded : Icons.check_circle_rounded, color: _hasError ? Colors.red : colorSuccessIcon, size: 22),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   _statusMessage,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: _hasError
-                                        ? Colors.red
-                                        : _isDone
-                                            ? colorSuccessIcon
-                                            : colorDominant,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontSize: 14, color: _hasError ? Colors.red : _isDone ? colorSuccessIcon : primaryColor, fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ],
- 
                       const Spacer(),
                       const SizedBox(height: 40),
- 
-                  
+                      // Main Action Button
                       SizedBox(
                         width: double.infinity,
                         height: 55,
                         child: ElevatedButton(
                           onPressed: (selectedFile == null || _isProcessing)
                               ? null
-                              : _hasError
-                                  ? pickFile
-                                  : _processAndGenerate,
+                              : _hasError ? pickFile : _processAndGenerate,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                _hasError ? Colors.red : colorAccent,
+                            backgroundColor: _hasError ? Colors.red : accentColor, // 10% accent for action
                             disabledBackgroundColor: Colors.grey.shade300,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           ),
                           child: _isProcessing
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                      color: Colors.white, strokeWidth: 2),
-                                )
+                              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                               : Text(
-                                  _hasError
-                                      ? 'Try Again'
-                                      : selectedFile != null
-                                          ? 'Generate Flashcards'
-                                          : 'Choose File',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                  _hasError ? 'Try Again' : selectedFile != null ? 'Generate Flashcards' : 'Choose File',
+                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                         ),
                       ),

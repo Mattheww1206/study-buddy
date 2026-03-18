@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for inputFormatters
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
@@ -23,6 +23,11 @@ class _RandomModePageState extends State<RandomModePage> {
   // Added for validation
   String? _errorMessage;
 
+  // BLUE THEME PALETTE
+  final Color primaryColor = const Color(0xFF1976D2);   // Deep Blue
+  final Color secondaryColor = const Color(0xFFE3F2FD); // Very Light Blue
+  final Color actionBlue = const Color(0xFF00B0FF);     // Vibrant Blue
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -44,67 +49,32 @@ class _RandomModePageState extends State<RandomModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        // PINALITAN: Logo ay pinalitan ng Mode Name para sa consistency
+        title: const Text(
+          "Random Mode",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           children: [
-            // Mode Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF665FBE),
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("SELECTED MODE",
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.shuffle, color: Colors.white, size: 26),
-                      ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Random Mode",
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                            Text("A mix of different question types",
-                                style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+            // TINANGGAL: Ang banner card sa itaas ay tinanggal.
 
             // Number of Questions Section
             Container(
@@ -112,15 +82,17 @@ class _RandomModePageState extends State<RandomModePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.quiz_outlined, color: Color(0xFF665FBE), size: 24),
-                      SizedBox(width: 8),
-                      Text("Number of Questions", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Icon(Icons.quiz_outlined, color: primaryColor, size: 24),
+                      const SizedBox(width: 8),
+                      const Text("Number of Questions", 
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -138,7 +110,7 @@ class _RandomModePageState extends State<RandomModePage> {
                       setState(() {
                         if (parsed > _deck.totalCards) {
                           _errorMessage = "Maximum is ${_deck.totalCards} questions only.";
-                          numberOfQuestions = parsed; // trigger error UI
+                          numberOfQuestions = parsed; 
                         } else if (parsed <= 0 && val.isNotEmpty) {
                           _errorMessage = "Enter at least 1 question.";
                           numberOfQuestions = 0;
@@ -149,15 +121,15 @@ class _RandomModePageState extends State<RandomModePage> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText: _errorMessage, // Displays the red error message
+                      errorText: _errorMessage,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFF665FBE), width: 1.6),
+                        borderSide: BorderSide(color: primaryColor, width: 1.6),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFF665FBE), width: 2.0),
+                        borderSide: BorderSide(color: primaryColor, width: 2.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -171,7 +143,7 @@ class _RandomModePageState extends State<RandomModePage> {
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold, 
-                      color: _errorMessage == null ? const Color(0xFF665FBE) : Colors.red
+                      color: _errorMessage == null ? primaryColor : Colors.red
                     ),
                   ),
                 ],
@@ -185,28 +157,31 @@ class _RandomModePageState extends State<RandomModePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.timer_outlined, color: Color(0xFF2D2D5E), size: 24),
-                          SizedBox(width: 8),
-                          Text("Quiz Timer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          Icon(Icons.timer_outlined, color: primaryColor, size: 24),
+                          const SizedBox(width: 8),
+                          const Text("Quiz Timer", 
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ],
                       ),
                       Switch(
                         value: isTimerEnabled,
                         onChanged: (val) => setState(() => isTimerEnabled = val),
-                        activeThumbColor: const Color(0xFF665FBE),
+                        activeTrackColor: actionBlue.withValues(alpha: 0.5),
+                        activeColor: primaryColor,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  if (isTimerEnabled)
+                  if (isTimerEnabled) ...[
+                    const SizedBox(height: 10),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -218,13 +193,13 @@ class _RandomModePageState extends State<RandomModePage> {
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF),
+                                color: isSelected ? primaryColor : secondaryColor,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 "${time}m",
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : const Color(0xFF665FBE),
+                                  color: isSelected ? Colors.white : primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -233,7 +208,8 @@ class _RandomModePageState extends State<RandomModePage> {
                           );
                         }).toList(),
                       ),
-                    )
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -246,32 +222,35 @@ class _RandomModePageState extends State<RandomModePage> {
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("QUIZ SUMMARY",
-                      style: TextStyle(color: Color(0xFF665FBE), fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text("QUIZ SUMMARY",
+                      style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 13),
-                  const Row(
-                    children: [
-                      Icon(Icons.shuffle, color: Color(0xFFFF7F32), size: 28),
-                      SizedBox(width: 10),
-                      Text("Random Mode", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(Icons.format_list_numbered, color: Color(0xFF665FBE), size: 28),
+                      Icon(Icons.shuffle, color: actionBlue, size: 28),
                       const SizedBox(width: 10),
-                      Text("$numberOfQuestions Questions", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const Text("Random Mode", 
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(isTimerEnabled ? Icons.timer : Icons.all_inclusive, color: const Color(0xFF665FBE), size: 28),
+                      Icon(Icons.format_list_numbered, color: primaryColor, size: 28),
+                      const SizedBox(width: 10),
+                      Text("$numberOfQuestions Questions", 
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(isTimerEnabled ? Icons.timer : Icons.all_inclusive, color: primaryColor, size: 28),
                       const SizedBox(width: 10),
                       Text(isTimerEnabled ? "$selectedTime min" : "No Limit",
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -280,14 +259,13 @@ class _RandomModePageState extends State<RandomModePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 23),
+            const SizedBox(height: 32),
 
             // Start Button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                // Disabled if there's an error or question count is 0
                 onPressed: (_errorMessage != null || numberOfQuestions <= 0) 
                 ? null 
                 : () {
@@ -299,7 +277,7 @@ class _RandomModePageState extends State<RandomModePage> {
                   ); 
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF7F32),
+                  backgroundColor: actionBlue,
                   disabledBackgroundColor: Colors.grey.shade400,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   elevation: 3,

@@ -14,11 +14,12 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
   List<Map<String, String>> wrongAnswers = [];
   late Deck deck;
   bool _initialized = false;
- 
-  final Color dominantColor = Color(0xFF665FBE);
-  final Color secondaryColor = Color(0xFFFAEEFF);
-  final Color accentColor = Color(0xFF665FBE);
   
+  // BLUE THEME PALETTE APPLIED
+  final Color dominantColor = const Color(0xFF1976D2);   // Solid Primary Blue
+  final Color secondaryColor = const Color(0xFFF5F9FF);  // Very Light Blue/White Background
+  final Color accentColor = const Color(0xFF2196F3);     
+  final Color actionBlue = const Color(0xFF1976D2); 
 
   @override
   void didChangeDependencies() {
@@ -29,9 +30,9 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
-
   }
- // Helper widget
+
+  // Helper widget
   Widget _buildAnswerBox({
     required String label,
     required String value,
@@ -74,9 +75,9 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor, // Light Blue background
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: dominantColor, // Solid Primary Blue
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
@@ -84,7 +85,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
         ),
         title: Text(
           'Review - ${deck.subject}',
-          style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -127,9 +128,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                       final item = wrongAnswers[index];
                       final type = item['type'] ?? 'multiple_choice';
 
-                      final questionText = type == 'true_false'
-                          ? item['question'] ?? ''
-                          : item['question'] ?? '';
+                      final questionText = item['question'] ?? '';
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 20),
@@ -185,7 +184,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                                     value: item['selectedAnswer'] ?? '',
                                     icon: Icons.close,
                                     iconColor: Colors.red,
-                                    boxColor: const Color(0xFFFDEEFF),
+                                    boxColor: const Color(0xFFFFEBEE), // Very light red
                                   ),
                                   const SizedBox(height: 10),
                                   _buildAnswerBox(
@@ -193,7 +192,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                                     value: item['correctAnswer'] ?? '',
                                     icon: Icons.check,
                                     iconColor: Colors.green,
-                                    boxColor: const Color(0xFFF3F2FF),
+                                    boxColor: const Color(0xFFE8F5E9), // Very light green
                                     valueColor: Colors.green[700],
                                   ),
                                 ],
@@ -205,7 +204,7 @@ class _RandomReviewPageState extends State<RandomReviewPage> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
                                   vertical: 12, horizontal: 20),
-                              color: accentColor,
+                              color: accentColor, // Action Blue
                               child: const Text(
                                 'Incorrect',
                                 style: TextStyle(

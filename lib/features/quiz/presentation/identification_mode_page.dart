@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for inputFormatters
+import 'package:flutter/services.dart'; 
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
@@ -19,12 +19,12 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
   int numberOfQuestions = 0;
   late TextEditingController _questionsController;
 
-  // Validation variable
   String? _errorMessage;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color accentColor = const Color(0xFFFF7F32);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
+  static const Color primaryColor = Color(0xFF1976D2);   
+  static const Color secondaryColor = Color(0xFFE3F2FD); 
+  static const Color accentColor = Color(0xFF2196F3);    
+  static const Color actionblue = Color(0xFF00B0FF); 
 
   @override
   void didChangeDependencies() {
@@ -33,7 +33,6 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
     _initialized = true;
     _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     
-    // Initial value setup
     numberOfQuestions = _deck.totalCards;
     _questionsController = TextEditingController(text: numberOfQuestions.toString());
   }
@@ -49,89 +48,46 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: dominantColor,
+        backgroundColor: primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        // PINALITAN: Inalis ang logo at inilagay ang mode name
+        title: const Text(
+          "Identification",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           children: [
-            // mode banner
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: dominantColor,
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('SELECTED MODE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.keyboard,
-                            color: Colors.white, size: 26),
-                      ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Identification',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18)),
-                            Text('Type the correct answer manually',
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+            // TINANGGAL: Ang "SELECTED MODE" banner card ay inalis na rito.
 
-            // number of questions
+            // number of questions section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      Icon(Icons.quiz_outlined, color: dominantColor, size: 24),
-                      const SizedBox(width: 8),
-                      const Text('Number of Questions',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Icon(Icons.quiz_outlined, color: primaryColor, size: 24),
+                      SizedBox(width: 8),
+                      Text('Number of Questions',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -149,7 +105,7 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
                       setState(() {
                         if (parsed > _deck.totalCards) {
                           _errorMessage = "Maximum is ${_deck.totalCards} questions only.";
-                          numberOfQuestions = parsed; // keep value to trigger UI error
+                          numberOfQuestions = parsed; 
                         } else if (parsed <= 0 && val.isNotEmpty) {
                           _errorMessage = "Enter at least 1 question.";
                           numberOfQuestions = 0;
@@ -160,18 +116,15 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText: _errorMessage, // Validation message
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 13),
+                      errorText: _errorMessage, 
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                            BorderSide(color: dominantColor, width: 1.6),
+                        borderSide: const BorderSide(color: primaryColor, width: 1.6),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide:
-                            BorderSide(color: dominantColor, width: 2.0),
+                        borderSide: const BorderSide(color: primaryColor, width: 2.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -185,40 +138,39 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: _errorMessage == null ? dominantColor : Colors.red),
+                        color: _errorMessage == null ? primaryColor : Colors.red),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // timer
+            // timer section
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      const Row(
                         children: [
-                          Icon(Icons.timer_outlined,
-                              color: dominantColor, size: 24),
-                          const SizedBox(width: 8),
-                          const Text('Quiz Timer',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          Icon(Icons.timer_outlined, color: primaryColor, size: 24),
+                          SizedBox(width: 8),
+                          Text('Quiz Timer',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ],
                       ),
                       Switch(
                         value: isTimerEnabled,
-                        onChanged: (val) =>
-                            setState(() => isTimerEnabled = val),
-                        activeThumbColor: dominantColor,
+                        onChanged: (val) => setState(() => isTimerEnabled = val),
+                        activeTrackColor: accentColor.withValues(alpha: 0.5),
+                        activeColor: primaryColor,
                       ),
                     ],
                   ),
@@ -230,25 +182,18 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
                         children: [10, 15, 20, 25, 30].map((time) {
                           bool isSelected = selectedTime == time;
                           return GestureDetector(
-                            onTap: () =>
-                                setState(() => selectedTime = time),
+                            onTap: () => setState(() => selectedTime = time),
                             child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 4),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 12),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? dominantColor
-                                    : secondaryColor,
+                                color: isSelected ? primaryColor : secondaryColor,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 '${time}m',
                                 style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : dominantColor,
+                                  color: isSelected ? Colors.white : primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -264,72 +209,57 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
             ),
             const SizedBox(height: 16),
 
-            // quiz summary
+            // quiz summary section
             Container(
               padding: const EdgeInsets.all(20),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: primaryColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('QUIZ SUMMARY',
-                      style: TextStyle(
-                          color: dominantColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
+                  const Text('QUIZ SUMMARY',
+                      style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 13),
-                  Row(
+                  const Row(
                     children: [
-                      Icon(Icons.keyboard, color: accentColor, size: 28),
-                      const SizedBox(width: 10),
-                      const Text('Identification',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Icon(Icons.keyboard, color: actionblue, size: 28),
+                      SizedBox(width: 10),
+                      Text('Identification',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.format_list_numbered,
-                          color: dominantColor, size: 28),
+                      const Icon(Icons.format_list_numbered, color: primaryColor, size: 28),
                       const SizedBox(width: 10),
                       Text('$numberOfQuestions Questions',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(
-                          isTimerEnabled
-                              ? Icons.timer
-                              : Icons.all_inclusive,
-                          color: dominantColor,
-                          size: 28),
+                      Icon(isTimerEnabled ? Icons.timer : Icons.all_inclusive, color: primaryColor, size: 28),
                       const SizedBox(width: 10),
-                      Text(
-                          isTimerEnabled
-                              ? '$selectedTime min'
-                              : 'No Limit',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(isTimerEnabled ? '$selectedTime min' : 'No Limit',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 23),
+            const SizedBox(height: 32),
 
             // start button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                // Button is disabled if there's an error
                 onPressed: (_errorMessage != null || numberOfQuestions <= 0)
                 ? null 
                 : () {
@@ -338,26 +268,20 @@ class _IdentificationModePageState extends State<IdentificationModePage> {
                     'identification',
                     arguments: {
                       'numberOfQuestions': numberOfQuestions,
-                      'timerMinutes':
-                          isTimerEnabled ? selectedTime : null, 
+                      'timerMinutes': isTimerEnabled ? selectedTime : null, 
                     },
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
+                  backgroundColor: actionblue,
                   disabledBackgroundColor: Colors.grey.shade400,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   elevation: 3,
                 ),
                 child: const Text('Start Quiz!',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               ),
             ),
-            const SizedBox(height: 8),
           ],
         ),
       ),

@@ -18,9 +18,10 @@ class _StudyPageState extends State<StudyPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF7A00);
+  // BLUE THEME PALETTE - 60-30-10 Rule
+  static const Color primaryColor = Color(0xFF1976D2);   // 60% (Dominant)
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30% (Background/Large surfaces)
+  static const Color accentColor = Color(0xFF2196F3);    // 10% (Action/Highlights)
 
   @override
   void dispose() {
@@ -32,23 +33,22 @@ class _StudyPageState extends State<StudyPage> {
   Widget build(BuildContext context) {
     final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
     final deckProvider = context.watch<DeckProvider>();
-    
 
     if (userId == null) {
-    return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            await FirebaseAuth.instance.signOut();
-          },
-          child: const Text('Force Logout'),
+      return Scaffold(
+        backgroundColor: secondaryColor,
+        body: Center(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+            onPressed: () async => await FirebaseAuth.instance.signOut(),
+            child: const Text('Force Logout', style: TextStyle(color: Colors.white)),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
     
     return Scaffold(
-      backgroundColor: secondaryColor,
+      backgroundColor: secondaryColor, // Ginamit ang 30% Secondary color para sa background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -57,14 +57,14 @@ class _StudyPageState extends State<StudyPage> {
             children: [
               const SizedBox(height: 20),
 
-              // search bar 
+              // Search bar
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: dominantColor.withValues(alpha: 0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -76,7 +76,7 @@ class _StudyPageState extends State<StudyPage> {
                   decoration: InputDecoration(
                     hintText: 'Search deck',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    prefixIcon: Icon(Icons.search, color: dominantColor),
+                    prefixIcon: const Icon(Icons.search, color: primaryColor),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 15),
                   ),
@@ -84,159 +84,150 @@ class _StudyPageState extends State<StudyPage> {
               ),
               const SizedBox(height: 35),
 
-              // deck list
-             Expanded(
-              child: StreamBuilder<List<Deck>>(
-                stream: _deckService.getUserDecks(userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              // Deck list section
+              Expanded(
+                child: StreamBuilder<List<Deck>>(
+                  stream: _deckService.getUserDecks(userId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator(color: primaryColor));
+                    }
 
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
+                    if (snapshot.hasData) {
+                      Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
+                    }
 
-                  if (snapshot.hasData) {
-                   Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
-                  }
+                    final providerDecks = deckProvider.decks;
+                    final filteredDecks = providerDecks.where((d) =>
+                        d.title.toLowerCase().contains(_searchQuery) ||
+                        d.subject.toLowerCase().contains(_searchQuery)).toList();
 
-                  final providerDecks = deckProvider.decks;
-
-                  final filteredDecks = _searchQuery.isEmpty
-                      ? providerDecks
-                      : providerDecks.where((d) =>
-                          d.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                          d.subject.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
-
-                  if (filteredDecks.isEmpty) {
-                    return Center(child: Text("No decks found"));
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header showing count of filtered results
-                      if (providerDecks.isNotEmpty) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Total No. of\nDecks',
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: dominantColor,
-                              height: 1.1,
-                            ),
-                          ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header section
+                        if (providerDecks.isNotEmpty) ...[
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(Icons.style_outlined, color: dominantColor, size: 35),
-                              const SizedBox(width: 10),
-                              Text(
-                                '${filteredDecks.length}', 
+                              const Text(
+                                'Total No. of\nDecks',
                                 style: TextStyle(
-                                  fontSize: 55,
-                                  fontWeight: FontWeight.w900,
-                                  color: accentColor,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor, // 60% Dominant
+                                  height: 1.1,
                                 ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.style_outlined, color: primaryColor, size: 35),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    '${filteredDecks.length}', 
+                                    style: const TextStyle(
+                                      fontSize: 55,
+                                      fontWeight: FontWeight.w900,
+                                      color: accentColor, // 10% Accent/Action
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
+                          const SizedBox(height: 25),
                         ],
-                      ),
-                      const SizedBox(height: 25),
-                      ],
 
-                      // List Logic
-                      if (filteredDecks.isEmpty)
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              _searchQuery.isEmpty
-                                  ? 'No decks yet.\nCreate one to start studying!'
-                                  : 'No decks found for "$_searchQuery"',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: dominantColor.withValues(alpha: 0.5), 
-                                fontSize: 16
+                        // List of Cards
+                        if (filteredDecks.isEmpty)
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                _searchQuery.isEmpty
+                                    ? 'No decks yet.\nCreate one to start studying!'
+                                    : 'No decks found for "$_searchQuery"',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: primaryColor.withValues(alpha: 0.5), 
+                                  fontSize: 16
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      else
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: filteredDecks.length,
-                            itemBuilder: (context, index) {
-                              final deck = filteredDecks[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  context.read<DeckProvider>().selectDeck(deck);
-                                  Navigator.pushNamed(context, 'mode');
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  padding: const EdgeInsets.all(18),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(25),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.03),
-                                        blurRadius: 15,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: secondaryColor,
-                                          borderRadius: BorderRadius.circular(12),
+                          )
+                        else
+                          Expanded(
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: filteredDecks.length,
+                              itemBuilder: (context, index) {
+                                final deck = filteredDecks[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    context.read<DeckProvider>().selectDeck(deck);
+                                    Navigator.pushNamed(context, 'mode');
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    padding: const EdgeInsets.all(18),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(25),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 8),
                                         ),
-                                        child: Icon(Icons.auto_awesome_motion, color: dominantColor),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              deck.title,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: dominantColor,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}',
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // Card Icon with Secondary Background
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: secondaryColor, // 30% background ng icon
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: const Icon(Icons.auto_awesome_motion, color: primaryColor),
                                         ),
-                                      ),
-                                      Icon(Icons.chevron_right, color: dominantColor.withValues(alpha: 0.4)),
-                                    ],
+                                        const SizedBox(width: 15),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                deck.title,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: primaryColor,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Icon(Icons.chevron_right, color: accentColor), // 10% Accent
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                    ],
-                  );
-                },
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
             ],
           ),
         ),

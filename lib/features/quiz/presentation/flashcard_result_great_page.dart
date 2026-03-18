@@ -19,6 +19,11 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
   late Deck deck;
   bool _initialized = false;
 
+  // Blue Theme Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -39,16 +44,16 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
         totalCards > 0 ? gotItCount / totalCards : 0.0;
     final int accuracyPercentage = (accuracyRatio * 100).toInt();
 
-    // Accuracy Color Logic - matches the orange/green theme
+    // Accuracy Color Logic
     Color accuracyColor = const Color.fromARGB(255, 235, 71, 42); 
     if (accuracyPercentage >= 80) {
       accuracyColor = Colors.green;
     } else if (accuracyPercentage >= 50) {
-      accuracyColor = const Color.fromARGB(255, 235, 71, 42);
+      accuracyColor = primaryColor;
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF665FBE), 
+      backgroundColor: primaryColor, // In-update: Mula purple tungo sa primaryColor
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -76,13 +81,13 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                 style: const TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 30),
 
-            // Main White/Lavender Container
+            // Main Blue Container
             Expanded(
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(25),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFFAEEFF), 
+                  color: secondaryColor, // In-update: Mula lavender tungo sa secondaryColor
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
@@ -150,19 +155,18 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.bar_chart, color: Color(0xFF665FBE)),
+                                const Icon(Icons.bar_chart, color: accentColor), // In-update: accentColor
                                 const SizedBox(width: 10),
                                 const Text('Accuracy',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold)),
                                 const Spacer(),
-                                // In-update: Ginawang accuracyColor ang kulay ng text
                                 Text('$accuracyPercentage%',
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color:accuracyColor)),
+                                        color: accuracyColor)),
                               ],
                             ),
                             const SizedBox(height: 15),
@@ -194,7 +198,7 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF27F21), 
+                              backgroundColor: const Color(0xFF00B0FF), 
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                         ),
@@ -225,16 +229,16 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                               }
                             },
                             icon: const Icon(Icons.push_pin,
-                                color: Color(0xFF665FBE)),
+                                color: primaryColor), // In-update: primaryColor
                             label: Text('Review Missed ($againCount)',
                                 style: const TextStyle(
-                                    color: Color(0xFF665FBE),
+                                    color: primaryColor, // In-update: primaryColor
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 elevation: 0,
-                                side: const BorderSide(color: Color(0xFF665FBE)),
+                                side: const BorderSide(color: primaryColor), // In-update: primaryColor
                                 shape: RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.circular(30))),
@@ -262,7 +266,7 @@ class _FlashcardResultGreatPageState extends State<FlashcardResultGreatPage> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF665FBE),
+                              backgroundColor: primaryColor, // In-update: primaryColor
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                         ),

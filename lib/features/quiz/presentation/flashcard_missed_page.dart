@@ -24,6 +24,11 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
   int _gotItCount = 0;
   int _stillUnsureCount = 0;
 
+  // Sky Blue Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // Deep Blue
+  static const Color backgroundColor = Color(0xFFE3F2FD); // Light Blue
+  static const Color progressColor = Color(0xFF2196F3);  // Primary Blue
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -55,7 +60,6 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
       setState(() {
         _isFinished = true;
       });
-      // Pagkatapos ng huling card, bumalik sa previous screen dala ang results
       Future.microtask(() {
         Navigator.pop(context, {
           'gotItCount': _gotItCount,
@@ -69,32 +73,34 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
   Widget build(BuildContext context) {
     if (missedCards.isEmpty) {
       return const Scaffold(
-        backgroundColor: Color(0xFFFAEEFF),
+        backgroundColor: backgroundColor,
         body: Center(child: Text('No missed cards to review!')),
       );
     }
 
     final card = missedCards[_currentIndex];
     final totalCards = missedCards.length;
-    // Calculate progress (0.0 to 1.0)
     final progress = (_currentIndex + 1) / totalCards;
-    // Calculate percentage integer
     final percentage = (progress * 100).toInt();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
-        elevation: 4,
+        backgroundColor: primaryColor,
+        elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+        // Dito nakalagay ang topic/title ng deck
+        title: Text(
+          deck.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
@@ -104,7 +110,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
             children: [
               const SizedBox(height: 30),
 
-              // Progress Bar Section with Percentage
+              // Progress Bar Section
               Row(
                 children: [
                   Text(
@@ -112,7 +118,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: const Color.fromARGB(255, 168, 28, 28),
+                      color: progressColor,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -123,7 +129,7 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                         value: progress,
                         minHeight: 8,
                         backgroundColor: Colors.white,
-                        color:const Color.fromARGB(255, 168, 28, 28), // Kulay pula dahil missed mode
+                        color: progressColor,
                       ),
                     ),
                   ),
@@ -131,49 +137,50 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                   Text(
                     '$percentage%',
                     style: const TextStyle(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.grey, // Muted color gaya ng sa screenshot
+                      color: Colors.grey,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 25),
 
-              // Review Badge
+              // Review Badge (Optional: Pwedeng tanggalin kung ayaw ng redundant info)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF912C2C),
-                  borderRadius: BorderRadius.circular(20),
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: primaryColor.withOpacity(0.3)),
                 ),
-                child: Text(
-                  'Review: ${deck.title}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                child: const Text(
+                  'Reviewing Missed Cards',
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
               // Flashcard Section
               Expanded(
-                child: _isFinished 
-                    ? const Center(child: CircularProgressIndicator())
+                child: _isFinished
+                    ? const Center(child: CircularProgressIndicator(color: primaryColor))
                     : Dismissible(
                         key: ValueKey(_currentIndex),
                         onDismissed: _onSwipe,
                         background: Container(
                           alignment: Alignment.centerLeft,
                           padding: const EdgeInsets.only(left: 20),
-                          child: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+                          child: const Icon(Icons.check_circle, color: Colors.green, size: 60),
                         ),
                         secondaryBackground: Container(
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(Icons.cancel, color: Colors.red, size: 50),
+                          child: const Icon(Icons.cancel, color: Colors.red, size: 60),
                         ),
                         child: GestureDetector(
                           onTap: () => setState(() => _isFlipped = !_isFlipped),
@@ -191,39 +198,61 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
                                   height: double.infinity,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: isBackSide ? Colors.white : const Color(0xFF912C2C),
+                                    color: isBackSide ? Colors.white : primaryColor,
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.1),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 5)),
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 8)),
                                     ],
                                   ),
                                   child: isBackSide
                                       ? Transform(
                                           alignment: Alignment.center,
                                           transform: Matrix4.identity()..rotateY(pi),
-                                          child: Center(
-                                            child: SingleChildScrollView(
-                                              padding: const EdgeInsets.all(40),
-                                              child: Text(
-                                                card.answer,
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(fontSize: 18, color: Colors.black87),
+                                          child: Stack(
+                                            children: [
+                                              Center(
+                                                child: SingleChildScrollView(
+                                                  padding: const EdgeInsets.all(40),
+                                                  child: Text(
+                                                    card.answer,
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      fontSize: 22,
+                                                      color: Color(0xFF2D3142),
+                                                      height: 1.5,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              const Positioned(
+                                                bottom: 25,
+                                                left: 0,
+                                                right: 0,
+                                                child: Center(
+                                                  child: Text(
+                                                    'swipe left/right to rate',
+                                                    style: TextStyle(
+                                                        color: Colors.black26,
+                                                        fontSize: 12,
+                                                        letterSpacing: 1.1),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         )
                                       : Center(
                                           child: Padding(
-                                            padding: const EdgeInsets.all(30),
+                                            padding: const EdgeInsets.symmetric(horizontal: 30),
                                             child: Text(
                                               card.question,
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 32,
+                                                  fontSize: 30,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
@@ -239,29 +268,31 @@ class _FlashcardMissedPageState extends State<FlashcardMissedPage> {
               const SizedBox(height: 30),
               const Text('← Still Unsure | Got it! →',
                   style: TextStyle(
-                      color: Color(0xFF665FBE),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500)),
-              const SizedBox(height: 50),
+                      color: primaryColor,
+                      fontSize: 16,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
 
-               Row(
+              // Dot indicators
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  totalCards > 5 ? 5 : totalCards,
+                  totalCards > 8 ? 8 : totalCards,
                   (i) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
                     height: 8,
-                    width: i == (_currentIndex % 5) ? 20 : 8,
+                    width: i == (_currentIndex % 8) ? 24 : 8,
                     decoration: BoxDecoration(
-                      color: i <= (_currentIndex % 5)
-                          ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withValues(alpha: 0.2),
+                      color: i <= (_currentIndex % 8)
+                          ? primaryColor
+                          : primaryColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
             ],
           ),
         ),
