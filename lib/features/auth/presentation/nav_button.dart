@@ -53,7 +53,7 @@ class _NavButtonState extends State<NavButton> {
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF665FBE), 
+        selectedItemColor: const Color(0xFF1976D2), 
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

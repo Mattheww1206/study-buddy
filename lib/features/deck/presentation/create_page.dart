@@ -14,10 +14,10 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  // Color Palette
-  final Color colorDominant = const Color(0xFF665FBE);
-  final Color colorSecondary = const Color(0xFFFAEEFF);
-  final Color colorAccent = const Color(0xFFFF7A00);
+  // --- BLUE 60-30-10 PALETTE APPLIED ---
+  final Color colorDominant = const Color(0xFF1976D2);   // 60% (Primary)
+  final Color colorSecondary = const Color(0xFFE3F2FD); // 30% (Secondary)
+  final Color colorAccent = const Color(0xFF2196F3);    // 10% (Accent)
   final Color colorWhite = Colors.white;
 
   final TextEditingController _searchController = TextEditingController();
@@ -30,7 +30,6 @@ class _CreatePageState extends State<CreatePage> {
   bool _isProcessing = false;
   late Stream<List<Deck>> _decksStream;
   bool _isStreamInitialized = false;
-  final Set<String> _pendingDeletedDeckIds = {};
 
   @override
   void didChangeDependencies() {
@@ -192,7 +191,7 @@ class _CreatePageState extends State<CreatePage> {
         isEditMode = false;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Failed to update.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
@@ -279,13 +278,13 @@ class _CreatePageState extends State<CreatePage> {
 
     if (confirm) {
       setState(() => _isProcessing = true);
-       final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
-       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+      final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
 
       try {
         for (var id in selectedDecksIds) {
           deckProvider.removeDecks(id);
-                _deckService.deleteDeck(id, userId: userId, isOnline: isOnline,);
+          _deckService.deleteDeck(id, userId: userId, isOnline: isOnline,);
         }
         setState(() {
           selectedDecksIds.clear();
@@ -302,7 +301,7 @@ class _CreatePageState extends State<CreatePage> {
           );
         }
       } catch (e) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Failed to delete.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
       } finally {
         if (mounted) setState(() => _isProcessing = false);
       }
@@ -319,7 +318,7 @@ class _CreatePageState extends State<CreatePage> {
   Widget build(BuildContext context) {
     final deckProvider = context.watch<DeckProvider>();
     return Scaffold(
-      backgroundColor: colorSecondary,
+      backgroundColor: colorSecondary, // 30% Secondary Background
       floatingActionButton: StreamBuilder<List<Deck>>(
         stream: _decksStream,
         builder: (context, snapshot) {
@@ -330,13 +329,13 @@ class _CreatePageState extends State<CreatePage> {
                     onPressed: () => _showActionOptions(decks),
                     label: Text('Manage (${selectedDecksIds.length})'),
                     icon: const Icon(Icons.edit_note_rounded),
-                    backgroundColor: colorDominant,
+                    backgroundColor: colorDominant, // 60% Primary
                   )
                 : const SizedBox.shrink();
           } else {
             return FloatingActionButton(
               onPressed: _showAddOptions,
-              backgroundColor: colorAccent,
+              backgroundColor: colorAccent, // 10% Accent
               elevation: 4,
               child: const Icon(Icons.add, color: Colors.white, size: 35),
             );
@@ -453,9 +452,9 @@ class _CreatePageState extends State<CreatePage> {
                             ],
                           ),
                           const SizedBox(height: 25),
-                         if (filteredDecks.isEmpty)
+                          if (filteredDecks.isEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(top: 220), // Space from the header
+                            padding: const EdgeInsets.only(top: 220), 
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -475,7 +474,6 @@ class _CreatePageState extends State<CreatePage> {
                             ),
                           )
                           else
-                          // --- UPDATED DYNAMIC DECK LIST ---
                           ...filteredDecks.map((deck) {
                             bool isSelected = selectedDecksIds.contains(deck.deckId);
                             return Padding(
@@ -488,7 +486,6 @@ class _CreatePageState extends State<CreatePage> {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   padding: const EdgeInsets.all(18),
-                                  // Inalis ang fixed height para lumaki kusa
                                   decoration: BoxDecoration(
                                     color: colorWhite,
                                     borderRadius: BorderRadius.circular(24),
@@ -502,7 +499,7 @@ class _CreatePageState extends State<CreatePage> {
                                     ],
                                   ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start, // Align to top para sa mahabang text
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       if (isEditMode)
                                         Padding(
@@ -518,19 +515,17 @@ class _CreatePageState extends State<CreatePage> {
                                         child: Icon(Icons.collections_bookmark_rounded, color: colorDominant, size: 30),
                                       ),
                                       const SizedBox(width: 18),
-                                      // Ginamitan ng Expanded para ang column ay hindi mag-overflow horizontally
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min, // Mahalaga ito para sa dynamic height
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
                                               deck.title, 
                                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorDominant),
-                                              softWrap: true, // Payagan ang pag-wrap sa next line
+                                              softWrap: true,
                                             ),
                                             const SizedBox(height: 6),
-                                            // Wrap Row in a Wrap widget just in case subject and cards count also get too long
                                             Wrap(
                                               crossAxisAlignment: WrapCrossAlignment.center,
                                               spacing: 8,

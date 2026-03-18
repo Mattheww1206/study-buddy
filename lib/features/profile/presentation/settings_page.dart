@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// Tinanggal ang google_fonts import
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
@@ -14,6 +13,11 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final AuthService _authService = AuthService();
 
+  // Color Palette
+  final Color primaryBlue = const Color(0xFF1976D2);
+  final Color backgroundBlue = const Color(0xFFE3F2FD);
+  final Color accentBlue = const Color(0xFF2196F3);
+
   void _showLogoutDialog(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     showDialog(
@@ -21,59 +25,24 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-          elevation: 10,
           child: Container(
             padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.logout_rounded,
-                  color: Color(0xFF665FBE), // Dominant Color
-                  size: 60,
-                ),
+                Icon(Icons.logout_rounded, color: accentBlue, size: 60),
                 const SizedBox(height: 20),
-                const Text(
-                  'Oh no! Leaving?',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
+                const Text('Oh no! Leaving?', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
-                Text(
-                  'Are you sure you want to log out of your StudyBuddy account?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
+                const Text('Are you sure you want to log out?', textAlign: TextAlign.center),
                 const SizedBox(height: 30),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          side: const BorderSide(color: Color(0xFF665FBE)), // Dominant Color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Stay',
-                          style: TextStyle(
-                            color: Color(0xFF665FBE), // Dominant Color
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        style: OutlinedButton.styleFrom(side: BorderSide(color: accentBlue)),
+                        child: Text('Stay', style: TextStyle(color: accentBlue)),
                       ),
                     ),
                     const SizedBox(width: 15),
@@ -85,21 +54,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           await _authService.signOut();
                           nav.pushNamedAndRemoveUntil('/', (route) => false);
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF665FBE), // Dominant Color
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Logout',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        style: ElevatedButton.styleFrom(backgroundColor: primaryBlue),
+                        child: const Text('Logout', style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ],
@@ -115,174 +71,122 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF), // Dominant Color
+      backgroundColor: backgroundBlue,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
-        title: const Text(
-          'Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25, 
-            color: Colors.white,
-          ),
-        ),
+        backgroundColor: primaryBlue,
+        elevation: 0,
+        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new,
-              size: 25, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0), 
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- SECTION 1: ACCOUNT & PREFERENCES ---
+            const Padding(
+              padding: EdgeInsets.only(left: 5, bottom: 10),
+              child: Text("Account & Preferences", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+            ),
             Container(
-              padding: const EdgeInsets.all(30), 
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 255, 255, 255), // Secondary Color
-                borderRadius: BorderRadius.circular(25),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 children: [
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'account');
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50, 
-                          width: 50,  
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF665FBE), // Dominant Color
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.person,
-                              size: 25, color: Colors.white), 
-                        ),
-                        const SizedBox(width: 15),
-                        const Text(
-                          'Account',
-                          style: TextStyle(
-                            fontSize: 20, 
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 20), 
-                      ],
-                    ),
+                  _buildSettingsTile(
+                    icon: Icons.person_outline,
+                    title: "Account",
+                    subtitle: "Profile & Security Settings",
+                    iconColor: accentBlue,
+                    onTap: () => Navigator.pushNamed(context, 'account'),
                   ),
-                  const Divider(height: 25), 
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'achievement');
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50, 
-                          width: 50,  
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF810E), // Accent Color
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.notifications,
-                              size: 25, color: Colors.white), 
-                        ),
-                        const SizedBox(width: 15),
-                        const Text(
-                          'Achievement',
-                          style: TextStyle(
-                            fontSize: 20, 
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 20), 
-                      ],
-                    ),
+                  _buildDivider(),
+                  _buildSettingsTile(
+                    icon: Icons.emoji_events_outlined,
+                    title: "Achievement",
+                    subtitle: "Your rewards and badges",
+                    iconColor: accentBlue,
+                    onTap: () => Navigator.pushNamed(context, 'achievement'),
                   ),
-                  const Divider(height: 25), 
-                  // ITO YUNG DAGDAG: Recently Deleted Section
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'delete');
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE53935), // Red color for delete
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.delete_sweep,
-                              size: 25, color: Colors.white),
-                        ),
-                        const SizedBox(width: 15),
-                        const Text(
-                          'Recently Deleted',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 20),
-                      ],
-                    ),
-                  ),
-                  const Divider(height: 25), 
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () async {
-                      _showLogoutDialog(context);
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 50, 
-                          width: 50,  
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF665FBE), // Dominant Color
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.lock,
-                              size: 25, color: Colors.white), 
-                        ),
-                        const SizedBox(width: 20), 
-                        const Text(
-                          'Logout',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold), 
-                        ),
-                      ],
-                    ),
+                  _buildDivider(),
+                  _buildSettingsTile(
+                    icon: Icons.delete_outline,
+                    title: "Recently Deleted",
+                    subtitle: "Manage your trashed items",
+                    iconColor: const Color.fromARGB(255, 216, 116, 115),
+                    onTap: () => Navigator.pushNamed(context, 'delete'),
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 25), // Space between sections
+
+            // --- SECTION 2: LOGOUT (HIWALAY NA BOX) ---
+            const Padding(
+              padding: EdgeInsets.only(left: 5, bottom: 10),
+              child: Text("Actions", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: _buildSettingsTile(
+                icon: Icons.logout,
+                title: "Logout",
+                subtitle: "Sign out of your account",
+                iconColor: primaryBlue,
+                onTap: () => _showLogoutDialog(context),
+                showArrow: false,
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSettingsTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color iconColor,
+    required VoidCallback onTap,
+    bool showArrow = true,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: iconColor.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: iconColor, size: 24),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+      ),
+      trailing: showArrow 
+          ? const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey) 
+          : null,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(height: 1, thickness: 1, indent: 70, endIndent: 20, color: Colors.grey[100]);
   }
 }

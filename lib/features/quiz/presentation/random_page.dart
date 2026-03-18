@@ -41,9 +41,10 @@ class _RandomPageState extends State<RandomPage> {
   int _secondsLeft = 0;
   bool _geminiUnavailable = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF6D00);
+  // UPDATED COLORS
+  final Color dominantColor = const Color(0xFF1976D2);
+  final Color secondaryColor = const Color(0xFFE3F2FD);
+  final Color accentColor = const Color(0xFF00B0FF);
 
   @override
   void didChangeDependencies() {
@@ -105,7 +106,6 @@ class _RandomPageState extends State<RandomPage> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  // 👈 DESIGN UPDATE: Ang Exit Confirmation Design
   Future<bool> _handleExitConfirmation() async {
     final bool? result = await showDialog<bool>(
       context: context,
@@ -336,7 +336,7 @@ class _RandomPageState extends State<RandomPage> {
             const SizedBox(width: 8),
             Text('Achievement Unlocked: $name!'),
           ]),
-          backgroundColor: const Color(0xFF665FBE),
+          backgroundColor: dominantColor,
           duration: const Duration(seconds: 3),
         ));
       }
@@ -388,14 +388,14 @@ class _RandomPageState extends State<RandomPage> {
           title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
           centerTitle: true,
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              CircularProgressIndicator(color: dominantColor),
               const SizedBox(height: 20),
               Text('Generating quiz questions...',
-                  style: TextStyle(color: Color(0xFF665FBE), fontSize: 16)),
+                  style: TextStyle(color: dominantColor, fontSize: 16)),
             ],
           ),
         ),
@@ -474,11 +474,25 @@ class _RandomPageState extends State<RandomPage> {
         backgroundColor: dominantColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => _handleExitConfirmation(),
         ),
-        title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-        centerTitle: true,
+       title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _deck.title,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              ),
+            ),
+          ),
+        ),
+         centerTitle:true,
       ),
       body: PopScope(
         canPop: false,
@@ -489,7 +503,6 @@ class _RandomPageState extends State<RandomPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Status Section
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
                 child: Column(
@@ -550,7 +563,6 @@ class _RandomPageState extends State<RandomPage> {
                 ),
               ),
 
-              // Question Card
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 width: double.infinity,
@@ -579,7 +591,6 @@ class _RandomPageState extends State<RandomPage> {
 
               const SizedBox(height: 20),
 
-              // Answer Section
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -591,7 +602,6 @@ class _RandomPageState extends State<RandomPage> {
                 ),
               ),
 
-              // Navigation Row
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 25),
                 child: Row(

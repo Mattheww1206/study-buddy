@@ -18,12 +18,13 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
   bool _initialized = false;
   String timeUsed = '';
   
-  // BAGONG VARIABLE: Para malaman kung ipapakita ang streak badge
   bool _isFirstQuizToday = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF7900);
+  // BLUE THEME PALETTE
+  final Color primaryColor = const Color(0xFF1976D2);   // 60%
+  final Color secondaryColor = const Color(0xFFE3F2FD); // 30%
+  final Color accentColor = const Color(0xFF2196F3);    // 10%
+  final Color actionBlue = const Color(0xFF00B0FF);     // Action Accent
 
   @override
   void didChangeDependencies() {
@@ -32,14 +33,26 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
     _initialized = true;
 
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    
+    // Extraction with safety checks
     _correctCount = args['correctCount'] as int;
     _totalCards = args['totalCards'] as int;
-    wrongAnswers = List<Map<String, String>>.from(args['wrongAnswers'] as List);
-    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
-    timeUsed = args['timeUsed'] as String;
     
-    // Tinatanggap ang value mula sa navigation logic
+    // DITO ANG CRITICAL PART: 
+    // Sinisiguro natin na kung null ang 'wrongAnswers', magiging empty list ito para hindi mag-error ang UI.
+    if (args['wrongAnswers'] != null) {
+      wrongAnswers = List<Map<String, String>>.from(
+        (args['wrongAnswers'] as List).map((item) => Map<String, String>.from(item))
+      );
+    } else {
+      wrongAnswers = [];
+    }
+    
+    deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
+    timeUsed = args['timeUsed'] as String? ?? '00:00';
     _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
+
+    debugPrint("DEBUG: Wrong Answers Count = ${wrongAnswers.length}");
   }
 
   @override
@@ -52,11 +65,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [dominantColor, const Color(0xFF7A73D1)],
-          ),
+          color: primaryColor, 
         ),
         child: SafeArea(
           bottom: false,
@@ -88,13 +97,13 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
               const SizedBox(height: 5),
               Text(
                 '$accuracyPercent%',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 50,
                     fontWeight: FontWeight.bold,
-                    color: accentColor),
+                    color: Colors.white), 
               ),
               Text(
-                isExcellent ? 'Excellent Work! 🎉' : 'Keep Practicing! 💪',
+                isExcellent ? 'Excellent Work! ' : 'Keep Practicing! ',
                 style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -120,9 +129,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(25, 30, 25, 0),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFAEEFF),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: secondaryColor,
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
@@ -135,9 +144,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8F7FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFE8E5FF)),
+                            border: Border.all(color: accentColor.withValues(alpha: 0.2)),
                           ),
                           child: Column(
                             children: [
@@ -146,7 +155,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                 style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
-                                    color: dominantColor),
+                                    color: primaryColor),
                               ),
                               const Text(
                                 'TOTAL SCORE',
@@ -163,9 +172,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8F7FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFE8E5FF)),
+                            border: Border.all(color: accentColor.withValues(alpha: 0.2)),
                           ),
                           child: Column(
                             children: [
@@ -175,7 +184,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                   Row(
                                     children: [
                                       Icon(Icons.bar_chart_rounded,
-                                          color: dominantColor, size: 20),
+                                          color: primaryColor, size: 20),
                                       const SizedBox(width: 8),
                                       const Text('Accuracy',
                                           style: TextStyle(
@@ -186,7 +195,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                   Text('$accuracyPercent%',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: dominantColor)),
+                                          color: primaryColor)),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -196,7 +205,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                   value: accuracy,
                                   minHeight: 10,
                                   backgroundColor: const Color(0xFFE0E0E0),
-                                  valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                                  valueColor: AlwaysStoppedAnimation<Color>(actionBlue),
                                 ),
                               ),
                             ],
@@ -210,9 +219,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(18),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF8F7FF),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: const Color(0xFFE8E5FF)),
+                                  border: Border.all(color: accentColor.withValues(alpha: 0.2)),
                                 ),
                                 child: Row(
                                   children: [
@@ -240,20 +249,19 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // CONDITIONAL RENDERING: Ipakita lang ang streak kung unang quiz
                             if (_isFirstQuizToday)
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(18),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF8F7FF),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: const Color(0xFFE8E5FF)),
+                                    border: Border.all(color: accentColor.withValues(alpha: 0.2)),
                                   ),
                                   child: Row(
                                     children: [
                                       Icon(Icons.local_fire_department,
-                                          color: accentColor, size: 22),
+                                          color: actionBlue, size: 22),
                                       const SizedBox(width: 8),
                                       const Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,14 +282,13 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                                 ),
                               )
                             else
-                              // Placeholder kung tapos na ang streak for today
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.all(18),
                                   decoration: BoxDecoration(
                                     color: Colors.black.withValues(alpha: 0.03),
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: const Color(0xFFE8E5FF)),
+                                    border: Border.all(color: Colors.black12),
                                   ),
                                   child: const Center(
                                     child: Text(
@@ -296,6 +303,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                         ),
                         const SizedBox(height: 25),
                         // Buttons Section
+                        // LALABAS LANG ITO KUNG MAY WRONG ANSWERS
                         if (wrongAnswers.isNotEmpty) ...[
                           ElevatedButton(
                             onPressed: () => Navigator.pushNamed(
@@ -306,8 +314,8 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                               },
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                              foregroundColor: secondaryColor,
+                              backgroundColor: actionBlue,
+                              foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 58),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
@@ -337,8 +345,9 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: dominantColor,
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: primaryColor,
+                            side: BorderSide(color: primaryColor, width: 2),
                             minimumSize: const Size(double.infinity, 58),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20)),
@@ -348,7 +357,7 @@ class _MultipleResultPageState extends State<MultipleResultPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.home_rounded, size: 20),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Text('Back to Study',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,

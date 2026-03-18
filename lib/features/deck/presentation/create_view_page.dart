@@ -22,12 +22,14 @@ class _CreateViewPageState extends State<CreateViewPage> {
   List<Flashcard> _flashcards = [];
   bool _isLoading = true;
   bool _isSaving = false;
-  final Color colorDominant = const Color(0xFF665FBE);
 
+  // New Theme Colors
+  final Color dominantColor = const Color(0xFF1976D2);   // Solid Primary Blue
+  final Color secondaryColor = const Color(0xFFF5F9FF);  // Very Light Blue/White Background
+  final Color accentColor = const Color(0xFF2196F3);     // Accent Blue
+  final Color actionBlue = const Color(0xFF1976D2);      // Action Blue
 
-  // State control para sa pag-edit ng Subject at Title sa itaas
   bool _isEditingDeckInfo = false;
-
   int editingIndex = -1;
   final TextEditingController _termController = TextEditingController();
   final TextEditingController _defController = TextEditingController();
@@ -73,12 +75,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to load Flashcards.'),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: colorDominant,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
+        SnackBar(
+          content: const Text('Failed to load Flashcards.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: dominantColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
     }
   }
@@ -111,14 +113,15 @@ class _CreateViewPageState extends State<CreateViewPage> {
                 child: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent, size: 40),
               ),
               const SizedBox(height: 20),
-              const Text('Move card to trash?',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF665FBE))),
+              Text('Move card to trash?',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: dominantColor)),
               const SizedBox(height: 10),
-                    Text(
-                isOnline
-                   ? 'This card will be moved to Recently Deleted. You can restore it within 30 days.'
-                   : 'You\'re offline. This card will be saved locally and synced to Recently Deleted when you reconnect.',
-                  textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 14)),
+              Text(
+                  isOnline
+                      ? 'This card will be moved to Recently Deleted. You can restore it within 30 days.'
+                      : 'You\'re offline. This card will be saved locally and synced to Recently Deleted when you reconnect.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14)),
               const SizedBox(height: 25),
               Row(
                 children: [
@@ -156,14 +159,13 @@ class _CreateViewPageState extends State<CreateViewPage> {
     if (confirm == true) {
       final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
       final isOnline = Provider.of<ConnectivityProvider>(context, listen: false).isOnline;
-      final deckProvider = Provider.of<DeckProvider>(context, listen: false);  
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
       try {
         deckProvider.removeFlashcard(cardId);
-
         setState(() {
           _flashcards.removeWhere((c) => c.cardId == cardId);
         });
-        
+
         await _flashcardService.deleteFlashcard(
           deckId: _deck.deckId,
           cardId: cardId,
@@ -171,19 +173,15 @@ class _CreateViewPageState extends State<CreateViewPage> {
           isOnline: isOnline,
           parentDeckTitle: _deck.title,
         );
-        setState(() {
-          _flashcards.removeWhere((c) => c.cardId == cardId);
-        });
-         if (mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isOnline
                   ? 'Card moved to Recently Deleted.'
                   : 'Saved offline. Will sync when you reconnect.'),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: colorDominant,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: dominantColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           );
         }
@@ -191,9 +189,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete card.'),
+            content: const Text('Failed to delete card.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: colorDominant,
+            backgroundColor: dominantColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
@@ -222,11 +220,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update card.'),
-           behavior: SnackBarBehavior.floating,
-           backgroundColor: colorDominant,
-           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ));
+          content: const Text('Failed to update card.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: dominantColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
     }
   }
 
@@ -237,10 +236,11 @@ class _CreateViewPageState extends State<CreateViewPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('New card ${i + 1} is missing a term or definition.'),
-             behavior: SnackBarBehavior.floating,
-             backgroundColor: colorDominant,
-             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ));
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: dominantColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
         return;
       }
     }
@@ -252,7 +252,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     final nav = Navigator.of(context);
 
     try {
-       await _deckService.updateDeck(
+      await _deckService.updateDeck(
         _deck.deckId,
         {
           'title': _titleEditController.text.trim(),
@@ -269,12 +269,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
       }
 
       messenger.showSnackBar(
-         SnackBar(
-          content: Text('Deck updated Successfully.'),
-           behavior: SnackBarBehavior.floating,
-           backgroundColor: colorDominant,
-           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
+        SnackBar(
+          content: const Text('Deck updated Successfully.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: dominantColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
       nav.pop();
     } catch (e) {
@@ -288,9 +288,9 @@ class _CreateViewPageState extends State<CreateViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F2F8),
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: dominantColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -304,11 +304,10 @@ class _CreateViewPageState extends State<CreateViewPage> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: dominantColor))
           : Column(
               children: [
                 const SizedBox(height: 10),
-                // DECK INFO EDIT BUTTON AT THE TOP
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -318,8 +317,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
                         onTap: () => setState(() => _isEditingDeckInfo = !_isEditingDeckInfo),
                         child: Text(
                           _isEditingDeckInfo ? 'Done' : 'Edit',
-                          style: const TextStyle(
-                            color: Color(0xFF665FBE),
+                          style: TextStyle(
+                            color: dominantColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -329,7 +328,6 @@ class _CreateViewPageState extends State<CreateViewPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                // SUBJECT AND TITLE FIELDS
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -340,18 +338,27 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: _isEditingDeckInfo ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF), width: 2),
+                            border: Border.all(
+                                color: _isEditingDeckInfo ? accentColor : Colors.white,
+                                width: 2),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('SUBJECT', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                              const Text('SUBJECT',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
                               TextField(
                                 controller: _subjectEditController,
                                 readOnly: !_isEditingDeckInfo,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+                                decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero),
                               ),
                             ],
                           ),
@@ -364,18 +371,27 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: _isEditingDeckInfo ? const Color(0xFF665FBE) : const Color(0xFFFAEEFF), width: 2),
+                            border: Border.all(
+                                color: _isEditingDeckInfo ? accentColor : Colors.white,
+                                width: 2),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('TITLE', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                              const Text('TITLE',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
                               TextField(
                                 controller: _titleEditController,
                                 readOnly: !_isEditingDeckInfo,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+                                decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero),
                               ),
                             ],
                           ),
@@ -399,6 +415,13 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,12 +432,23 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                   Row(
                                     children: [
                                       Container(
-                                        width: 24, height: 24,
-                                        decoration: const BoxDecoration(color: Color(0xFFED9E4F), shape: BoxShape.circle),
-                                        child: Center(child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                            color: accentColor, shape: BoxShape.circle),
+                                        child: Center(
+                                            child: Text('${index + 1}',
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold))),
                                       ),
                                       const SizedBox(width: 8),
-                                      const Text('Card', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF665FBE))),
+                                      Text('Card',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: dominantColor)),
                                     ],
                                   ),
                                   Row(
@@ -426,53 +460,76 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                           } else {
                                             setState(() {
                                               editingIndex = index;
-                                              // INAYOS DITO:
                                               _termController.text = card.answer;
                                               _defController.text = card.question;
                                             });
                                           }
                                         },
-                                        child: Text(isCurrentlyEditing ? 'Done' : 'Edit', style: const TextStyle(color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
+                                        child: Text(isCurrentlyEditing ? 'Done' : 'Edit',
+                                            style: TextStyle(
+                                                color: actionBlue, fontWeight: FontWeight.bold)),
                                       ),
                                       const Text(' | ', style: TextStyle(color: Colors.grey)),
                                       GestureDetector(
                                         onTap: () => _deleteFlashcard(card.cardId),
-                                        child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                                        child: const Text('Delete',
+                                            style: TextStyle(color: Colors.redAccent)),
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 15),
-                              const Text('TERM', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
+                              Text('TERM',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: dominantColor,
+                                      fontWeight: FontWeight.bold)),
                               Container(
                                 width: double.infinity,
                                 margin: const EdgeInsets.only(top: 5, bottom: 15),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isCurrentlyEditing ? Colors.white : const Color(0xFFFAEEFF),
+                                  color: isCurrentlyEditing ? Colors.white : secondaryColor,
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: isCurrentlyEditing ? const Color(0xFF665FBE) : Colors.transparent, width: 1.5),
+                                  border: Border.all(
+                                      color: isCurrentlyEditing ? accentColor : Colors.transparent,
+                                      width: 1.5),
                                 ),
                                 child: isCurrentlyEditing
-                                    ? TextField(controller: _termController, decoration: const InputDecoration(border: InputBorder.none, isDense: true))
-                                    // INAYOS DITO:
-                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.answer)),
+                                    ? TextField(
+                                        controller: _termController,
+                                        decoration: const InputDecoration(
+                                            border: InputBorder.none, isDense: true))
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Text(card.answer)),
                               ),
-                              const Text('DEFINITION', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
+                              Text('DEFINITION',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: dominantColor,
+                                      fontWeight: FontWeight.bold)),
                               Container(
                                 width: double.infinity,
                                 margin: const EdgeInsets.only(top: 5),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isCurrentlyEditing ? Colors.white : const Color(0xFFFAEEFF),
+                                  color: isCurrentlyEditing ? Colors.white : secondaryColor,
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: isCurrentlyEditing ? const Color(0xFF665FBE) : Colors.transparent, width: 1.5),
+                                  border: Border.all(
+                                      color: isCurrentlyEditing ? accentColor : Colors.transparent,
+                                      width: 1.5),
                                 ),
                                 child: isCurrentlyEditing
-                                    ? TextField(controller: _defController, maxLines: null, decoration: const InputDecoration(border: InputBorder.none, isDense: true))
-                                    // INAYOS DITO:
-                                    : Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: Text(card.question)),
+                                    ? TextField(
+                                        controller: _defController,
+                                        maxLines: null,
+                                        decoration: const InputDecoration(
+                                            border: InputBorder.none, isDense: true))
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Text(card.question)),
                               ),
                             ],
                           ),
@@ -486,7 +543,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFF665FBE), width: 1.5),
+                            border: Border.all(color: accentColor, width: 1.5),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -497,12 +554,23 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                   Row(
                                     children: [
                                       Container(
-                                        width: 24, height: 24,
-                                        decoration: const BoxDecoration(color: Color(0xFF665FBE), shape: BoxShape.circle),
-                                        child: Center(child: Text('${_flashcards.length + index + 1}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                            color: actionBlue, shape: BoxShape.circle),
+                                        child: Center(
+                                            child: Text('${_flashcards.length + index + 1}',
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold))),
                                       ),
                                       const SizedBox(width: 8),
-                                      const Text('New Card', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF665FBE))),
+                                      Text('New Card',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: dominantColor)),
                                     ],
                                   ),
                                   GestureDetector(
@@ -513,30 +581,52 @@ class _CreateViewPageState extends State<CreateViewPage> {
                                         _newCards.removeAt(index);
                                       });
                                     },
-                                    child: const Text('Remove', style: TextStyle(color: Colors.redAccent)),
+                                    child: const Text('Remove',
+                                        style: TextStyle(color: Colors.redAccent)),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 15),
-                              const Text('TERM', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
+                              Text('TERM',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: dominantColor,
+                                      fontWeight: FontWeight.bold)),
                               Container(
                                 margin: const EdgeInsets.only(top: 5, bottom: 15),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.white, borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFF665FBE), width: 1.5),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: accentColor, width: 1.5),
                                 ),
-                                child: TextField(controller: _newCards[index]['term'], decoration: const InputDecoration(hintText: 'Enter term...', border: InputBorder.none, isDense: true)),
+                                child: TextField(
+                                    controller: _newCards[index]['term'],
+                                    decoration: const InputDecoration(
+                                        hintText: 'Enter term...',
+                                        border: InputBorder.none,
+                                        isDense: true)),
                               ),
-                              const Text('DEFINITION', style: TextStyle(fontSize: 10, color: Color(0xFF665FBE), fontWeight: FontWeight.bold)),
+                              Text('DEFINITION',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: dominantColor,
+                                      fontWeight: FontWeight.bold)),
                               Container(
                                 margin: const EdgeInsets.only(top: 5),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.white, borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFF665FBE), width: 1.5),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: accentColor, width: 1.5),
                                 ),
-                                child: TextField(controller: _newCards[index]['def'], maxLines: null, decoration: const InputDecoration(hintText: 'Enter definition...', border: InputBorder.none, isDense: true)),
+                                child: TextField(
+                                    controller: _newCards[index]['def'],
+                                    maxLines: null,
+                                    decoration: const InputDecoration(
+                                        hintText: 'Enter definition...',
+                                        border: InputBorder.none,
+                                        isDense: true)),
                               ),
                             ],
                           ),
@@ -556,13 +646,28 @@ class _CreateViewPageState extends State<CreateViewPage> {
                           child: Container(
                             height: 60,
                             decoration: BoxDecoration(
-                              color: _isSaving ? Colors.grey : const Color(0xFFED9E4F),
+                              color: _isSaving ? Colors.grey : actionBlue,
                               borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: actionBlue.withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                )
+                              ],
                             ),
                             child: Center(
                               child: _isSaving
-                                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                                  : const Text('Save Deck', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2.5))
+                                  : const Text('Save Deck',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
@@ -571,8 +676,10 @@ class _CreateViewPageState extends State<CreateViewPage> {
                       GestureDetector(
                         onTap: _addNewCard,
                         child: Container(
-                          height: 60, width: 60,
-                          decoration: BoxDecoration(color: const Color(0xFF665FBE), borderRadius: BorderRadius.circular(15)),
+                          height: 60,
+                          width: 60,
+                          decoration: BoxDecoration(
+                              color: accentColor, borderRadius: BorderRadius.circular(15)),
                           child: const Icon(Icons.add, color: Colors.white, size: 30),
                         ),
                       ),

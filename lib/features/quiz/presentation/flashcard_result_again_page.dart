@@ -19,6 +19,11 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
   late Deck deck;
   bool _initialized = false;
 
+  // Sky Blue Theme Palette (60-30-10 Rule)
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -39,16 +44,16 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
         totalCards > 0 ? gotItCount / totalCards : 0.0;
     final int accuracyPercentage = (accuracyRatio * 100).toInt();
 
-    // Accuracy Color Logic (Same as Great Page)
+    // Accuracy Color Logic
     Color accuracyColor = Colors.red; 
     if (accuracyPercentage >= 80) {
       accuracyColor = Colors.green;
     } else if (accuracyPercentage >= 50) {
-      accuracyColor =  Colors.red;
+      accuracyColor = Color(0xFF1976D2);
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF665FBE), // Same Lavender Background
+      backgroundColor: primaryColor, // Ginamit ang Primary Blue (60%)
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -76,13 +81,13 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                 style: TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 30),
 
-            // Main White/Lavender Container
+            // Main Secondary Container (30%)
             Expanded(
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(25),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFFAEEFF), 
+                  color: secondaryColor, // Ginamit ang Secondary Color
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
@@ -150,7 +155,7 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.bar_chart, color: Color(0xFF665FBE)),
+                                const Icon(Icons.bar_chart, color: accentColor), // Ginamit ang Accent Blue
                                 const SizedBox(width: 10),
                                 const Text('Accuracy',
                                     style: TextStyle(
@@ -161,7 +166,7 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: accuracyColor)), // Dynamic color text
+                                        color: accuracyColor)), 
                               ],
                             ),
                             const SizedBox(height: 15),
@@ -193,14 +198,14 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF27F21), 
+                              backgroundColor: const Color(0xFF00B0FF), // Action Orange (nananatiling orange para sa contrast)
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                         ),
                       ),
                       const SizedBox(height: 15),
 
-                      // Focus on Missed Button (Conditional)
+                      // Focus on Missed Button
                       if (againCount > 0)
                         SizedBox(
                           width: double.infinity,
@@ -224,16 +229,16 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                               }
                             },
                             icon: const Icon(Icons.push_pin,
-                                color: Color(0xFF665FBE)),
+                                color: primaryColor), // Primary Blue
                             label: Text('Focus on Missed ($againCount)',
                                 style: const TextStyle(
-                                    color: Color(0xFF665FBE),
+                                    color: primaryColor,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 elevation: 0,
-                                side: const BorderSide(color: Color(0xFF665FBE)),
+                                side: const BorderSide(color: primaryColor),
                                 shape: RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.circular(30))),
@@ -261,7 +266,7 @@ class _FlashcardResultAgainPageState extends State<FlashcardResultAgainPage> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF665FBE),
+                              backgroundColor: primaryColor, // Primary Blue
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30))),
                         ),

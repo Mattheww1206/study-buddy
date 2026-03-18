@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for inputFormatters
+import 'package:flutter/services.dart'; 
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
@@ -18,13 +18,13 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
   int selectedTime = 15;
   int numberOfQuestions = 0;
   late TextEditingController _questionsController;
-
-  // Added for validation
   String? _errorMessage;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color accentColor = const Color(0xFFFF7F32);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
+  // BLUE THEME PALETTE
+  final Color dominantColor = const Color(0xFF1976D2);   // Solid Primary Blue
+  final Color secondaryColor = const Color(0xFFF5F9FF);  // Very Light Blue Background
+  final Color accentColor = const Color(0xFF2196F3);     // Action Blue
+  final Color actionBlue = const Color(0xFF1976D2);
 
   @override
   void didChangeDependencies() {
@@ -32,7 +32,6 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
     if (_initialized) return;
     _deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     
-    // Initial value setup
     numberOfQuestions = _deck.totalCards;
     _questionsController = TextEditingController(text: numberOfQuestions.toString());
     
@@ -57,68 +56,25 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
         backgroundColor: dominantColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 36),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        // PINALITAN: Text title na ngayon para sa consistency
+        title: const Text(
+          "True or False",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           children: [
-            // Mode Section
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: dominantColor,
-                borderRadius: BorderRadius.circular(26),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('SELECTED MODE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.fact_check,
-                            color: Colors.white, size: 26),
-                      ),
-                      const SizedBox(width: 16),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('True or False',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18)),
-                            Text('Verify if the statement is correct',
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+            // TINANGGAL: Ang "Selected Mode" banner container dito.
 
             // Number of Questions Section
             Container(
@@ -126,6 +82,14 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: dominantColor.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +129,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText: _errorMessage, // Displays error text in red
+                      errorText: _errorMessage,
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 13),
                       enabledBorder: OutlineInputBorder(
@@ -203,6 +167,14 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(26),
+                border: Border.all(color: dominantColor.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
               child: Column(
                 children: [
@@ -223,7 +195,8 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                         value: isTimerEnabled,
                         onChanged: (val) =>
                             setState(() => isTimerEnabled = val),
-                        activeThumbColor: dominantColor,
+                        activeColor: Colors.white,
+                        activeTrackColor: dominantColor,
                       ),
                     ],
                   ),
@@ -245,6 +218,9 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                                     ? dominantColor
                                     : secondaryColor,
                                 borderRadius: BorderRadius.circular(12),
+                                border: isSelected 
+                                    ? null 
+                                    : Border.all(color: dominantColor.withValues(alpha: 0.1)),
                               ),
                               child: Text(
                                 '${time}m',
@@ -274,6 +250,7 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: dominantColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,14 +291,13 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 23),
+            const SizedBox(height: 32),
 
             // Start Button
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                // Button is disabled if there is an error
                 onPressed: (_errorMessage != null || numberOfQuestions <= 0)
                 ? null 
                 : () {
@@ -335,11 +311,11 @@ class _TrueFalseModePageState extends State<TrueFalseModePage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
+                  backgroundColor: actionBlue,
                   disabledBackgroundColor: Colors.grey.shade400,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
-                  elevation: 3,
+                  elevation: 4,
                 ),
                 child: const Text('Start Quiz!',
                     style: TextStyle(

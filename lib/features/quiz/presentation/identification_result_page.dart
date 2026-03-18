@@ -19,12 +19,14 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
   bool _initialized = false;
   String timeUsed = '';
   
-  // BAGONG VARIABLE: Para sa streak visibility
+  // Variable para sa streak visibility
   bool _isFirstQuizToday = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF7900);
+  // BAGONG COLOR PALETTE
+  static const Color primaryColor = Color(0xFF1976D2);   // 60% (Deep Blue)
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30% (Very Light Blue)
+  static const Color accentColor = Color(0xFF2196F3);    // 10% (Medium Blue)
+  static const Color actionblue = Color(0xFF00B0FF);     // Action Accent (Vibrant Blue)
 
   @override
   void didChangeDependencies() {
@@ -40,7 +42,6 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
     deck = Provider.of<DeckProvider>(context, listen: false).selectedDeck!;
     timeUsed = args['timeUsed'] as String;
     
-    // Kunin ang streak flag mula sa IdentificationPage
     _isFirstQuizToday = args['isFirstQuizToday'] ?? false;
   }
 
@@ -54,11 +55,11 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [dominantColor, const Color(0xFF7A73D1)],
+            colors: [primaryColor, accentColor], // Deep to Medium Blue gradient
           ),
         ),
         child: SafeArea(
@@ -93,13 +94,13 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
               const SizedBox(height: 5),
               Text(
                 '$accuracyPercent%',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 50,
                     fontWeight: FontWeight.bold,
-                    color: accentColor),
+                    color: Colors.white), // Ginawang white para lutang sa blue
               ),
               Text(
-                isExcellent ? 'Excellent Work! 🎉' : 'Keep Practicing! 💪',
+                isExcellent ? 'Excellent Work! ' : 'Keep Practicing! ',
                 style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -128,7 +129,7 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(25, 30, 25, 0),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFAEEFF),
+                    color: secondaryColor, // Light Blue background
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
@@ -137,24 +138,23 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        // total score
+                        // TOTAL SCORE CARD
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8F7FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                                color: const Color(0xFFE8E5FF)),
+                            border: Border.all(color: accentColor.withValues(alpha: 0.1)),
                           ),
                           child: Column(
                             children: [
                               Text(
                                 '$_correctCount/$_totalCards',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
-                                    color: dominantColor),
+                                    color: primaryColor),
                               ),
                               const Text(
                                 'TOTAL SCORE',
@@ -168,36 +168,34 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                         ),
                         const SizedBox(height: 12),
 
-                        // accuracy
+                        // ACCURACY CARD
                         Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8F7FF),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                                color: const Color(0xFFE8E5FF)),
+                            border: Border.all(color: accentColor.withValues(alpha: 0.1)),
                           ),
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  const Row(
                                     children: [
                                       Icon(Icons.insights,
-                                          color: dominantColor, size: 20),
-                                      const SizedBox(width: 8),
-                                      const Text('Accuracy',
+                                          color: primaryColor, size: 20),
+                                      SizedBox(width: 8),
+                                      Text('Accuracy',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16)),
                                     ],
                                   ),
                                   Text('$accuracyPercent%',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: dominantColor)),
+                                          color: primaryColor)),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -206,10 +204,9 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                                 child: LinearProgressIndicator(
                                   value: accuracy,
                                   minHeight: 10,
-                                  backgroundColor:
-                                      const Color(0xFFE0E0E0),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      accentColor),
+                                  backgroundColor: secondaryColor,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(
+                                      actionblue), // Vibrant Blue bar
                                 ),
                               ),
                             ],
@@ -217,17 +214,16 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                         ),
                         const SizedBox(height: 12),
 
-                        // time and streak row
+                        // TIME AND STREAK ROW
                         Row(
                           children: [
                             Expanded(
                               child: Container(
                                 padding: const EdgeInsets.all(18),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF8F7FF),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                      color: const Color(0xFFE8E5FF)),
+                                  border: Border.all(color: accentColor.withValues(alpha: 0.1)),
                                 ),
                                 child: Row(
                                   children: [
@@ -258,133 +254,129 @@ class _IdentificationResultPageState extends State<IdentificationResultPage> {
                             ),
                             const SizedBox(width: 12),
                             
-                            // CONDITIONAL RENDERING: Ipakita lang ang streak kung ito ang unang quiz today
                             Expanded(
                               child: _isFirstQuizToday 
                               ? Container(
-                                padding: const EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF8F7FF),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                      color: const Color(0xFFE8E5FF)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.local_fire_department,
-                                        color: accentColor, size: 22),
-                                    const SizedBox(width: 8),
-                                    const Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('+1 day',
-                                          style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14)),
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: accentColor.withValues(alpha: 0.1)),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.local_fire_department,
+                                          color: Colors.orange, size: 22), // Keep orange for fire icon
+                                      SizedBox(width: 8),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('+1 day',
+                                            style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14)),
                                           Text('STREAK',
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            color: Colors.black38,
-                                            fontWeight:FontWeight.bold)),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  : Container(
-                                      padding: const EdgeInsets.all(18),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.02),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                            color: const Color(0xFFE8E5FF)),
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              color: Colors.black38,
+                                              fontWeight:FontWeight.bold)),
+                                        ],
                                       ),
-                                      child: const Center(
-                                        child: Text(
-                                          "Daily Streak\nClaimed",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 10, 
-                                            color: Colors.black26, 
-                                            fontWeight: FontWeight.bold
-                                          ),
-                                        ),
+                                    ],
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.02),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.black12),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Daily Streak\nClaimed",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 10, 
+                                        color: Colors.black26, 
+                                        fontWeight: FontWeight.bold
                                       ),
                                     ),
+                                  ),
                                 ),
-                              ],
                             ),
-                            const SizedBox(height: 25),
-                            // review wrong answers
-                            if (wrongAnswers.isNotEmpty) ...[
-                              ElevatedButton(
-                                onPressed: () => Navigator.pushNamed(
-                                  context,
-                                  'iden_review',
-                                  arguments: {
-                                    'wrongAnswers': wrongAnswers,
-                                  },
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: accentColor,
-                                  foregroundColor: secondaryColor,
-                                  minimumSize: const Size(double.infinity, 58),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  elevation: 0,
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.fact_check, size: 20),
-                                    SizedBox(width: 10),
-                                    Text('Review Answers',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            // back to home
-                            ElevatedButton(
-                              onPressed: (){
-                                Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false, arguments: 2,);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: dominantColor,
-                                minimumSize: const Size(double.infinity, 58),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                                side: const BorderSide(
-                                  color: Color(0xFFE8E5FF)),
-                                elevation: 0,
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.home_rounded, size: 20),
-                                  SizedBox(width: 10),
-                                  Text('Back to Study',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16)),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20),
                           ],
                         ),
+                        const SizedBox(height: 25),
+                        
+                        // review wrong answers
+                        if (wrongAnswers.isNotEmpty) ...[
+                          ElevatedButton(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              'iden_review',
+                              arguments: {
+                                'wrongAnswers': wrongAnswers,
+                              },
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: actionblue, // Ginamit ang vibrant blue
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(double.infinity, 58),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fact_check, size: 20),
+                                SizedBox(width: 10),
+                                Text('Review Wrong Answers',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                        
+                        // back to home
+                        ElevatedButton(
+                          onPressed: (){
+                            Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false, arguments: 2,);
+                          },
+                          style: OutlinedButton.styleFrom(
+                        foregroundColor: primaryColor,
+                        side: BorderSide(color: primaryColor, width: 2),
+                        minimumSize: const Size(double.infinity, 58),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
                       ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.home_rounded, size: 20),
+                              SizedBox(width: 10),
+                              Text('Back to Study',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        );
+        ),
+      ),
+    );
   }
 }

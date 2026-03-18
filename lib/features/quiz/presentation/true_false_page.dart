@@ -37,9 +37,11 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
   int _secondsLeft = 0;
   bool _geminiUnavailable = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF6D00);
+  // NEW BLUE THEME PALETTE
+  final Color dominantColor = const Color(0xFF1976D2);   // Solid Primary Blue
+  final Color secondaryColor = const Color(0xFFF5F9FF);  // Very Light Blue Background
+  final Color accentColor = const Color(0xFF2196F3);     // Action Blue
+  final Color actionBlue = const Color(0xFF1976D2);
 
   @override
   void didChangeDependencies() {
@@ -143,7 +145,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: dominantColor.withValues(alpha: 0.1),
+                color: dominantColor.withAlpha(25),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.exit_to_app_rounded, color: dominantColor, size: 44),
@@ -154,7 +156,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4A4A6A),
+                color: Color(0xFF1A1A1A),
               ),
             ),
             const SizedBox(height: 12),
@@ -183,7 +185,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: dominantColor,
+                      backgroundColor: actionBlue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       elevation: 0,
@@ -280,7 +282,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             const SizedBox(width: 8),
             Text('Achievement Unlocked: $name!'),
           ]),
-          backgroundColor: const Color(0xFF665FBE),
+          backgroundColor: actionBlue,
           duration: const Duration(seconds: 3),
         ));
       }
@@ -309,13 +311,6 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentData = _quizData[_currentIndex];
-    final statement = currentData['statement'] as String;
-    final totalQuestions = _quizData.length;
-    final progressValue = (_currentIndex + 1) / totalQuestions;
-    final progressPercent = (progressValue * 100).toInt();
-    final isLastQuestion = _currentIndex >= totalQuestions - 1;
-
     if (_isLoading) {
       return Scaffold(
         backgroundColor: secondaryColor,
@@ -329,21 +324,20 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
           title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
           centerTitle: true,
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
+              CircularProgressIndicator(color: actionBlue),
+              const SizedBox(height: 20),
               Text('Generating questions...',
-                  style: TextStyle(color: Color(0xFF665FBE), fontSize: 16)),
+                  style: TextStyle(color: dominantColor, fontSize: 16)),
             ],
           ),
         ),
       );
     }
 
-    // Error UI
     if (_geminiUnavailable) {
       return Scaffold(
         backgroundColor: secondaryColor,
@@ -364,7 +358,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.wifi_off_rounded,
-                    size: 80, color: dominantColor.withValues(alpha: 0.4)),
+                    size: 80, color: dominantColor.withAlpha(100)),
                 const SizedBox(height: 20),
                 Text('AI Unavailable',
                     style: TextStyle(
@@ -382,7 +376,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                     _loadQuiz();
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: dominantColor, foregroundColor: Colors.white),
+                      backgroundColor: actionBlue, foregroundColor: Colors.white),
                   child: const Text('Retry'),
                 ),
               ],
@@ -391,17 +385,42 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
         ),
       );
     }
+
+    final currentData = _quizData[_currentIndex];
+    final statement = currentData['statement'] as String;
+    final totalQuestions = _quizData.length;
+    final progressValue = (_currentIndex + 1) / totalQuestions;
+    final progressPercent = (progressValue * 100).toInt();
+    final isLastQuestion = _currentIndex >= totalQuestions - 1;
+
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
         backgroundColor: dominantColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => _handleExitConfirmation(),
         ),
-        title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-        centerTitle: true,
+       title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _deck.title,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              
+              ),
+          
+            ),
+          ),
+        ),
+        
+            centerTitle:true,
       ),
       body: PopScope(
         canPop: false,
@@ -442,7 +461,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                               border: Border.all(
                                   color: _secondsLeft < 60
                                       ? Colors.red
-                                      : dominantColor.withValues(alpha: 0.2),
+                                      : dominantColor.withAlpha(50),
                                   width: 1.5),
                             ),
                             child: Row(
@@ -486,7 +505,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withAlpha(12),
                         blurRadius: 10,
                         offset: const Offset(0, 4))
                   ],
@@ -562,7 +581,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: const BorderSide(color: Color(0xFFF0F0F0), width: 1.5),
+                              side: BorderSide(color: dominantColor.withAlpha(50), width: 1.5),
                               shape:
                                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
@@ -583,22 +602,15 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
                         height: 60,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            if (_selectedOption != null)
-                              BoxShadow(
-                                  color: accentColor.withValues(alpha: 0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4)),
-                          ],
                         ),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _selectedOption != null
-                                ? (isLastQuestion ? dominantColor : accentColor)
+                                ? actionBlue
                                 : Colors.grey[300],
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                            elevation: 0,
+                            elevation: _selectedOption != null ? 3 : 0,
                           ),
                           onPressed: _selectedOption != null ? _onNextTapped : null,
                           child: Text(isLastQuestion ? 'Submit' : 'Next',

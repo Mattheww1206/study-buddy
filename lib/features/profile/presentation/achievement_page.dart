@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/features/Achievements/model/achievement_model.dart';
 import 'package:studybuddy/features/Achievements/services/achievement_service.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
-// Tinanggal ang google_fonts import
 
 class AchievementPage extends StatefulWidget {
   const AchievementPage({super.key});
@@ -13,11 +12,16 @@ class AchievementPage extends StatefulWidget {
 }
 
 class _AchievementPageState extends State<AchievementPage> {
-   final AchievementService _achievementService = AchievementService();
-   List<Achievement> _achievements = [];
-   bool _isLoading = true;
+  final AchievementService _achievementService = AchievementService();
+  List<Achievement> _achievements = [];
+  bool _isLoading = true;
 
-    @override
+  // Blue Palette definition based on 60-30-10
+  final Color primaryBlue = const Color(0xFF1976D2);   // 60%
+  final Color backgroundBlue = const Color(0xFFE3F2FD); // 30%
+  final Color accentBlue = const Color(0xFF2196F3);    // 10%
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
@@ -62,7 +66,6 @@ class _AchievementPageState extends State<AchievementPage> {
     };
     return map[iconName] ?? Icons.emoji_events;
   }
-   
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +73,9 @@ class _AchievementPageState extends State<AchievementPage> {
     final locked = _achievements.where((a) => !a.isUnlocked).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: backgroundBlue,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
+        backgroundColor: primaryBlue,
         elevation: 0,
         title: const Text('Achievements',
             style: TextStyle(
@@ -84,7 +87,7 @@ class _AchievementPageState extends State<AchievementPage> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: primaryBlue))
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Column(
@@ -93,17 +96,17 @@ class _AchievementPageState extends State<AchievementPage> {
                   // Stats
                   Row(
                     children: [
-                      _buildStatBox('$unlocked', 'UNLOCKED', Colors.orange),
+                      _buildStatBox('$unlocked', 'UNLOCKED', accentBlue),
                       const SizedBox(width: 15),
-                      _buildStatBox('$locked', 'LOCKED', const Color(0xFF7165D6)),
+                      _buildStatBox('$locked', 'LOCKED', primaryBlue),
                     ],
                   ),
- 
+
                   const SizedBox(height: 30),
- 
+
                   Row(
                     children: [
-                      const Icon(Icons.emoji_events, color: Colors.orange, size: 20),
+                      Icon(Icons.emoji_events, color: primaryBlue, size: 20),
                       const SizedBox(width: 8),
                       Text('ALL ACHIEVEMENTS',
                           style: TextStyle(
@@ -112,9 +115,9 @@ class _AchievementPageState extends State<AchievementPage> {
                               color: Colors.grey[600])),
                     ],
                   ),
- 
+
                   const SizedBox(height: 15),
- 
+
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -129,88 +132,93 @@ class _AchievementPageState extends State<AchievementPage> {
                     itemBuilder: (context, index) {
                       final item = _achievements[index];
                       final icon = _getIcon(item.icon);
- 
+
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(25),
                           border: item.isUnlocked
-                              ? Border.all(
-                                  color: const Color(0xFFFD9519), width: 2)
+                              ? Border.all(color: accentBlue, width: 2)
                               : null,
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.02),
+                                color: Colors.black.withOpacity(0.02),
                                 blurRadius: 5)
                           ],
                         ),
                         child: Stack(
                           children: [
+                            // Lock Icon - Nasa top-right pa rin
                             Positioned(
                               top: 10,
                               right: 10,
                               child: Icon(
                                 item.isUnlocked ? Icons.lock_open : Icons.lock,
                                 color: item.isUnlocked
-                                    ? const Color(0xFFFD9519)
+                                    ? accentBlue
                                     : Colors.grey[300],
                                 size: 14,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: item.isUnlocked
-                                          ? const Color(0xFFFFF3E0)
-                                          : Colors.grey[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      icon,
-                                      color: item.isUnlocked
-                                          ? const Color(0xFFFD9519)
-                                          : Colors.grey[300],
-                                      size: 28,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    item.title,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
+                            
+                            // Itong Center widget ang magpapatalsik sa lahat sa gitna
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min, // Mahalaga para mag-center vertically
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center, // Horizontal centering
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
                                         color: item.isUnlocked
-                                            ? Colors.black87
-                                            : Colors.grey[500]),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item.desc,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 4,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 8,
-                                        color: Colors.grey[400],
-                                        height: 1.1),
-                                  ),
-                                  if (item.isUnlocked &&
-                                      item.unlockedAt != null) ...[
+                                            ? backgroundBlue
+                                            : Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        icon,
+                                        color: item.isUnlocked
+                                            ? primaryBlue
+                                            : Colors.grey[300],
+                                        size: 28,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      item.title,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: item.isUnlocked
+                                              ? Colors.black87
+                                              : Colors.grey[500]),
+                                    ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '${item.unlockedAt!.month}/${item.unlockedAt!.day}/${item.unlockedAt!.year}',
+                                      item.desc,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 4,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          fontSize: 7,
-                                          color: Colors.orange[300]),
+                                          fontSize: 8,
+                                          color: Colors.grey[400],
+                                          height: 1.1),
                                     ),
+                                    if (item.isUnlocked && item.unlockedAt != null) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${item.unlockedAt!.month}/${item.unlockedAt!.day}/${item.unlockedAt!.year}',
+                                        style: TextStyle(
+                                            fontSize: 7,
+                                            color: primaryBlue.withOpacity(0.7)),
+                                      ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
                             ),
                           ],
@@ -224,7 +232,7 @@ class _AchievementPageState extends State<AchievementPage> {
             ),
     );
   }
- 
+
   Widget _buildStatBox(String count, String label, Color color) {
     return Expanded(
       child: Container(
@@ -234,7 +242,7 @@ class _AchievementPageState extends State<AchievementPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)
+                color: Colors.black.withOpacity(0.05), blurRadius: 10)
           ],
         ),
         child: Column(
@@ -255,4 +263,3 @@ class _AchievementPageState extends State<AchievementPage> {
     );
   }
 }
- 

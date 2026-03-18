@@ -31,6 +31,11 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
   int _easyCount = 0;
   int _againCount = 0;
 
+  // Blue 60-30-10 Palette
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+
   @override
   void initState() {
     super.initState();
@@ -74,9 +79,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
         _currentIndex++;
       });
     } else {
-      setState(() {
-        _isFinished = true;
-      });
+      setState(() => _isFinished = true);
       Future.microtask(() => _saveResultAndNavigate());
     }
   }
@@ -129,16 +132,17 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: Color(0xFFFAEEFF),
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: secondaryColor,
+        body: Center(child: CircularProgressIndicator(color: primaryColor)),
       );
     }
 
     if (_flashcards.isEmpty) {
       return Scaffold(
-        backgroundColor: const Color(0xFFFAEEFF),
+        backgroundColor: secondaryColor,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF665FBE),
+          backgroundColor: primaryColor,
+          title: Text(_deck.title, style: const TextStyle(color: Colors.white)),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
@@ -153,19 +157,30 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
     final progress = (_currentIndex + 1) / totalCards;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAEEFF),
+      backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF665FBE),
-        elevation: 4,
-        centerTitle: true,
+        backgroundColor: primaryColor,
+        elevation: 0,
+        centerTitle: true, 
+        titleSpacing: 0, 
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/studybuddy-logo.png',
-          height: 95,
-          fit: BoxFit.contain,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _deck.title,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              ),
+            ),
+          ),
         ),
       ),
       body: SafeArea(
@@ -182,7 +197,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
-                          color: Color(0xFF665FBE))),
+                          color: primaryColor)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ClipRRect(
@@ -191,40 +206,22 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                         value: progress,
                         minHeight: 8,
                         backgroundColor: Colors.white,
-                        color: const Color(0xFF665FBE),
+                        color: accentColor,
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text('${(progress * 100).toInt()}%',
-                      style: const TextStyle(color: Colors.grey)),
+                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500)),
                 ],
               ),
-              const SizedBox(height: 25),
-
-              // Deck title
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF665FBE),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _deck.title,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22),
-                ),
-              ),
+              
               const SizedBox(height: 30),
 
               // Flashcard Section
               Expanded(
-                // FIXED: Idinagdag ang _isFinished check para mawala ang Dismissible 
-                // bago mag-navigate, maiwasan ang "Dismissible widget is still part of the tree" error.
                 child: _isFinished || _isSaving
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator(color: primaryColor))
                     : Dismissible(
                         key: ValueKey(_currentIndex),
                         onDismissed: _onSwipe,
@@ -232,13 +229,13 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                           alignment: Alignment.centerLeft,
                           padding: const EdgeInsets.only(left: 20),
                           child: const Icon(Icons.check_circle,
-                              color: Colors.green, size: 50),
+                              color: Colors.green, size: 60),
                         ),
                         secondaryBackground: Container(
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),
                           child: const Icon(Icons.cancel,
-                              color: Colors.red, size: 50),
+                              color: Colors.red, size: 60),
                         ),
                         child: GestureDetector(
                           onTap: () => setState(() => _isFlipped = !_isFlipped),
@@ -258,13 +255,13 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                   decoration: BoxDecoration(
                                     color: isBackSide
                                         ? Colors.white
-                                        : const Color(0xFF51459E),
+                                        : primaryColor,
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.1),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 5)),
+                                          color: primaryColor.withOpacity(0.2),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 8)),
                                     ],
                                   ),
                                   child: isBackSide
@@ -280,20 +277,24 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                                     card.answer,
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                        fontSize: 18,
-                                                        color: Colors.black87,
-                                                        height: 1.6),
+                                                        fontSize: 24,
+                                                        color: Color(0xFF2D3142),
+                                                        height: 1.5),
                                                   ),
                                                 ),
                                               ),
                                               const Positioned(
-                                                bottom: 20,
-                                                right: 20,
-                                                child: Text(
-                                                    'swipe left/right to rate',
-                                                    style: TextStyle(
-                                                        color: Colors.black26,
-                                                        fontSize: 12)),
+                                                bottom: 25,
+                                                left: 0,
+                                                right: 0,
+                                                child: Center(
+                                                  child: Text(
+                                                      'swipe left/right to rate',
+                                                      style: TextStyle(
+                                                          color: Colors.black26,
+                                                          fontSize: 12,
+                                                          letterSpacing: 1.1)),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -301,7 +302,7 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                       : Stack(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 40),
+                                              padding: const EdgeInsets.symmetric(horizontal: 30),
                                               child: Center(
                                                 child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -311,26 +312,27 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
                                                       textAlign: TextAlign.center,
                                                       style: const TextStyle(
                                                           color: Colors.white,
-                                                          fontSize: 32,
+                                                          fontSize: 30,
                                                           fontWeight: FontWeight.bold),
                                                     ),
-                                                    const SizedBox(height: 12),
-                                                    const Text(
-                                                      'Tap to see definition',
-                                                      style: TextStyle(
-                                                          color: Colors.white70,
-                                                          fontSize: 14)),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white.withOpacity(0.2),
+                                                        borderRadius: BorderRadius.circular(10)
+                                                      ),
+                                                      child: const Text(
+                                                        'Tap to flip',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.w500),
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
-                                            ),
-                                            const Positioned(
-                                              bottom: 20,
-                                              right: 20,
-                                              child: Text('tap to flip →',
-                                                  style: TextStyle(
-                                                      color: Colors.white54,
-                                                      fontSize: 15)),
                                             ),
                                           ],
                                         ),
@@ -345,30 +347,31 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
               const SizedBox(height: 30),
               const Text('← Again | Got it →',
                   style: TextStyle(
-                      color: Color(0xFF665FBE),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500)),
+                      color: primaryColor,
+                      fontSize: 16,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold)),
               const SizedBox(height: 30),
 
               // Dot indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  totalCards > 5 ? 5 : totalCards,
+                  totalCards > 8 ? 8 : totalCards,
                   (i) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
                     height: 8,
-                    width: i == (_currentIndex % 5) ? 20 : 8,
+                    width: i == (_currentIndex % 8) ? 24 : 8,
                     decoration: BoxDecoration(
-                      color: i <= (_currentIndex % 5)
-                          ? const Color(0xFF665FBE)
-                          : const Color(0xFF665FBE).withValues(alpha: 0.2),
+                      color: i <= (_currentIndex % 8)
+                          ? primaryColor
+                          : primaryColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
             ],
           ),
         ),

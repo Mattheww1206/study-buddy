@@ -23,6 +23,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
   final DeckService _deckService = DeckService();
   final AchievementService _achievementService = AchievementService();
   final TextEditingController _answerController = TextEditingController();
+  
   late Deck _deck;
   late int _numberOfQuestions;
   late DateTime _startTime;
@@ -37,9 +38,11 @@ class _IdentificationPageState extends State<IdentificationPage> {
   int _secondsLeft = 0;
   bool _geminiUnavailable = false;
 
-  final Color dominantColor = const Color(0xFF665FBE);
-  final Color secondaryColor = const Color(0xFFFAEEFF);
-  final Color accentColor = const Color(0xFFFF6D00);
+  // Blue Theme Palette (60-30-10 Rule)
+  static const Color primaryColor = Color(0xFF1976D2);   // 60%
+  static const Color secondaryColor = Color(0xFFE3F2FD); // 30%
+  static const Color accentColor = Color(0xFF2196F3);    // 10%
+  static const Color actionOrange = const Color(0xFF00B0FF);   // Accent for "Next/Submit"
 
   @override
   void didChangeDependencies() {
@@ -145,10 +148,10 @@ class _IdentificationPageState extends State<IdentificationPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: dominantColor.withValues(alpha: 0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.exit_to_app_rounded, color: dominantColor, size: 44),
+              child: const Icon(Icons.exit_to_app_rounded, color: primaryColor, size: 44),
             ),
             const SizedBox(height: 24),
             const Text(
@@ -156,7 +159,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF4A4A6A),
+                color: Color(0xFF1A1A1A),
               ),
             ),
             const SizedBox(height: 12),
@@ -184,7 +187,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: dominantColor,
+                      backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       elevation: 0,
@@ -252,8 +255,9 @@ class _IdentificationPageState extends State<IdentificationPage> {
         completedAt: DateTime.now(),
       ));
     } catch (e) {
-      print('Error saving result: $e');
+      debugPrint('Error saving result: $e');
     }
+    
     try {
       final results = await _resultService.getUserResults(userId);
       final decks = await _deckService.getUserDecks(userId).first;
@@ -274,12 +278,12 @@ class _IdentificationPageState extends State<IdentificationPage> {
             const SizedBox(width: 8),
             Text('Achievement Unlocked: $name!'),
           ]),
-          backgroundColor: const Color(0xFF665FBE),
+          backgroundColor: primaryColor,
           duration: const Duration(seconds: 3),
         ));
       }
     } catch (e) {
-      print('Achievement evaluation error: $e');
+      debugPrint('Achievement evaluation error: $e');
     }
 
     if (!mounted) return;
@@ -308,7 +312,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
       return Scaffold(
         backgroundColor: secondaryColor,
         appBar: AppBar(
-          backgroundColor: dominantColor,
+          backgroundColor: primaryColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
@@ -321,9 +325,9 @@ class _IdentificationPageState extends State<IdentificationPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              CircularProgressIndicator(color: primaryColor),
               SizedBox(height: 20),
-              Text('Generating questions...', style: TextStyle(color: Color(0xFF665FBE), fontSize: 16)),
+              Text('Generating questions...', style: TextStyle(color: primaryColor, fontSize: 16)),
             ],
           ),
         ),
@@ -331,25 +335,10 @@ class _IdentificationPageState extends State<IdentificationPage> {
     }
 
     if (_geminiUnavailable) {
-       // ... keep your existing geminiUnavailable scaffold here ...
-       return Scaffold(/* Existing error UI */);
-    }
-
-    if (_quizData.isEmpty) {
-      return Scaffold(
-        backgroundColor: secondaryColor,
-        appBar: AppBar(
-          backgroundColor: dominantColor,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-          centerTitle: true,
-        ),
-        body: const Center(child: Text('No flashcards in this deck.')),
-      );
+       return Scaffold(
+         backgroundColor: secondaryColor,
+         body: Center(child: Text("Service Unavailable", style: TextStyle(color: primaryColor))),
+       );
     }
 
     final currentData = _quizData[_currentIndex];
@@ -362,14 +351,28 @@ class _IdentificationPageState extends State<IdentificationPage> {
     return Scaffold(
       backgroundColor: secondaryColor,
       appBar: AppBar(
-        backgroundColor: dominantColor,
+        backgroundColor: primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () => _handleExitConfirmation(),
         ),
-        title: Text(_deck.title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-        centerTitle: true,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _deck.title,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              ),
+            ),
+          ),
+        ),
+         centerTitle:true,
       ),
       body: PopScope(
         canPop: false,
@@ -394,11 +397,11 @@ class _IdentificationPageState extends State<IdentificationPage> {
                             children: [
                               Text(
                                 'Question ${_currentIndex + 1}/$totalQuestions',
-                                style: TextStyle(fontWeight: FontWeight.bold, color: dominantColor, fontSize: 22),
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor, fontSize: 22),
                               ),
                               Text(
                                 '$progressPercent% Completed',
-                                style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.grey, fontSize: 16),
+                                style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.blueGrey, fontSize: 16),
                               ),
                             ],
                           ),
@@ -409,18 +412,18 @@ class _IdentificationPageState extends State<IdentificationPage> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(15),
                                 border: Border.all(
-                                  color: _secondsLeft < 60 ? Colors.red : dominantColor.withValues(alpha: 0.2),
+                                  color: _secondsLeft < 60 ? Colors.red : primaryColor.withValues(alpha: 0.2),
                                   width: 1.5,
                                 ),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.timer_outlined, color: _secondsLeft < 60 ? Colors.red : dominantColor, size: 18),
+                                  Icon(Icons.timer_outlined, color: _secondsLeft < 60 ? Colors.red : primaryColor, size: 18),
                                   const SizedBox(width: 6),
                                   Text(
                                     _timerDisplay,
                                     style: TextStyle(
-                                        color: _secondsLeft < 60 ? Colors.red : dominantColor,
+                                        color: _secondsLeft < 60 ? Colors.red : primaryColor,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -455,7 +458,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
+                      BoxShadow(color: primaryColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
                     ],
                   ),
                   child: Center(
@@ -464,7 +467,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                       child: Text(
                         question,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: dominantColor, fontSize: 20, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: primaryColor, fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -478,9 +481,9 @@ class _IdentificationPageState extends State<IdentificationPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Your Answer:',
-                        style: TextStyle(color: dominantColor, fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       const SizedBox(height: 10),
                       TextField(
@@ -493,11 +496,11 @@ class _IdentificationPageState extends State<IdentificationPage> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: dominantColor.withValues(alpha: 0.1)),
+                            borderSide: BorderSide(color: primaryColor.withValues(alpha: 0.1)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: dominantColor, width: 2),
+                            borderSide: const BorderSide(color: primaryColor, width: 2),
                           ),
                         ),
                       ),
@@ -520,12 +523,12 @@ class _IdentificationPageState extends State<IdentificationPage> {
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                side: const BorderSide(color: Color(0xFFF0F0F0), width: 1.5),
+                                side: const BorderSide(color: primaryColor, width: 1.5),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                               ),
                               onPressed: _onPrevTapped,
-                              child: Text('Previous',
-                                  style: TextStyle(color: dominantColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                              child: const Text('Previous',
+                                  style: TextStyle(color: primaryColor, fontSize: 18, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
@@ -538,12 +541,12 @@ class _IdentificationPageState extends State<IdentificationPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
-                              BoxShadow(color: accentColor.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                              BoxShadow(color: actionOrange.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
                             ],
                           ),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isLastQuestion ? dominantColor : accentColor,
+                              backgroundColor: isLastQuestion ? primaryColor : actionOrange,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                               elevation: 0,
