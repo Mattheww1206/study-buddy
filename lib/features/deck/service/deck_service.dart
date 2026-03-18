@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
+import 'package:studybuddy/features/recentlyDeleted/service/recently_deleted_service.dart';
 import 'package:studybuddy/services/local_storage_service.dart';
 
 class DeckService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final LocalStorageService _localStorage = LocalStorageService();
+  final RecentlyDeletedService _recentlyDeletedService = RecentlyDeletedService();
 
-  // Create deck — saves to Firestore + local JSON
+  // ─── Create ──────────────────────────────────────────────────────
+
   Future<Deck> createDeck({
     required String userId,
     required String title,
@@ -40,13 +43,12 @@ class DeckService {
       flashcards.add(flashcard);
     }
 
-    // ✅ Save to local JSON so it's readable offline after restart
     await _localStorage.saveFlashcards(deckDocs.id, flashcards);
-
     return newDeck;
   }
 
-  // Get all user decks stream
+  // ─── Read ────────────────────────────────────────────────────────
+
   Stream<List<Deck>> getUserDecks(String userId) {
     return _firestore
         .collection('decks')
@@ -57,7 +59,6 @@ class DeckService {
             snapshot.docs.map((doc) => Deck.fromMap(doc.id, doc.data())).toList());
   }
 
-  // Get flashcards — tries Firestore first, falls back to local JSON
   Future<List<Flashcard>> getDeckFlashcards(String deckId) async {
     try {
       final snapshot = await _firestore
@@ -75,14 +76,13 @@ class DeckService {
         final localCards = await _localStorage.loadFlashcards(deckId);
         final localIds = localCards?.map((c) => c.cardId).toSet() ?? {};
         final remoteIds = cards.map((c) => c.cardId).toSet();
-
-        if (localIds.length != remoteIds.length || !localIds.containsAll(remoteIds)) {
-        await _localStorage.saveFlashcards(deckId, cards);
-      }
+        if (localIds.length != remoteIds.length ||
+            !localIds.containsAll(remoteIds)) {
+          await _localStorage.saveFlashcards(deckId, cards);
+        }
         return cards;
       }
 
-      // Firestore returned empty — try local JSON fallback
       print('Firestore returned 0 cards, trying local storage...');
       final localCards = await _localStorage.loadFlashcards(deckId);
       if (localCards != null && localCards.isNotEmpty) {
@@ -92,22 +92,58 @@ class DeckService {
 
       return [];
     } catch (e) {
-      print('getDeckFlashcards Firestore error: $e — trying local storage');
-      // ✅ On any Firestore error, fall back to local JSON
+      print('getDeckFlashcards error: $e — trying local storage');
       final localCards = await _localStorage.loadFlashcards(deckId);
       return localCards ?? [];
     }
   }
 
-  // Delete deck — also deletes local JSON file
-  Future<void> deleteDeck(String deckId) async {
-    final flashcards = await _firestore
+  // ─── Delete (Offline-Aware) ──────────────────────────────────────
+
+  /// Soft-deletes a deck.
+  ///
+  /// [isOnline] — pass `ConnectivityProvider.isConnected`.
+  ///
+  /// • Online  → snapshots to Firestore recentlyDeleted, then hard-deletes originals.
+  /// • Offline → saves to local pending queue, removes from local cache immediately
+  ///             so the deck disappears from the UI. Syncs to Firestore when back online.
+  Future<void> deleteDeck(
+    String deckId, {
+    required String userId,
+    required bool isOnline,
+  }) async {
+    if (isOnline) {
+      await _deleteDeckOnline(deckId, userId: userId);
+    } else {
+      await _deleteDeckOffline(deckId, userId: userId);
+    }
+  }
+
+  Future<void> _deleteDeckOnline(String deckId,
+      {required String userId}) async {
+    final deckDoc = await _firestore.collection('decks').doc(deckId).get();
+    if (!deckDoc.exists) return;
+
+    final deck = Deck.fromMap(deckDoc.id, deckDoc.data()!);
+
+    final flashcardSnap = await _firestore
         .collection('decks')
         .doc(deckId)
         .collection('flashcards')
-        .snapshots()
-        .first;
+        .get();
 
+    final flashcards = flashcardSnap.docs
+        .map((d) => Flashcard.fromMap(d.id, d.data()))
+        .toList();
+
+    // Snapshot to recentlyDeleted BEFORE deleting originals
+    await _recentlyDeletedService.softDeleteDeck(
+      userId: userId,
+      deck: deck,
+      flashcards: flashcards,
+    );
+
+    // Hard-delete originals
     final generatedQuiz = await _firestore
         .collection('decks')
         .doc(deckId)
@@ -115,21 +151,62 @@ class DeckService {
         .snapshots()
         .first;
 
-    final deckBatch = _firestore.batch();
-    for (final doc in flashcards.docs) {
-      deckBatch.delete(doc.reference);
+    final batch = _firestore.batch();
+    for (final doc in flashcardSnap.docs) {
+      batch.delete(doc.reference);
     }
     for (final doc in generatedQuiz.docs) {
-      deckBatch.delete(doc.reference);
+      batch.delete(doc.reference);
     }
-    deckBatch.delete(_firestore.collection('decks').doc(deckId));
-    await deckBatch.commit();
+    batch.delete(_firestore.collection('decks').doc(deckId));
+    await batch.commit();
 
-    // ✅ Delete local JSON file too
     await _localStorage.deleteDeckFile(deckId);
   }
 
+  Future<void> _deleteDeckOffline(String deckId,
+      {required String userId}) async {
+    // Load deck info from Firestore cache (available offline via Firestore SDK)
+    final deckDoc = await _firestore.collection('decks').doc(deckId).get();
+    if (!deckDoc.exists) return;
+
+    final deck = Deck.fromMap(deckDoc.id, deckDoc.data()!);
+
+    // Load flashcards from local JSON cache
+    final localCards = await _localStorage.loadFlashcards(deckId) ?? [];
+
+    // Queue in local pending deletions
+    await _recentlyDeletedService.pendingDeleteDeck(
+      userId: userId,
+      deck: deck,
+      flashcards: localCards,
+    );
+
+    // Remove from local cache so deck disappears from UI immediately
+    await _localStorage.deleteDeckFile(deckId);
+
+    // Note: The deck doc itself will still appear in the Firestore stream
+    // until connectivity is restored and the hard-delete runs during sync.
+    // To hide it immediately offline, the UI filters out pending-deleted deckIds.
+    print('DeckService: deck $deckId queued for offline deletion');
+  }
+
+  // ─── Update ──────────────────────────────────────────────────────
+
   Future<void> updateDeck(String deckId, Map<String, dynamic> data) async {
     await _firestore.collection('decks').doc(deckId).update(data);
+  }
+
+  
+
+  Stream<List<Deck>> getDecksStream() {
+    return _firestore
+        .collection('decks')
+        .orderBy('createdAt', descending: true)
+        // includeMetadataChanges: true makes the UI react instantly to local deletes
+        .snapshots(includeMetadataChanges: true) 
+        .map((snapshot) {
+          return snapshot.docs.map((doc) => Deck.fromFirestore(doc)).toList();
+        });
   }
 }

@@ -24,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   String? _passwordError;
 
   final Color _themeBackgroundColor = const Color(0xFFFAEEFF);
+  final Color colorDominant = const Color(0xFF665FBE);
 
   @override
   void dispose() {
@@ -176,9 +177,13 @@ class _LoginPageState extends State<LoginPage> {
                         await _authService.resetPassword(
                             email: emailController.text.trim());
                         nav.pop();
-                        messenger.showSnackBar(const SnackBar(
+                        messenger.showSnackBar( SnackBar(
                             content: Text(
-                                'Password reset email has been sent! Please check your email.')));
+                                'Password reset email has been sent! Please check your email.'),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: colorDominant,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ));
                       } catch (e) {
                         setDialogState(() {
                           errorMessage =

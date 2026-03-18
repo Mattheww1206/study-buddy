@@ -31,6 +31,7 @@ class _StudyPageState extends State<StudyPage> {
   @override
   Widget build(BuildContext context) {
     final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
+    final deckProvider = context.watch<DeckProvider>();
     
 
     if (userId == null) {
@@ -84,147 +85,158 @@ class _StudyPageState extends State<StudyPage> {
               const SizedBox(height: 35),
 
               // deck list
-              Expanded(
-                child: StreamBuilder<List<Deck>>(
-                  stream: _deckService.getUserDecks(userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+             Expanded(
+              child: StreamBuilder<List<Deck>>(
+                stream: _deckService.getUserDecks(userId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
 
-                    final decks = snapshot.data ?? [];
-                    final filteredDecks = _searchQuery.isEmpty
-                        ? decks
-                        : decks.where((d) =>
-                            d.title.toLowerCase().contains(_searchQuery) ||
-                            d.subject.toLowerCase().contains(_searchQuery)).toList();
+                  if (snapshot.hasData) {
+                   Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
+                  }
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total No. of\nDecks',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: dominantColor,
-                                height: 1.1,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Icon(Icons.style_outlined,
-                                    color: dominantColor, size: 35),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '${filteredDecks.length}', 
-                                  style: TextStyle(
-                                    fontSize: 55,
-                                    fontWeight: FontWeight.w900,
-                                    color: accentColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 25),
+                  final providerDecks = deckProvider.decks;
 
-                        // empty state
-                        if (filteredDecks.isEmpty)
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                decks.isEmpty
-                                    ? 'No decks yet.\nCreate one to start studying!'
-                                    : 'No decks found for "$_searchQuery"',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: dominantColor.withValues(alpha: 0.5), fontSize: 16),
-                              ),
-                            ),
-                          )
-                        else
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: filteredDecks.length,
-                              itemBuilder: (context, index) {
-                                final deck = filteredDecks[index];
-                                return GestureDetector(
-                                 onTap: () {
-                                    Provider.of<DeckProvider>(context, listen: false).selectDeck(deck);
-                                    Navigator.pushNamed(context, 'mode');
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    padding: const EdgeInsets.all(18),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(25),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.03),
-                                          blurRadius: 15,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: secondaryColor,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Icon(Icons.auto_awesome_motion,
-                                              color: dominantColor),
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                deck.title, 
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: dominantColor,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}',
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Icon(Icons.chevron_right,
-                                            color: dominantColor.withValues(alpha: 0.4)),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                  final filteredDecks = _searchQuery.isEmpty
+                      ? providerDecks
+                      : providerDecks.where((d) =>
+                          d.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                          d.subject.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+
+                  if (filteredDecks.isEmpty) {
+                    return Center(child: Text("No decks found"));
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header showing count of filtered results
+                      if (providerDecks.isNotEmpty) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total No. of\nDecks',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: dominantColor,
+                              height: 1.1,
                             ),
                           ),
+                          Row(
+                            children: [
+                              Icon(Icons.style_outlined, color: dominantColor, size: 35),
+                              const SizedBox(width: 10),
+                              Text(
+                                '${filteredDecks.length}', 
+                                style: TextStyle(
+                                  fontSize: 55,
+                                  fontWeight: FontWeight.w900,
+                                  color: accentColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 25),
                       ],
-                    );
-                  },
-                ),
+
+                      // List Logic
+                      if (filteredDecks.isEmpty)
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              _searchQuery.isEmpty
+                                  ? 'No decks yet.\nCreate one to start studying!'
+                                  : 'No decks found for "$_searchQuery"',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: dominantColor.withValues(alpha: 0.5), 
+                                fontSize: 16
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: filteredDecks.length,
+                            itemBuilder: (context, index) {
+                              final deck = filteredDecks[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  context.read<DeckProvider>().selectDeck(deck);
+                                  Navigator.pushNamed(context, 'mode');
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(25),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.03),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: secondaryColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(Icons.auto_awesome_motion, color: dominantColor),
+                                      ),
+                                      const SizedBox(width: 15),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              deck.title,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: dominantColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${deck.totalCards} ${deck.totalCards < 2 ? 'Flashcard' : 'Flashcards'}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(Icons.chevron_right, color: dominantColor.withValues(alpha: 0.4)),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
+            ),
             ],
           ),
         ),

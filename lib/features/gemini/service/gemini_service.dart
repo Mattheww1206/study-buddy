@@ -3,8 +3,7 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GeminiService {
-  final _model =
-      FirebaseAI.googleAI().generativeModel(model: 'gemini-2.5-flash-lite');
+  final _model = FirebaseAI.googleAI().generativeModel(model: 'gemini-2.5-flash-lite');
 
   // Check locally without burning a request
    static const _retryKey = 'gemini_retry_after';

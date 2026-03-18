@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
@@ -24,10 +25,12 @@ class _CreatePageState extends State<CreatePage> {
   final DeckService _deckService = DeckService();
 
   bool isEditMode = false;
+  bool isOnline = true;
   Set<String> selectedDecksIds = {};
   bool _isProcessing = false;
   late Stream<List<Deck>> _decksStream;
   bool _isStreamInitialized = false;
+  final Set<String> _pendingDeletedDeckIds = {};
 
   @override
   void didChangeDependencies() {
@@ -189,13 +192,14 @@ class _CreatePageState extends State<CreatePage> {
         isEditMode = false;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
 
   void _confirmDeleteSelected() async {
+    final isOnline = Provider.of<ConnectivityProvider>(context, listen: false).isOnline;
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -275,16 +279,30 @@ class _CreatePageState extends State<CreatePage> {
 
     if (confirm) {
       setState(() => _isProcessing = true);
+       final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
+       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+
       try {
         for (var id in selectedDecksIds) {
-          await _deckService.deleteDeck(id);
+          deckProvider.removeDecks(id);
+                _deckService.deleteDeck(id, userId: userId, isOnline: isOnline,);
         }
         setState(() {
           selectedDecksIds.clear();
           isEditMode = false;
         });
+        if(mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Moved to Recently Deleted.'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: colorDominant,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
       } catch (e) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to delete.')));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete.'), behavior: SnackBarBehavior.floating, backgroundColor: colorDominant, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),));
       } finally {
         if (mounted) setState(() => _isProcessing = false);
       }
@@ -299,6 +317,7 @@ class _CreatePageState extends State<CreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final deckProvider = context.watch<DeckProvider>();
     return Scaffold(
       backgroundColor: colorSecondary,
       floatingActionButton: StreamBuilder<List<Deck>>(
@@ -336,14 +355,17 @@ class _CreatePageState extends State<CreatePage> {
                     if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                       return Center(child: CircularProgressIndicator(color: colorDominant));
                     }
-                    final decks = snapshot.data ?? [];
-                    final sortedDecks = List<Deck>.from(decks);
-                    sortedDecks.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
 
-                    final filteredDecks = sortedDecks.where((deck) =>
-                      deck.title.toLowerCase().contains(_searchQuery) ||
-                      deck.subject.toLowerCase().contains(_searchQuery)).toList();
+                    if (snapshot.hasData) {
+                      Future.microtask(() => context.read<DeckProvider>().setDecks(snapshot.data!));
+                    }
 
+                    final providerDecks = deckProvider.decks;
+                    final filteredDecks = _searchQuery.isEmpty
+                    ? providerDecks
+                    : providerDecks.where((d) =>
+                        d.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                        d.subject.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
                     return SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       child: Column(
@@ -431,7 +453,28 @@ class _CreatePageState extends State<CreatePage> {
                             ],
                           ),
                           const SizedBox(height: 25),
-                          
+                         if (filteredDecks.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 220), // Space from the header
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    providerDecks.isEmpty
+                                        ? 'No decks yet.\nCreate one to start studying!'
+                                        : 'No decks found for "$_searchQuery"',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: colorDominant.withValues(alpha: 0.5),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          else
                           // --- UPDATED DYNAMIC DECK LIST ---
                           ...filteredDecks.map((deck) {
                             bool isSelected = selectedDecksIds.contains(deck.deckId);

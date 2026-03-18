@@ -12,7 +12,20 @@
           "package_name": "com.project.studybuddy"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "379381007222-gsr5thajgfkt9v4fe6utdjp44vf90jft.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.studybuddy",
+            "certificate_hash": "ce917a6c0731d598b29743c27ad898ea0398e002"
+          }
+        },
+        {
+          "client_id": "379381007222-3btople9e43n7e3evrvdqvhd5dj6ejmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCvbrSP0h7K3JV8S-VIjIzZUDwggxxdMa4"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "379381007222-3btople9e43n7e3evrvdqvhd5dj6ejmi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "379381007222-2lgglq8tdbai779bk99hq36ep2a2pd56.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.studybuddy"
+              }
+            }
+          ]
         }
       }
     }

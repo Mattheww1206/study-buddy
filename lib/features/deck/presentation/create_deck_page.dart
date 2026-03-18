@@ -19,6 +19,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   final _titleController = TextEditingController();
   final _subjectController = TextEditingController();
   bool _isLoading = false;
+  final Color colorDominant = const Color(0xFF665FBE);
 
   // List of card data
   List<Map<String, TextEditingController>> cardControllers = [
@@ -145,7 +146,12 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
   Future<void> _saveDeck() async {
     if (_titleController.text.trim().isEmpty || _subjectController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Title and Subject are required.")),
+             SnackBar(
+          content: Text("Title and Subject are required."),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: colorDominant,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
       return;
     }
@@ -154,7 +160,12 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       if (cardControllers[i]['term']!.text.trim().isEmpty ||
           cardControllers[i]['def']!.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Card ${i + 1} is missing a term or definition.")),
+          SnackBar(
+            content: Text("Card ${i + 1} is missing a term or definition."),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: colorDominant,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
         );
         return;
       }
@@ -180,7 +191,12 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         cards: cards
         ).catchError((e) => print('Error saving decks: $e'));
       messenger.showSnackBar(
-        SnackBar(content: Text('Deck Saved!', style: GoogleFonts.itim()))
+        SnackBar(
+          content: Text('Deck Saved!', style: GoogleFonts.itim()),
+           behavior: SnackBarBehavior.floating,
+           backgroundColor: colorDominant,
+           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        )
       );
       nav.pop();
 
@@ -196,7 +212,14 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
       ).catchError((e) => print('Achievement eval error: $e'));
 
     } catch (e) {
-      messenger.showSnackBar(const SnackBar(content: Text('Failed to save deck.')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to save deck.'),
+           behavior: SnackBarBehavior.floating,
+           backgroundColor: colorDominant,
+           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+         ),
+          );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

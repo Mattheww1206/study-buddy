@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/core/ConnectivityProvider.dart';
+import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/deck/service/deck_service.dart';
@@ -20,6 +22,8 @@ class _CreateViewPageState extends State<CreateViewPage> {
   List<Flashcard> _flashcards = [];
   bool _isLoading = true;
   bool _isSaving = false;
+  final Color colorDominant = const Color(0xFF665FBE);
+
 
   // State control para sa pag-edit ng Subject at Title sa itaas
   bool _isEditingDeckInfo = false;
@@ -69,7 +73,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load Flashcards.')),
+              SnackBar(
+                content: Text('Failed to load Flashcards.'),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: colorDominant,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
       );
     }
   }
@@ -87,6 +96,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
+        final isOnline = Provider.of<ConnectivityProvider>(context, listen: false).isOnline;
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           content: Column(
@@ -101,10 +111,13 @@ class _CreateViewPageState extends State<CreateViewPage> {
                 child: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent, size: 40),
               ),
               const SizedBox(height: 20),
-              const Text('Delete this card?',
+              const Text('Move card to trash?',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF665FBE))),
               const SizedBox(height: 10),
-              const Text('Are you sure you want to delete this card? This action cannot be undone.',
+                    Text(
+                isOnline
+                   ? 'This card will be moved to Recently Deleted. You can restore it within 30 days.'
+                   : 'You\'re offline. This card will be saved locally and synced to Recently Deleted when you reconnect.',
                   textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 14)),
               const SizedBox(height: 25),
               Row(
@@ -141,18 +154,48 @@ class _CreateViewPageState extends State<CreateViewPage> {
     );
 
     if (confirm == true) {
+      final userId = Provider.of<UserProvider>(context, listen: false).user?.userId ?? '';
+      final isOnline = Provider.of<ConnectivityProvider>(context, listen: false).isOnline;
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);  
       try {
+        deckProvider.removeFlashcard(cardId);
+
+        setState(() {
+          _flashcards.removeWhere((c) => c.cardId == cardId);
+        });
+        
         await _flashcardService.deleteFlashcard(
           deckId: _deck.deckId,
           cardId: cardId,
+          userId: userId,
+          isOnline: isOnline,
+          parentDeckTitle: _deck.title,
         );
         setState(() {
           _flashcards.removeWhere((c) => c.cardId == cardId);
         });
+         if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isOnline
+                  ? 'Card moved to Recently Deleted.'
+                  : 'Saved offline. Will sync when you reconnect.'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: colorDominant,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete card.')),
+          SnackBar(
+            content: Text('Failed to delete card.'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: colorDominant,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         );
       }
     }
@@ -178,7 +221,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update card.')));
+        SnackBar(
+          content: Text('Failed to update card.'),
+           behavior: SnackBarBehavior.floating,
+           backgroundColor: colorDominant,
+           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ));
     }
   }
 
@@ -186,8 +234,13 @@ class _CreateViewPageState extends State<CreateViewPage> {
     for (int i = 0; i < _newCards.length; i++) {
       if (_newCards[i]['def']!.text.trim().isEmpty ||
           _newCards[i]['term']!.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('New card ${i + 1} is missing a term or definition.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('New card ${i + 1} is missing a term or definition.'),
+             behavior: SnackBarBehavior.floating,
+             backgroundColor: colorDominant,
+             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ));
         return;
       }
     }
@@ -216,7 +269,12 @@ class _CreateViewPageState extends State<CreateViewPage> {
       }
 
       messenger.showSnackBar(
-        const SnackBar(content: Text('Deck updated Successfully.')),
+         SnackBar(
+          content: Text('Deck updated Successfully.'),
+           behavior: SnackBarBehavior.floating,
+           backgroundColor: colorDominant,
+           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
       );
       nav.pop();
     } catch (e) {

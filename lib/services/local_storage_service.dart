@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
+import 'package:studybuddy/features/recentlyDeleted/model/recently_deleted_model.dart';
 
 class LocalStorageService {
   static final LocalStorageService _instance = LocalStorageService._internal();
@@ -16,6 +17,11 @@ class LocalStorageService {
       await deckDir.create(recursive: true);
     }
     return File('${deckDir.path}/$deckId.json');
+  }
+
+  Future<File> _getPendingDeletionsFile() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    return File('${appDir.path}/pending_deletions.json');
   }
 
   // Saves flashcards locally
@@ -104,4 +110,111 @@ class LocalStorageService {
       print('LocalStorage: deleteDeckFile error: $e');
     }
   }
+
+  Future<List<RecentlyDeletedItem>> loadPendingDeletions() async {
+    try {
+      final file = await _getPendingDeletionsFile();
+      if (!await file.exists()) return [];
+      final content = await file.readAsString();
+      final List<dynamic> list = jsonDecode(content);
+      return list
+          .map((e) => RecentlyDeletedItem.fromLocalMap(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('LocalStorage: loadPendingDeletions error: $e');
+      return [];
+    }
+  }
+
+  Future<void> savePendingDeletion(RecentlyDeletedItem item) async {
+    try {
+      final existing = await loadPendingDeletions();
+      existing.removeWhere((e) => e.deletedId == item.deletedId);
+      existing.add(item);
+      await _writePendingDeletions(existing);
+      print('LocalStorage: queued pending deletion ${item.deletedId}');
+    } catch (e) {
+      print('LocalStorage: savePendingDeletion error: $e');
+    }
+  }
+
+  Future<void> removePendingDeletion(String deletedId) async {
+    try {
+      final existing = await loadPendingDeletions();
+      existing.removeWhere((e) => e.deletedId == deletedId);
+      await _writePendingDeletions(existing);
+      print('LocalStorage: removed pending deletion $deletedId');
+    } catch (e) {
+      print('LocalStorage: removePendingDeletion error: $e');
+    }
+  }
+
+  Future<void> clearPendingDeletions() async {
+    try {
+      await _writePendingDeletions([]);
+      print('LocalStorage: cleared all pending deletions');
+    } catch (e) {
+      print('LocalStorage: clearPendingDeletions error: $e');
+    }
+  }
+
+  Future<void> _writePendingDeletions(List<RecentlyDeletedItem> items) async {
+    final file = await _getPendingDeletionsFile();
+    final data = items.map((e) => e.toLocalMap()).toList();
+    await file.writeAsString(jsonEncode(data));
+  }
+
+  Future<File> _getPendingDeckFlashcardsFile(String localDeletedId) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final dir = Directory('${appDir.path}/pending_flashcards');
+    if (!await dir.exists()) await dir.create(recursive: true);
+    return File('${dir.path}/$localDeletedId.json');
+  }
+
+  Future<void> savePendingDeckFlashcards(
+      String localDeletedId, List<Flashcard> flashcards) async {
+    try {
+      final file = await _getPendingDeckFlashcardsFile(localDeletedId);
+      final data = flashcards.map((f) => {
+        'cardId': f.cardId,
+        'deckId': f.deckId,
+        'question': f.question,
+        'answer': f.answer,
+      }).toList();
+      await file.writeAsString(jsonEncode(data));
+    } catch (e) {
+      print('LocalStorage: savePendingDeckFlashcards error: $e');
+    }
+  }
+
+  Future<List<Flashcard>?> loadPendingDeckFlashcards(
+      String localDeletedId) async {
+    try {
+      final file = await _getPendingDeckFlashcardsFile(localDeletedId);
+      if (!await file.exists()) return null;
+      final content = await file.readAsString();
+      final List<dynamic> list = jsonDecode(content);
+      return list.map((f) => Flashcard(
+        cardId: f['cardId'],
+        deckId: f['deckId'],
+        question: f['question'],
+        answer: f['answer'],
+      )).toList();
+    } catch (e) {
+      print('LocalStorage: loadPendingDeckFlashcards error: $e');
+      return null;
+    }
+  }
+
+  Future<void> deletePendingDeckFlashcards(String localDeletedId) async {
+    try {
+      final file = await _getPendingDeckFlashcardsFile(localDeletedId);
+      if (await file.exists()) await file.delete();
+    } catch (e) {
+      print('LocalStorage: deletePendingDeckFlashcards error: $e');
+    }
+  }
+
+
+
 }
