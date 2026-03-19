@@ -45,10 +45,16 @@ class _FlashcardModePageState extends State<FlashcardModePage> {
   }
 
   Future<void> _loadFlashcards() async {
+    
     try {
+      print('=== LOADING FLASHCARDS ===');
+    print('deckId: ${_deck.deckId}');
      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+     print('calling deckProvider.loadFlashcards...');
     await deckProvider.loadFlashcards(_deck.deckId);
+    print('loadFlashcards done');
     final cards = List<Flashcard>.from(deckProvider.currentFlashcards);
+     print('cards count: ${cards.length}');
       cards.shuffle();
       setState(() {
         _flashcards = cards;

@@ -554,7 +554,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                               BoxShadow(color: actionOrange.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
                             ],
                           ),
-                          child: ValueListenableBuilder<TextEditingValue>( // ✅ moved inside child:
+                          child: ValueListenableBuilder<TextEditingValue>( 
                             valueListenable: _answerController,
                             builder: (context, value, child) {
                               final hasInput = value.text.trim().isNotEmpty;

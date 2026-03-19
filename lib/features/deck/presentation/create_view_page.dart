@@ -66,7 +66,7 @@ class _CreateViewPageState extends State<CreateViewPage> {
   Future<void> _loadFlashcards() async {
     try {
       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-      await deckProvider.loadFlashcards(_deck.deckId);
+         await deckProvider.loadFlashcards(_deck.deckId);
       final cards = deckProvider.currentFlashcards;
       if (mounted) {
         setState(() {

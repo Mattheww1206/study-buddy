@@ -65,8 +65,7 @@ class DeckService {
           .collection('decks')
           .doc(deckId)
           .collection('flashcards')
-          .snapshots()
-          .first;
+          .get(const GetOptions(source: Source.serverAndCache));
 
       final cards = snapshot.docs
           .map((doc) => Flashcard.fromMap(doc.id, doc.data()))
@@ -78,7 +77,7 @@ class DeckService {
         final remoteIds = cards.map((c) => c.cardId).toSet();
         if (localIds.length != remoteIds.length ||
             !localIds.containsAll(remoteIds)) {
-          await _localStorage.saveFlashcards(deckId, cards);
+            _localStorage.saveFlashcards(deckId, cards);
         }
         return cards;
       }
@@ -98,15 +97,6 @@ class DeckService {
     }
   }
 
-  // ─── Delete (Offline-Aware) ──────────────────────────────────────
-
-  /// Soft-deletes a deck.
-  ///
-  /// [isOnline] — pass `ConnectivityProvider.isConnected`.
-  ///
-  /// • Online  → snapshots to Firestore recentlyDeleted, then hard-deletes originals.
-  /// • Offline → saves to local pending queue, removes from local cache immediately
-  ///             so the deck disappears from the UI. Syncs to Firestore when back online.
   Future<void> deleteDeck(
     String deckId, {
     required String userId,
@@ -148,8 +138,7 @@ class DeckService {
         .collection('decks')
         .doc(deckId)
         .collection('generatedQuiz')
-        .snapshots()
-        .first;
+        .get();
 
     final batch = _firestore.batch();
     for (final doc in flashcardSnap.docs) {

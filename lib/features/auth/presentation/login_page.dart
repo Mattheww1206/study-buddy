@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
+import 'package:studybuddy/features/deck/provider/deck_provider.dart';
+import 'package:studybuddy/features/results/provider/result_provider.dart';
 import 'package:studybuddy/widgets/custom_button.dart';
 import 'package:studybuddy/widgets/custom_textfield.dart';
 
@@ -48,78 +50,79 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> signIn() async {
-    if (!_formKey.currentState!.validate()) return;
+ Future<void> signIn() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _emailError = null;
-      _passwordError = null;
-    });
+  setState(() {
+    _isLoading = true;
+    _emailError = null;
+    _passwordError = null;
+  });
 
-    try {
-      final user = await _authService.signInWithEmailOrUsername(
-        emailOrUsername: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+  try {
+    final user = await _authService.signInWithEmailOrUsername(
+      emailOrUsername: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      if (user != null) {
-        Provider.of<UserProvider>(context, listen: false).setUser(user);
-      }
-
-      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-    } catch (e) {
-      final error = e.toString().replaceFirst('Exception: ', '');
-      setState(() {
-        if (error.contains('No account found')) {
-          _emailError = error;
-          _passwordError = null;
-        } else if (error.contains('verify your email')) {
-          _emailError = error;
-          _passwordError = null;
-        } else if (error.contains('Incorrect email or password')) {
-          _passwordError = 'Incorrect email or password.';
-        }
-      });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    if (user != null) {
+      Provider.of<UserProvider>(context, listen: false).setUser(user);
     }
+
+    
+    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
+
+  } catch (e) {
+    final error = e.toString().replaceFirst('Exception: ', '');
+    setState(() {
+      if (error.contains('No account found')) {
+        _emailError = error;
+      } else if (error.contains('verify your email')) {
+        _emailError = error;
+      } else if (error.contains('Incorrect email or password')) {
+        _passwordError = 'Incorrect email or password.';
+      }
+    });
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   Future<void> signInWithGoogle() async {
-    setState(() {
-      _isLoading = true;
-      _emailError = null;
-      _passwordError = null;
-    });
+  setState(() {
+    _isLoading = true;
+    _emailError = null;
+    _passwordError = null;
+  });
 
-    try {
-      final gUser = await _authService.signInWithGoogle();
+  try {
+    final gUser = await _authService.signInWithGoogle();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      if (gUser != null) {
-        Provider.of<UserProvider>(context, listen: false).setUser(gUser);
-      }
-      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-    } catch (e) {
-      setState(() {
-        _emailError = e.toString().replaceFirst('Exception: ', '');
-      });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    if (gUser != null) {
+      Provider.of<UserProvider>(context, listen: false).setUser(gUser);
+
+      
+      Provider.of<DeckProvider>(context, listen: false)
+          .listenToDecks(gUser.userId);
+      Provider.of<ResultProvider>(context, listen: false)
+          .loadResults(gUser.userId);
     }
+
+   
+    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
+
+  } catch (e) {
+    setState(() {
+      _emailError = e.toString().replaceFirst('Exception: ', '');
+    });
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   Future<void> showForgotPasswordDialog() async {
     final emailController = TextEditingController();

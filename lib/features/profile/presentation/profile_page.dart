@@ -62,11 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadResultsThenAchievements() async {
   final resultProvider = Provider.of<ResultProvider>(context, listen: false);
-
-  // ✅ Await the results load so data is ready before achievements run
   await resultProvider.loadResults(_userId!);
-
-  // Now load achievements with fresh data
   await _loadAchievements();
 }
 

@@ -75,28 +75,33 @@ void initState() {
     );
   }
 
-  Future<void> _loadUser(BuildContext context, String uid) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (userProvider.user != null) return;
+ Future<void> _loadUser(BuildContext context, String uid) async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+  final resultProvider = Provider.of<ResultProvider>(context, listen: false);
 
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
+  // ✅ Always start listeners — even if user already set
+   Future.microtask(() {
+    deckProvider.listenToDecks(uid);
+    resultProvider.loadResults(uid);
+  });
+  if (userProvider.user != null) return; // user data already loaded
 
-    if (doc.exists) {
-      final data = doc.data() as Map<String, dynamic>;
-      userProvider.setUser(AppUser(
-        userId: uid,
-        username: data['username'],
-        email: data['email'],
-        provider: data['provider'] ?? 'password',
-        photoUrl: data['photoUrl'],
-      ));
+  final doc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .get();
 
-      Provider.of<DeckProvider>(context, listen: false).listenToDecks(uid);
-      Provider.of<ResultProvider>(context, listen: false).loadResults(uid);
-    }
+  if (doc.exists) {
+    final data = doc.data() as Map<String, dynamic>;
+    userProvider.setUser(AppUser(
+      userId: uid,
+      username: data['username'],
+      email: data['email'],
+      provider: data['provider'] ?? 'password',
+      photoUrl: data['photoUrl'],
+    ));
   }
+}
   
 }
