@@ -258,7 +258,7 @@ class GeminiService {
         """
 
         Rules:
-        - Generate as many flashcards pairs as the content warrants (minimum 5, maximum 20).
+        - Generate as many flashcards pairs as the content warrants.
         - Each question should test understanding of a key concept from the text.
         - Each answer should be concise and clear.
         - Also determine a suitable deck title and subject based on the content.

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
-import 'package:studybuddy/services/notification_service.dart';
 
 class StreakService {
 
@@ -39,7 +38,6 @@ class StreakService {
       // Only cancel reminders if the user actually studied today
       final studiedToday = dates.contains(today);
       if (streak > 0 && studiedToday) {
-        await StreakNotificationService.instance.cancelUpcomingRemindersForToday();
       }
     }
 

@@ -19,7 +19,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final ResultService _resultService = ResultService();
   final AchievementService _achievementService = AchievementService();
   List<Achievement> _achievements = [];
   bool _isLoading = true;

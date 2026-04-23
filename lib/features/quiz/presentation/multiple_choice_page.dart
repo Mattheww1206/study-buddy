@@ -5,7 +5,6 @@ import 'package:studybuddy/features/Achievements/services/achievement_service.da
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/quiz/service/quiz_service.dart';
 import 'package:studybuddy/features/results/model/study_result.dart';
@@ -40,8 +39,7 @@ class _MultipleChoicePageState extends State<MultipleChoicePage> {
 
   // NEW COLOR PALETTE APPLIED
   static const Color primaryColor = Color(0xFF1976D2);   
-  static const Color secondaryColor = Color(0xFFE3F2FD); 
-  static const Color accentColor = Color(0xFF2196F3);    
+  static const Color secondaryColor = Color(0xFFE3F2FD);     
   static const Color actionblue = Color(0xFF00B0FF); 
 
   @override

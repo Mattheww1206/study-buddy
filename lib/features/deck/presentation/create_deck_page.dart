@@ -190,7 +190,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
           title: _titleController.text.trim(),
           subject: _subjectController.text.trim(),
           cards: cards
-      ).catchError((e) => print('Error saving decks: $e'));
+      );
 
       messenger.showSnackBar(
           SnackBar(
@@ -211,7 +211,7 @@ class _CreateDeckPageState extends State<CreateDeckPage> {
         results: results,
         decks: decks,
         streak: streak,
-      ).catchError((e) => print('Achievement eval error: $e'));
+      );
 
     } catch (e) {
       messenger.showSnackBar(

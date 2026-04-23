@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:studybuddy/services/notification_service.dart';
 import 'package:studybuddy/widgets/custom_button.dart';
 
 

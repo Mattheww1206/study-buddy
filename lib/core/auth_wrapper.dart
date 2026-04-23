@@ -9,7 +9,6 @@ import 'package:studybuddy/features/auth/presentation/opening_page.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
 import 'package:studybuddy/features/results/provider/result_provider.dart';
-import 'package:studybuddy/services/notification_service.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
@@ -26,22 +25,12 @@ void initState() {
   super.initState();
   Future.delayed(const Duration(seconds: 3), () {
     if (mounted) {
-      setState(() => _showSplash = false);
-      _scheduleReminders(); // ← now inside mounted check ✅
+      setState(() => _showSplash = false); 
     }
   });
 }
 
 
-  Future<void> _scheduleReminders() async {
-  try {
-    await StreakNotificationService.instance.scheduleAllReminders();
-    debugPrint('Reminders scheduled ✅');
-  } catch (e) {
-    debugPrint('Failed to schedule reminders: $e');
-    // Don't crash the app — notifications are non-critical
-  }
-}
 
   @override
   Widget build(BuildContext context) {

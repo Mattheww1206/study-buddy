@@ -30,7 +30,6 @@ class _StudyPageState extends State<StudyPage> {
   @override
   Widget build(BuildContext context) {
     final userId = Provider.of<UserProvider>(context, listen: false).user?.userId;
-    final deckProvider = context.watch<DeckProvider>();
 
     if (userId == null) {
       return Scaffold(

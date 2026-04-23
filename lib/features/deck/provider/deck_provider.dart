@@ -8,7 +8,6 @@ import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 class DeckProvider extends ChangeNotifier {
   final DeckService _deckService = DeckService();
 
-  // ─── Internal State ──────────────────────────────────────────────
   List<Deck> _decks = [];
   Deck? _selectedDeck;
   List<Flashcard> _currentFlashcards = [];
@@ -136,10 +135,6 @@ class DeckProvider extends ChangeNotifier {
 
   void setDecks(List<Deck> incomingDecks) {
   _decks = incomingDecks.map((incoming) {
-    final existing = _decks.firstWhere(
-      (d) => d.deckId == incoming.deckId,
-      orElse: () => incoming,
-    );
     if (_pendingDeletions.contains(incoming.deckId)) return incoming;
     return incoming;
   }).toList();
@@ -150,7 +145,7 @@ class DeckProvider extends ChangeNotifier {
 
   void addDeck(Deck deck) {
   _decks.insert(0, deck);
-  _sortDecks(); // ✅
+  _sortDecks(); 
   notifyListeners();
 }
 
@@ -163,7 +158,7 @@ void updateDecks(Deck updatedDeck) {
     if (_selectedDeck?.deckId == updatedDeck.deckId) {
       _selectedDeck = updatedDeck;
     }
-    _sortDecks(); // ✅
+    _sortDecks(); 
     notifyListeners();
   }
 }

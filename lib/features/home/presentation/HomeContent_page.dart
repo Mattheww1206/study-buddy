@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/results/provider/result_provider.dart';
 
 class HomeContentPage extends StatefulWidget {

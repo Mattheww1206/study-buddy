@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'dart:convert';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:studybuddy/features/auth/service/auth_service.dart';
 import 'package:studybuddy/features/profile/service/profile_service.dart';
 

@@ -4,7 +4,6 @@ import 'package:studybuddy/core/ConnectivityProvider.dart';
 import 'package:studybuddy/features/auth/provider/user_provider.dart';
 import 'package:studybuddy/features/deck/model/deck_model.dart';
 import 'package:studybuddy/features/deck/provider/deck_provider.dart';
-import 'package:studybuddy/features/deck/service/deck_service.dart';
 import 'package:studybuddy/features/flashcards/model/flashcard_model.dart';
 import 'package:studybuddy/features/flashcards/service/flashcard_service.dart';
 
